@@ -92,9 +92,7 @@
 import { ref } from 'vue'
 import { useSidebar } from '@/composables/useSidebar'
 import ThemeToggler from '../common/ThemeToggler.vue'
-import SearchBar from './header/SearchBar.vue'
 import HeaderLogo from './header/HeaderLogo.vue'
-import dark:bg-white/3 from './header/dark:bg-white/3.vue'
 import UserMenu from './header/UserMenu.vue'
 
 const { toggleSidebar, toggleMobileSidebar, isMobileOpen } = useSidebar()
