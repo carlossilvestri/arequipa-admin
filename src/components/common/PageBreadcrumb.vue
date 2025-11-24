@@ -1,8 +1,6 @@
 <template>
   <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-white/90" x-text="pageTitle">
-      {{ pageTitle }}
-    </h2>
+    <go-back />
     <nav>
       <ol class="flex items-center gap-1.5">
         <li>
@@ -10,7 +8,7 @@
             class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400"
             to="/"
           >
-            Home
+            Inicio
             <svg
               class="stroke-current"
               width="17"
@@ -39,7 +37,7 @@
 
 <script setup lang="ts">
 import { defineProps } from 'vue'
-
+import GoBack from '@/components/common/custom/GoBack.vue'
 interface BreadcrumbProps {
   pageTitle: string
 }

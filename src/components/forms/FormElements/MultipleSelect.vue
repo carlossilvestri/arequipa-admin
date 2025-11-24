@@ -76,7 +76,7 @@
             :key="item.value"
             @click="toggleItem(item)"
             class="relative flex items-center w-full px-3 py-2 border-transparent cursor-pointer first:rounded-t-lg last:rounded-b-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
-            :class="{ 'bg-gray-50 dark:bg-white/[0.03]': isSelected(item) }"
+            :class="{ 'bg-gray-50 dark:bg-white/3': isSelected(item) }"
             role="option"
             :aria-selected="isSelected(item)"
           >

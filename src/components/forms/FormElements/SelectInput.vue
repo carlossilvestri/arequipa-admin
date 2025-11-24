@@ -44,11 +44,6 @@
         </span>
       </div>
     </div>
-
-    <!-- Multiple Select Input -->
-    <div>
-      <MultipleSelect v-model="selectedItems" :options="optionss" class="w-full" />
-    </div>
   </div>
 </template>
 

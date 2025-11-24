@@ -167,7 +167,6 @@
           </div>
         </div>
       </nav>
-      <SidebarWidget v-if="isExpanded || isHovered || isMobileOpen" />
     </div>
   </aside>
 </template>
@@ -203,6 +202,7 @@ const menuGroups = [
   {
     title: 'Menu',
     items: [
+      /*
       {
         icon: GridIcon,
         name: 'Dashboard',
@@ -237,8 +237,15 @@ const menuGroups = [
           { name: '404 Page', path: '/error-404', pro: false },
         ],
       },
+      */
+      {
+        name: 'Unidades de medida',
+        icon: ListIcon,
+        path: '/units-of-measure',
+      },
     ],
   },
+  /*
   {
     title: 'Others',
     items: [
@@ -273,6 +280,7 @@ const menuGroups = [
       // ... Add other menu items here
     ],
   },
+  */
 ]
 
 const isActive = (path) => route.path === path

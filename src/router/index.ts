@@ -140,12 +140,29 @@ const router = createRouter({
         title: 'Signup',
       },
     },
+    /* New custom modules */
+    {
+      path: '/units-of-measure',
+      name: 'Units of Measure',
+      component: () => import('../views/UnitOfMeasure/Table.vue'),
+      meta: {
+        title: 'Units of Measure',
+      },
+    },
+    {
+      path: '/units-of-measure/:id',
+      name: 'UnitOfMeasureEdit',
+      component: () => import('../views/UnitOfMeasure/:id/Index.vue'),
+      meta: {
+        title: 'Units of Measure',
+      },
+    },
   ],
 })
 
 export default router
 
 router.beforeEach((to, from, next) => {
-  document.title = `Vue.js ${to.meta.title} | TailAdmin - Vue.js Tailwind CSS Dashboard Template`
+  document.title = `${to.meta.title}`
   next()
 })

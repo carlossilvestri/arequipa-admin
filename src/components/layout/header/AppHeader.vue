@@ -79,7 +79,7 @@
         <div class="flex items-center gap-2 2xsm:gap-3">
           <ThemeToggler />
           <!--
-          <NotificationMenu />
+          <dark:bg-white/3 />
           -->
         </div>
         <UserMenu />
@@ -94,7 +94,7 @@ import { useSidebar } from '@/composables/useSidebar'
 import ThemeToggler from '../common/ThemeToggler.vue'
 import SearchBar from './header/SearchBar.vue'
 import HeaderLogo from './header/HeaderLogo.vue'
-import NotificationMenu from './header/NotificationMenu.vue'
+import dark:bg-white/3 from './header/dark:bg-white/3.vue'
 import UserMenu from './header/UserMenu.vue'
 
 const { toggleSidebar, toggleMobileSidebar, isMobileOpen } = useSidebar()
