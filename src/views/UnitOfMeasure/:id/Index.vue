@@ -2,12 +2,12 @@
   <AdminLayout>
     <PageBreadcrumb :pageTitle="currentPageTitle" />
     <div class="space-y-5 sm:space-y-6">
-      <ComponentCard title="Editar Unidad de Medida">
+      <ComponentCard :title="currentPageTitle">
         <Form
           :validation-schema="schema"
           class="space-y-4 sm:space-y-5"
           :initial-values="form"
-          @submit.prevent="save"
+          @submit="save"
         >
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
@@ -61,10 +61,18 @@
               </template>
             </custom-input>
           </div>
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <custom-input v-model="form.date" label="Fecha" name="date" type="date" />
+            </div>
+            <div>
+              <custom-input v-model="form.time" label="Hora" name="time" type="time" />
+            </div>
+          </div>
 
           <div class="flex items-center justify-end gap-3">
             <Button variant="outline" @click="cancel">Cancelar</Button>
-            <Button type="submit" @click="submit">Guardar</Button>
+            <Button type="submit">Guardar</Button>
           </div>
         </Form>
       </ComponentCard>
@@ -72,10 +80,11 @@
   </AdminLayout>
 </template>
 
-<script setup>
-import { Form } from 'vee-validate'
+<script setup lang="ts">
+import { Form, useForm } from 'vee-validate'
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useNotificationStore } from '@/stores/notification'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import PageBreadcrumb from '@/components/common/PageBreadcrumb.vue'
 import ComponentCard from '@/components/common/ComponentCard.vue'
@@ -85,22 +94,22 @@ import { object, string, number, array } from 'yup'
 import CustomInput from '@/components/common/custom/CustomInput.vue'
 import MultipleSelect from '@/components/forms/FormElements/MultipleSelect.vue'
 
-const currentPageTitle = ref('Editar Unidad de Medida')
+const currentPageTitle = ref('Editar Unidades de Medida')
 const route = useRoute()
 const router = useRouter()
-
+const notifications = useNotificationStore()
 const schema = object().shape({
-  name: string().required('Valor requerido').min(6),
-  description: string().required('Valor requerido'),
-  status: string().required('Valor requerido'),
-  quantity: number('El valor debe ser un número')
-    .transform((value) => (Number.isNaN(value) ? null : value))
-    .required('Valor requerido'),
-  quantity2: number('El valor debe ser un número')
-    .transform((value) => (Number.isNaN(value) ? null : value))
-    .integer('El valor no debe tener decimales')
-    .required('Valor requerido'),
-  selectedItems: array().min(1, 'Valor requerido').required('Valor requerido'),
+  name: string().required('Valor requerido').min(1),
+  //description: string().required('Valor requerido'),
+  //status: string().required('Valor requerido'),
+  //quantity: number('El valor debe ser un número')
+  //.transform((value) => (Number.isNaN(value) ? null : value))
+  //.required('Valor requerido'),
+  //quantity2: number('El valor debe ser un número'),
+  //.transform((value) => (Number.isNaN(value) ? null : value))
+  //.integer('El valor no debe tener decimales')
+  //.required('Valor requerido'),
+  //selectedItems: array().min(1, 'Valor requerido').required('Valor requerido'),
 })
 
 const form = ref({
@@ -110,7 +119,13 @@ const form = ref({
   status: 'Active',
   quantity: null,
   quantity2: null,
+  date: null,
+  time: null,
   selectedItems: [],
+})
+
+const { resetForm } = useForm({
+  initialValues: form.value, // Opcional: establece los valores iniciales
 })
 
 const options = [
@@ -125,10 +140,17 @@ const options = [
 onMounted(() => {
   const id = route.params.id
   form.value.id = id
+  if (id && id !== 'new') {
+    currentPageTitle.value = 'Editar unidades de Medida'
+  } else {
+    currentPageTitle.value = 'Nuevas unidades de Medida'
+    resetForm()
+  }
 })
 
-function save() {
-  if (!numericValid.value) return
+function save(values: any) {
+  // ...persist your data here
+  notifications.success('El registro fue grabado con éxito.')
   router.push('/units-of-measure')
 }
 

@@ -4,11 +4,9 @@
     <div
       class="relative w-full max-w-md rounded-xl border border-gray-200 bg-white p-5 shadow-xl dark:border-gray-800 dark:bg-gray-900"
     >
-      <h3 class="mb-2 text-lg font-semibold text-gray-800 dark:text-white/90">
-        Confirmar eliminación
-      </h3>
+      <h3 class="mb-2 text-lg font-semibold text-gray-800 dark:text-white/90">Confirmar</h3>
       <p class="mb-5 text-sm text-gray-600 dark:text-white/70">
-        ¿Estás seguro de que deseas eliminar esta unidad de medida?
+        ¿Estás seguro de que deseas eliminar el registro?
       </p>
       <div class="flex justify-end gap-3">
         <button
@@ -21,7 +19,7 @@
           class="inline-flex items-center rounded-lg bg-error-600 px-4 py-2 text-sm text-white hover:bg-error-700"
           @click="confirmYes"
         >
-          Sí, eliminar
+          Sí
         </button>
       </div>
     </div>

@@ -37,6 +37,7 @@
       </footer>
       -->
     </div>
+    <NotificationContainer />
   </div>
 </template>
 
@@ -45,5 +46,6 @@ import { useSidebar } from '@/composables/useSidebar'
 import AppHeader from './AppHeader.vue'
 import AppSidebar from './AppSidebar.vue'
 import Backdrop from './Backdrop.vue'
+import NotificationContainer from '@/components/common/custom/NotificationContainer.vue'
 const { isExpanded, isHovered } = useSidebar()
 </script>

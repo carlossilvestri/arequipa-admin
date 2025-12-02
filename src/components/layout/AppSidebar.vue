@@ -243,6 +243,31 @@ const menuGroups = [
         icon: ListIcon,
         path: '/units-of-measure',
       },
+      {
+        name: 'Frecuencias de medición',
+        icon: ListIcon,
+        path: '/frecuencies-of-measurement',
+      },
+      {
+        name: 'Ámbitos geográficos',
+        icon: ListIcon,
+        path: '/geographic-scopes',
+      },
+      {
+        name: 'Categorías',
+        icon: ListIcon,
+        path: '/categories',
+      },
+      {
+        name: 'Subcategorías',
+        icon: ListIcon,
+        path: '/subcategories',
+      },
+      {
+        name: 'Indicadores',
+        icon: ListIcon,
+        path: '/indicators',
+      },
     ],
   },
   /*

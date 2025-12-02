@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
-    <go-back />
+    <span></span>
     <nav>
       <ol class="flex items-center gap-1.5">
         <li>
