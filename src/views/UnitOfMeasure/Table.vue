@@ -86,7 +86,7 @@ const mockInfoTable = ref({
       key: 'actions',
       label: 'Acciones',
       type: 'actions',
-      thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
+      thClass: 'px-5 py-3 text-left w-2/11 sm:px-6 text-right',
     },
   ],
   rows: [
