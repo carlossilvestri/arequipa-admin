@@ -7,6 +7,12 @@ const router = createRouter({
   },
   routes: [
     {
+      path: '/one-page',
+      name: 'OnePage',
+      component: () => import('../views/OnePage.vue'),
+      meta: { title: 'One Page' },
+    },
+    {
       path: '/',
       name: 'Ecommerce',
       component: () => import('../views/Ecommerce.vue'),

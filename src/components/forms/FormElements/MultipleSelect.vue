@@ -5,7 +5,7 @@
       class="dark:bg-dark-900 h-11 flex items-center w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
       :class="{ 'text-gray-800 dark:text-white/90': isOpen }"
     >
-      <span v-if="selectedItems.length === 0" class="text-gray-400"> Select items... </span>
+      <span v-if="selectedItems.length === 0" class="text-gray-400"> Seleccionar... </span>
       <div class="flex flex-wrap items-center flex-auto gap-2">
         <div
           v-for="item in selectedItems"
