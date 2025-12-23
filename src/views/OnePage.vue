@@ -68,7 +68,7 @@
         <MultipleSelect v-model="form.selectedItems" :options="options" class="w-full" />
       </div>
       <div class="grid">
-        <MonthlySale />
+        <MultiChartDashboard />
 
         <div class="flex justify-end">
           <Button class-name="m-2 p-2">Exportar</Button>
@@ -101,6 +101,7 @@
 <script setup lang="ts">
 // Reutilizamos el componente existente
 import MonthlySale from '@/components/ecommerce/MonthlySale.vue'
+import MultiChartDashboard from '@/components/charts/MultiChartDashboard.vue'
 import MultipleSelect from '@/components/forms/FormElements/MultipleSelect.vue'
 import { ref } from 'vue'
 import banner from '@/assets/img/banners/banner-01.jpg'
