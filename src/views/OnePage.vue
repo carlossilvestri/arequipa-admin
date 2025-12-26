@@ -14,6 +14,12 @@
           width="150"
           height="40"
         />
+        <img
+          class="filter brightness-0 invert"
+          src="@/assets/img/logos/logo-ipe-arequipa.svg"
+          alt="Logo"
+          width="150"
+        />
         <ul class="flex items-center gap-3">
           <li>
             <a

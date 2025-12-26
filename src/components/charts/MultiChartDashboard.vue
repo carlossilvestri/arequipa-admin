@@ -146,35 +146,6 @@
       />
     </div>
 
-    <!-- Filtros de series (solo mostrar si no es pie) -->
-    <div v-if="currentChartType !== 'pie'" class="bg-white rounded-xl shadow-sm p-4 mb-6">
-      <h3 class="text-lg font-semibold text-gray-800 mb-4">Mostrar/Ocultar Series</h3>
-      <div class="flex flex-wrap gap-3">
-        <div
-          v-for="(series, index) in series"
-          :key="series.name"
-          class="flex items-center space-x-2"
-        >
-          <input
-            type="checkbox"
-            :id="`series-${index}`"
-            v-model="visibleSeries[index]"
-            class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-          />
-          <label :for="`series-${index}`" class="flex items-center space-x-2 cursor-pointer">
-            <span
-              class="w-3 h-3 rounded-full"
-              :style="{ backgroundColor: seriesColor(index) }"
-            ></span>
-            <span class="text-sm text-gray-700">{{ series.name }}</span>
-            <span class="text-xs text-gray-500"
-              >(Total: ${{ seriesTotal(series.data).toLocaleString() }})</span
-            >
-          </label>
-        </div>
-      </div>
-    </div>
-
     <!-- Filtro de fecha y controles adicionales -->
     <div class="bg-white rounded-xl shadow-sm p-4">
       <div class="flex flex-wrap items-center justify-between gap-4">
@@ -448,7 +419,7 @@ const chartOptions = computed(() => ({
   },
   colors: series.value.map((_, index) => seriesColor(index)),
   dataLabels: {
-    enabled: currentChartType.value === 'bar' || currentChartType.value === 'radar',
+    enabled: currentChartType.value === 'radar',
   },
   stroke: {
     curve: currentChartType.value === 'line' ? 'smooth' : 'straight',
@@ -541,6 +512,39 @@ const chartOptions = computed(() => ({
 // Funciones
 const changeChartType = (type) => {
   currentChartType.value = type
+  if (type === 'bar') {
+    series.value = [
+      {
+        name: 'Ventas',
+        data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 110, 95, 120],
+      },
+      {
+        name: 'Gastos',
+        type: 'line',
+        data: [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75],
+      },
+      {
+        name: 'Beneficios',
+        type: 'area',
+        data: [10, 15, 5, 15, 9, 15, 20, 36, 65, 45, 25, 45],
+      },
+    ]
+  } else {
+    series.value = [
+      {
+        name: 'Ventas',
+        data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 110, 95, 120],
+      },
+      {
+        name: 'Gastos',
+        data: [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75],
+      },
+      {
+        name: 'Beneficios',
+        data: [10, 15, 5, 15, 9, 15, 20, 36, 65, 45, 25, 45],
+      },
+    ]
+  }
   chartKey.value++ // Forzar re-render
 }
 
