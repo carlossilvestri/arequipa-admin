@@ -11,11 +11,12 @@ import App from './App.vue'
 import router from './router'
 import VueApexCharts from 'vue3-apexcharts'
 import { createPinia } from 'pinia' // Import createPinia
-
+import axiosPlugin from './plugins/axios'
 const app = createApp(App)
 
 app.use(router)
 app.use(createPinia())
 app.use(VueApexCharts)
+app.use(axiosPlugin)
 
 app.mount('#app')

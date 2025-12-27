@@ -163,6 +163,14 @@ const router = createRouter({
         title: 'Unidades de Medida',
       },
     },
+    {
+      path: '/users',
+      name: 'Usuarios',
+      component: () => import('../views/Pages/Users/Index.vue'),
+      meta: {
+        title: 'Usuarios',
+      },
+    },
   ],
 })
 
