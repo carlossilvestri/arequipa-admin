@@ -1,18 +1,19 @@
 import { axiosInstance } from '@/plugins/axios'
 import type {
   BOResultadoLogicaNegocio,
-  BOUsuario,
+  BOUnidadMedida,
   CreateUserRequest,
   DeleteByIdRequest,
-  FilterBOUsuario,
+  FilterBOUnidadMedida,
   LoginRequest,
   UpdateUserRequest,
 } from '@/interfaces'
 import { useNotificationStore } from '@/stores/notification'
-import { useUserStore } from '@/stores/user'
+import { useUnitMeasureStore } from '@/stores/unitMeasure'
 
 const notifications = useNotificationStore()
-const userStore = useUserStore()
+const unitMeasureStore = useUnitMeasureStore()
+const name = 'Unidad de medida'
 
 const handleShowError = (error: any) => {
   console.error(error)
@@ -20,16 +21,19 @@ const handleShowError = (error: any) => {
 }
 
 /**
- * Get users.
- * @Param filter: FilterBOUsuario. The object you want to filter.
- * @Return Promise<BOUsuario[]>
+ * Get unit measures.
+ * @Param filter: FilterBOUnidadMedida. The object you want to filter.
+ * @Return Promise<BOUnidadMedida[]>
  */
-export async function getUsers(filter: FilterBOUsuario): Promise<BOUsuario[]> {
+export async function getUnitMeasures(filter: FilterBOUnidadMedida): Promise<BOUnidadMedida[]> {
   try {
-    const { data } = await axiosInstance.get<BOUsuario[]>('/api/Usuario/LeerPorCriterio', {
-      params: filter,
-    })
-    userStore.saveUsersOnStore(data)
+    const { data } = await axiosInstance.get<BOUnidadMedida[]>(
+      '/api/UnidadMedida/LeerPorCriterio',
+      {
+        params: filter,
+      },
+    )
+    unitMeasureStore.saveUnitMeasuresOnStore(data)
     return data
   } catch (error) {
     console.error(error)
@@ -39,25 +43,25 @@ export async function getUsers(filter: FilterBOUsuario): Promise<BOUsuario[]> {
 }
 
 /**
- * Create user.
+ * Create unit measure.
  * @Param userData: CreateUserRequest.
- * @Return Promise<BOResultadoLogicaNegocio<BOUsuario>>
+ * @Return Promise<BOResultadoLogicaNegocio<BOUnidadMedida>>
  */
-export async function createUser(
+export async function createUnitMeasure(
   userData: CreateUserRequest,
-): Promise<BOResultadoLogicaNegocio<BOUsuario>> {
+): Promise<BOResultadoLogicaNegocio<BOUnidadMedida>> {
   try {
-    const { data } = await axiosInstance.post<BOResultadoLogicaNegocio<BOUsuario>>(
-      '/api/Usuario/Grabar',
+    const { data } = await axiosInstance.post<BOResultadoLogicaNegocio<BOUnidadMedida>>(
+      '/api/UnidadMedida/Grabar',
       null,
       {
         params: userData,
       },
     )
     if (data?.exito) {
-      notifications.success('El usuario fue creado con éxito.')
+      notifications.success(`${name} fue creado con éxito.`)
     } else {
-      const errorMsg = data.errores || 'Error al crear el usuario'
+      const errorMsg = data.errores || `Error al crear el ${name}`
       notifications.error(errorMsg)
     }
     return data
@@ -71,23 +75,23 @@ export async function createUser(
 /**
  * Update user.
  * @Param userData: UpdateUserRequest.
- * @Return Promise<BOResultadoLogicaNegocio<BOUsuario>>
+ * @Return Promise<BOResultadoLogicaNegocio<BOUnidadMedida>>
  */
 export async function updateUser(
   userData: UpdateUserRequest,
-): Promise<BOResultadoLogicaNegocio<BOUsuario>> {
+): Promise<BOResultadoLogicaNegocio<BOUnidadMedida>> {
   try {
-    const { data } = await axiosInstance.post<BOResultadoLogicaNegocio<BOUsuario>>(
-      '/api/Usuario/Editar',
+    const { data } = await axiosInstance.post<BOResultadoLogicaNegocio<BOUnidadMedida>>(
+      '/api/UnidadMedida/Editar',
       null,
       {
         params: userData,
       },
     )
     if (data?.exito) {
-      notifications.success('El usuario fue actualizado con éxito.')
+      notifications.success(`${name} fue actualizado con éxito.`)
     } else {
-      const errorMsg = data.errores || 'Error al actualizar el usuario'
+      const errorMsg = data.errores || `Error al actualizar el ${name}`
       notifications.error(errorMsg)
     }
 
@@ -104,17 +108,23 @@ export async function updateUser(
  * @Param deleteById: DeleteByIdRequest.
  * @Return Promise<BOResultadoLogicaNegocio<null>>
  */
-export async function deleteUser(
+export async function deleteUnitMeasure(
   deleteById: DeleteByIdRequest,
 ): Promise<BOResultadoLogicaNegocio<null>> {
   try {
     const { data } = await axiosInstance.post<BOResultadoLogicaNegocio<null>>(
-      '/api/Usuario/Eliminar',
+      '/api/UnidadMedida/Eliminar',
       null,
       {
         params: deleteById,
       },
     )
+    if (data?.exito) {
+      notifications.success(`${name} fue eliminado con éxito.`)
+    } else {
+      const errorMsg = data.errores || `Error al eliminar el ${name}`
+      notifications.error(errorMsg)
+    }
     return data
   } catch (error) {
     console.error(error)
@@ -126,36 +136,15 @@ export async function deleteUser(
 /**
  * Get user by id.
  * @Param id: number.
- * @Return Promise<BOResultadoLogicaNegocio<BOUsuario>>
+ * @Return Promise<BOResultadoLogicaNegocio<BOUnidadMedida>>
  */
-export async function getUserById(id: number): Promise<BOResultadoLogicaNegocio<BOUsuario>> {
+export async function getUnitMeasureById(
+  id: number,
+): Promise<BOResultadoLogicaNegocio<BOUnidadMedida>> {
   try {
-    const { data } = await axiosInstance.get<BOResultadoLogicaNegocio<BOUsuario>>(
-      `/api/Usuario/LeerPorId?id=${id}`,
+    const { data } = await axiosInstance.get<BOResultadoLogicaNegocio<BOUnidadMedida>>(
+      `/api/UnidadMedida/LeerPorId?id=${id}`,
     )
-    return data
-  } catch (error) {
-    console.error(error)
-    handleShowError(error)
-    throw error
-  }
-}
-
-/**
- * Login.
- * @Param id: number.
- * @Return Promise<BOResultadoLogicaNegocio<BOUsuario>>
- */
-export async function login(loginData: LoginRequest): Promise<BOResultadoLogicaNegocio<BOUsuario>> {
-  try {
-    const { data } = await axiosInstance.get<BOResultadoLogicaNegocio<BOUsuario>>(
-      '/api/Usuario/Login',
-      {
-        params: loginData,
-      },
-    )
-
-    userStore.saveLoggedUserOnStore(data.objeto)
     return data
   } catch (error) {
     console.error(error)
@@ -165,9 +154,9 @@ export async function login(loginData: LoginRequest): Promise<BOResultadoLogicaN
 }
 
 export default {
-  getUsers,
-  createUser,
+  getUnitMeasures,
+  createUnitMeasure,
   updateUser,
-  deleteUser,
-  getUserById,
+  deleteUnitMeasure,
+  getUnitMeasureById,
 }
