@@ -249,9 +249,9 @@ const menuGroups = [
         path: '/units-of-measure',
       },
       {
-        name: 'Frecuencias de medición',
+        name: 'Grupos',
         icon: ListIcon,
-        path: '/frecuencies-of-measurement',
+        path: '/groups',
       },
       {
         name: 'Ámbitos geográficos',

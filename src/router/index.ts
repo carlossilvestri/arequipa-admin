@@ -148,6 +148,22 @@ const router = createRouter({
     },
     /* New custom modules */
     {
+      path: '/groups',
+      name: 'Grupos',
+      component: () => import('../views/Pages/Groups/Index.vue'),
+      meta: {
+        title: 'Grupos',
+      },
+    },
+    {
+      path: '/groups/:id',
+      name: 'GroupEdit',
+      component: () => import('../views/Pages/Groups/:id/Index.vue'),
+      meta: {
+        title: 'Editar Grupo',
+      },
+    },
+    {
       path: '/units-of-measure',
       name: 'Unidades de Medida',
       component: () => import('../views/Pages/UnitOfMeasure/Table.vue'),

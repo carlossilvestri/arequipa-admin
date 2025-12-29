@@ -13,9 +13,9 @@
         </template>
         <DynamicTableOne
           :columns="mockInfoTable.columns"
-          :rows="unitMeasureStore.unitMeasures"
+          :rows="unitMeasureStore.groups"
           :loading="loading"
-          rowKey="idunidadmedida"
+          rowKey="idgrupo"
           @edit="onEdit"
           @delete="onDelete"
         />
@@ -40,24 +40,24 @@ import ComponentCard from '@/components/common/ComponentCard.vue'
 import DynamicTableOne from '@/components/tables/dynamic-tables/DynamicTableOne.vue'
 import AreYouSureModal from '@/components/common/custom/AreYouSureModal.vue'
 import Button from '@/components/ui/Button.vue'
-import { useUnitMeasureStore } from '@/stores/unitMeasure'
-import { useUnitMeasure } from '@/composables/useUnitMeasure'
-import type { BOUnidadMedida } from '@/interfaces'
+import { useGroupStore } from '@/stores/group'
+import { useGroup } from '@/composables/useGroup'
+import type { BOGrupo } from '@/interfaces'
 
-const { loadUnitMeasures, loading, handleDelete, loadingDelete } = useUnitMeasure()
-const unitMeasureStore = useUnitMeasureStore()
-const currentPageTitle = ref('Unidades de Medida')
-const mainRoute = 'units-of-measure'
+const { loadGroups, loading, handleDelete, loadingDelete } = useGroup()
+const unitMeasureStore = useGroupStore()
+const currentPageTitle = ref('Grupos')
+const mainRoute = 'groups'
 const router = useRouter()
 const showConfirm = ref(false)
-const rowToDelete = ref<BOUnidadMedida | null>(null)
+const rowToDelete = ref<BOGrupo | null>(null)
 
-function onEdit(row: BOUnidadMedida) {
-  if (!row || row.idunidadmedida == null) return
-  router.push(`/${mainRoute}/${row.idunidadmedida}`)
+function onEdit(row: BOGrupo) {
+  if (!row || row.idgrupo == null) return
+  router.push(`/${mainRoute}/${row.idgrupo}`)
 }
 
-function onDelete(row: BOUnidadMedida) {
+function onDelete(row: BOGrupo) {
   rowToDelete.value = row
   showConfirm.value = true
 }
@@ -69,7 +69,7 @@ function confirmNo(): void {
 
 const confirmYes = async (): Promise<void> => {
   if (!rowToDelete.value) return
-  const id: number = Number(rowToDelete.value.idunidadmedida)
+  const id: number = Number(rowToDelete.value.idgrupo)
   await handleDelete(id)
   showConfirm.value = false
 }
@@ -77,24 +77,18 @@ const confirmYes = async (): Promise<void> => {
 // rows and loading come directly from the store/composable to avoid nested refs
 
 onMounted(async () => {
-  // Load unit measures when component mounts
-  await loadUnitMeasures()
+  // Load groups when component mounts
+  await loadGroups()
 })
 
 const mockInfoTable = ref({
   columns: [
     {
-      key: 'idunidadmedida',
+      key: 'idgrupo',
       label: 'Id',
       thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
     },
-    { key: 'nombreunidadmedida', label: 'Nombre', thClass: 'px-5 py-3 text-left w-2/11 sm:px-6' },
-    { key: 'simbolounidadmedida', label: 'Símbolo', thClass: 'px-5 py-3 text-left w-2/11 sm:px-6' },
-    {
-      key: 'descripcionunidadmedida',
-      label: 'Descripción',
-      thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
-    },
+    { key: 'nombregrupo', label: 'Nombre', thClass: 'px-5 py-3 text-left w-2/11 sm:px-6' },
     {
       key: 'actions',
       label: 'Acciones',

@@ -15,30 +15,11 @@
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <custom-input
-                v-model="form.NOMBREUNIDADMEDIDA"
+                v-model="form.NOMBREGRUPO"
                 placeholder="Nombre"
                 label="Nombre"
-                name="NOMBREUNIDADMEDIDA"
+                name="NOMBREGRUPO"
                 type="text"
-              />
-            </div>
-            <div>
-              <custom-input
-                v-model="form.SIMBOLOUNIDADMEDIDA"
-                placeholder="Símbolo"
-                label="Símbolo"
-                name="SIMBOLOUNIDADMEDIDA"
-                type="text"
-              />
-            </div>
-
-            <div>
-              <custom-input
-                v-model="form.DESCRIPCIONUNIDADMEDIDA"
-                type="text"
-                name="DESCRIPCIONUNIDADMEDIDA"
-                label="Descripción"
-                placeholder="Ingrese la descripción"
               />
             </div>
           </div>
@@ -66,13 +47,13 @@ import CustomInput from '@/components/common/custom/CustomInput.vue'
 import PulseLoading from '@/components/loading/PulseLoading.vue'
 import {
   EstadoPersistenciaEnum,
-  type CreateBOUnidadMedidaRequest,
-  type UpdateBOUnidadMedidaRequest,
+  type CreateBOGrupoRequest,
+  type UpdateBOGrupoRequest,
 } from '@/interfaces'
-import { createUnitMeasure, getUnitMeasureById, updateUnitMeasure } from '@/services/unitMeasure'
+import { createGroup, getGroupById, updateGroup } from '@/services/group'
 
-const topic: string = 'Unidad de medida'
-const mainPage: string = 'units-of-measure'
+const topic: string = 'Grupo'
+const mainPage: string = 'groups'
 const currentPageTitle = ref(`Editar ${topic}`)
 const status = ref('')
 const loading = ref(false)
@@ -80,16 +61,12 @@ const route = useRoute()
 const router = useRouter()
 const defaultErrorMsg = 'Valor requerido'
 const schema = object().shape({
-  NOMBREUNIDADMEDIDA: string().required(defaultErrorMsg).min(1).max(100),
-  SIMBOLOUNIDADMEDIDA: string().required(defaultErrorMsg).min(1).max(100),
-  DESCRIPCIONUNIDADMEDIDA: string().required(defaultErrorMsg).min(1).max(1000),
+  NOMBREGRUPO: string().required(defaultErrorMsg).min(1).max(100),
 })
 
 const form = ref({
-  IDUNIDADMEDIDA: '',
-  NOMBREUNIDADMEDIDA: '',
-  SIMBOLOUNIDADMEDIDA: '',
-  DESCRIPCIONUNIDADMEDIDA: '',
+  IDGRUPO: '',
+  NOMBREGRUPO: '',
 })
 
 const { resetForm } = useForm({
@@ -103,14 +80,12 @@ onMounted(async () => {
 const handleOnMount = async () => {
   const id = route.params.id
   if (id && id !== 'new') {
-    form.value.IDUNIDADMEDIDA = id as string
+    form.value.IDGRUPO = id as string
     currentPageTitle.value = `Editar ${topic}`
-    const response = await getUnitMeasureById(Number(id))
+    const response = await getGroupById(Number(id))
     if (response?.objeto) {
       const objectData = response.objeto
-      form.value.NOMBREUNIDADMEDIDA = objectData.nombreunidadmedida
-      form.value.SIMBOLOUNIDADMEDIDA = objectData.simbolounidadmedida
-      form.value.DESCRIPCIONUNIDADMEDIDA = objectData.descripcionunidadmedida
+      form.value.NOMBREGRUPO = objectData.nombregrupo
     }
     status.value = 'update'
   } else {
@@ -122,19 +97,17 @@ const handleOnMount = async () => {
 
 const save = async () => {
   loading.value = true
-  const createUserData: CreateBOUnidadMedidaRequest = {
-    NOMBREUNIDADMEDIDA: form.value.NOMBREUNIDADMEDIDA,
-    SIMBOLOUNIDADMEDIDA: form.value.SIMBOLOUNIDADMEDIDA,
-    DESCRIPCIONUNIDADMEDIDA: form.value.DESCRIPCIONUNIDADMEDIDA,
+  const createUserData: CreateBOGrupoRequest = {
+    NOMBREGRUPO: form.value.NOMBREGRUPO,
     EstadoPersistencia: EstadoPersistenciaEnum.NEW,
   }
   if (status.value === 'new') {
     await handleCreate(createUserData)
   } else {
     // TODO: Handle update logic
-    const updateUserData: UpdateBOUnidadMedidaRequest = {
+    const updateUserData: UpdateBOGrupoRequest = {
       ...createUserData,
-      IDUNIDADMEDIDA: Number(route.params.id),
+      IDGRUPO: Number(route.params.id),
       EstadoPersistencia: EstadoPersistenciaEnum.MODIFIED,
     }
     await handleUpdate(updateUserData)
@@ -143,13 +116,13 @@ const save = async () => {
   loading.value = false
 }
 
-const handleCreate = async (values: CreateBOUnidadMedidaRequest) => {
+const handleCreate = async (values: CreateBOGrupoRequest) => {
   // TODO: Call your API to save the user here
-  await createUnitMeasure(values)
+  await createGroup(values)
 }
 
-const handleUpdate = async (values: UpdateBOUnidadMedidaRequest) => {
-  await updateUnitMeasure(values)
+const handleUpdate = async (values: UpdateBOGrupoRequest) => {
+  await updateGroup(values)
 }
 
 function cancel() {

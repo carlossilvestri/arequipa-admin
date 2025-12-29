@@ -109,7 +109,7 @@ export interface LoginRequest {
   nick: string
   password: string
 }
-
+/* UNIDAD DE MEDIDA */
 export interface BOUnidadMedida {
   estadoPersistencia: EstadoPersistenciaEnum
   errores: string | null
@@ -134,4 +134,26 @@ export interface CreateBOUnidadMedidaRequest {
 
 export interface UpdateBOUnidadMedidaRequest extends CreateBOUnidadMedidaRequest {
   IDUNIDADMEDIDA: number
+}
+
+/* GRUPO */
+export interface BOGrupo {
+  estadoPersistencia: EstadoPersistenciaEnum
+  errores: string | null
+  listaErrores: string[] | null
+  idgrupo: number
+  nombregrupo: string
+}
+
+export interface FilterBOGrupo {
+  NOMBRE?: string
+}
+
+export interface CreateBOGrupoRequest {
+  NOMBREGRUPO: string
+  EstadoPersistencia: EstadoPersistenciaEnum
+}
+
+export interface UpdateBOGrupoRequest extends CreateBOGrupoRequest {
+  IDGRUPO: number
 }
