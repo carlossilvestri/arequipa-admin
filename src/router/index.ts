@@ -150,7 +150,7 @@ const router = createRouter({
     {
       path: '/units-of-measure',
       name: 'Unidades de Medida',
-      component: () => import('../views/UnitOfMeasure/Table.vue'),
+      component: () => import('../views/Pages/UnitOfMeasure/Table.vue'),
       meta: {
         title: 'Unidades de Medida',
       },
@@ -158,7 +158,7 @@ const router = createRouter({
     {
       path: '/units-of-measure/:id',
       name: 'UnitOfMeasureEdit',
-      component: () => import('../views/UnitOfMeasure/:id/Index.vue'),
+      component: () => import('../views/Pages/UnitOfMeasure/:id/Index.vue'),
       meta: {
         title: 'Unidades de Medida',
       },
@@ -169,6 +169,14 @@ const router = createRouter({
       component: () => import('../views/Pages/Users/Index.vue'),
       meta: {
         title: 'Usuarios',
+      },
+    },
+    {
+      path: '/users/:id',
+      name: 'UserEdit',
+      component: () => import('../views/Pages/Users/:id/Index.vue'),
+      meta: {
+        title: 'Editar Usuario',
       },
     },
   ],

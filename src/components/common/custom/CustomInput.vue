@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useField } from 'vee-validate'
+import { watch } from 'vue'
 
 const props = defineProps({
   name: { type: String, required: true },
@@ -20,10 +21,29 @@ defineSlots<{
   }) => any
 }>()
 
+// optional parent v-model support
+const model = defineModel<string | undefined>()
+
 const { value, errorMessage, meta, handleBlur, handleChange } = useField(
   () => props.name,
   undefined,
-  { validateOnMount: false },
+  { validateOnMount: false, initialValue: model?.value },
+)
+
+// keep parent v-model and vee-validate field in sync
+watch(
+  () => model?.value,
+  (v) => {
+    if (value.value !== (v as any)) value.value = v as any
+  },
+  { immediate: true },
+)
+
+watch(
+  () => value.value,
+  (v) => {
+    if (model && model.value !== (v as any)) model.value = v as any
+  },
 )
 </script>
 

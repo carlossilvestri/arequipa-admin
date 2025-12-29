@@ -13,6 +13,7 @@ export const axiosInstance = axios.create({
     Accept: 'application/json',
     'Content-Type': 'application/json',
   },
+  timeout: 10000,
 })
 
 // Interceptors

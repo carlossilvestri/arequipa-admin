@@ -26,8 +26,8 @@ export interface BOPeriodo {
   fechafin: string | null
 }
 
-export interface BOResultadoLogicaNegocio {
-  objeto: any
+export interface BOResultadoLogicaNegocio<T> {
+  objeto: T
   exito: boolean
   listaErrores: string[] | null
   errores: string | null
@@ -80,4 +80,58 @@ export interface BOUsuario {
   nombre: string
   clave: string
   estado: string
+  nick: string
+}
+
+export interface FilterBOUsuario {
+  NOMBRE?: string
+  NICK?: string
+  ESTADO?: string
+}
+
+export interface CreateUserRequest {
+  IDUSUARIO?: number
+  NOMBRE: string
+  NICK: string
+  CLAVE: string
+  ESTADO: string
+  EstadoPersistencia: EstadoPersistenciaEnum
+}
+
+export interface UpdateUserRequest extends CreateUserRequest {
+  IDUSUARIO: number
+}
+export interface DeleteByIdRequest {
+  id: number
+}
+
+export interface LoginRequest {
+  nick: string
+  password: string
+}
+
+export interface BOUnidadMedida {
+  estadoPersistencia: EstadoPersistenciaEnum
+  errores: string | null
+  listaErrores: string[] | null
+  idunidadmedida: number
+  nombreunidadmedida: string
+  simbolounidadmedida: string
+  descripcionunidadmedida: string
+}
+
+export interface FilterBOUnidadMedida {
+  NOMBRE?: string
+  SIMBOLO?: string
+}
+
+export interface CreateBOUnidadMedidaRequest {
+  NOMBREUNIDADMEDIDA: string
+  SIMBOLOUNIDADMEDIDA: string
+  DESCRIPCIONUNIDADMEDIDA: string
+  EstadoPersistencia: EstadoPersistenciaEnum
+}
+
+export interface UpdateBOUnidadMedidaRequest extends CreateBOUnidadMedidaRequest {
+  IDUNIDADMEDIDA: number
 }

@@ -72,7 +72,7 @@ const mockInfoTable = ref({
     {
       key: 'id',
       label: 'Id',
-      thClass: 'px-5 py-3 text-left w-3/11 sm:px-6',
+      thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
     },
     { key: 'name', label: 'Nombre', thClass: 'px-5 py-3 text-left w-2/11 sm:px-6' },
     { key: 'description', label: 'Descripción', thClass: 'px-5 py-3 text-left w-2/11 sm:px-6' },

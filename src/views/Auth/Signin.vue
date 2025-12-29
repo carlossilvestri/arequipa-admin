@@ -57,30 +57,7 @@
                     <div>
                       <CustomInput type="password" name="password">
                         <template #input="{ value, meta, onBlur, onInput }">
-                          <label
-                            for="password"
-                            class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                          >
-                            Contraseña<span class="text-error-500">*</span>
-                          </label>
-                          <div class="relative">
-                            <input
-                              :value="value"
-                              :type="showPassword ? 'text' : 'password'"
-                              id="password"
-                              placeholder="Ingrese su contraseña"
-                              class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                              @input="onInput"
-                              @blur="onBlur"
-                            />
-                            <span
-                              @click="togglePasswordVisibility"
-                              class="absolute z-30 text-gray-500 -translate-y-1/2 cursor-pointer right-4 top-1/2 dark:text-gray-400"
-                            >
-                              <EyeIcon v-if="showPassword" />
-                              <CloseEye v-else />
-                            </span>
-                          </div>
+                          <password-input @blur="onBlur" @input="onInput" :value="value" />
                         </template>
                       </CustomInput>
                     </div>
@@ -207,8 +184,7 @@ import { useRouter } from 'vue-router'
 import { object, string } from 'yup'
 import Alert from '@/components/ui/Alert.vue'
 import CustomInput from '@/components/common/custom/CustomInput.vue'
-import EyeIcon from '@/icons/EyeIcon.vue'
-import CloseEye from '@/icons/CloseEye.vue'
+import PasswordInput from '@/components/common/custom/PasswordInput.vue'
 
 const router = useRouter()
 

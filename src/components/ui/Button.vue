@@ -5,11 +5,15 @@
       sizeClasses[size],
       variantClasses[variant],
       className,
-      { 'cursor-not-allowed opacity-50': disabled },
+      { 'cursor-not-allowed opacity-50': disabled || loading },
     ]"
     @click="onClick"
-    :disabled="disabled"
+    :disabled="disabled || loading"
   >
+    <svg v-if="loading" class="mr-3 size-5 animate-spin text-white" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="4"></circle>
+      <path d="M12 2L12 6" stroke="currentColor" stroke-width="4" stroke-linecap="round"></path>
+    </svg>
     <span v-if="startIcon" class="flex items-center">
       <component :is="startIcon" />
     </span>
@@ -21,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+//import { toRefs } from 'vue'
 
 interface ButtonProps {
   size?: 'sm' | 'md'
@@ -31,6 +35,7 @@ interface ButtonProps {
   onClick?: () => void
   className?: string
   disabled?: boolean
+  loading?: boolean
 }
 
 const props = withDefaults(defineProps<ButtonProps>(), {
@@ -38,6 +43,7 @@ const props = withDefaults(defineProps<ButtonProps>(), {
   variant: 'primary',
   className: '',
   disabled: false,
+  loading: false,
 })
 
 const sizeClasses = {

@@ -239,6 +239,11 @@ const menuGroups = [
       },
       */
       {
+        name: 'Usuarios',
+        icon: ListIcon,
+        path: '/users',
+      },
+      {
         name: 'Unidades de medida',
         icon: ListIcon,
         path: '/units-of-measure',

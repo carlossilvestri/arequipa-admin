@@ -15,20 +15,27 @@
         >
           No
         </button>
-        <button
-          class="inline-flex items-center rounded-lg bg-error-600 px-4 py-2 text-sm text-white hover:bg-error-700"
+        <Button
+          class="inline-flex items-center rounded-lg bg-error-600 px-4 py-2 text-sm text-white hover:bg-error-700 disabled:opacity-50 disabled:bg-error-600 disabled:cursor-not-allowed"
           @click="confirmYes"
+          :loading="loading"
         >
           Sí
-        </button>
+        </Button>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import Button from '@/components/ui/Button.vue'
+
 const props = defineProps({
   showConfirm: {
+    type: Boolean,
+    default: false,
+  },
+  loading: {
     type: Boolean,
     default: false,
   },
