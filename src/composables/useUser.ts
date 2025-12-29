@@ -25,17 +25,11 @@ export function useUser() {
     loadingDelete.value = true
     try {
       const response = await deleteUser({ id })
-      if (response?.exito) {
-        // Show success notification
-        notifications.success('Usuario eliminado correctamente')
-      } else {
-        const errorMsg: string = response.errores || 'Error al eliminar el usuario'
-        notifications.error(errorMsg)
-      }
       // Refresh the user list after deletion
       await loadUsers()
+      return response
     } catch (error) {
-      console.error('Error deleting user:', error)
+      console.error(error)
     } finally {
       loadingDelete.value = false
     }

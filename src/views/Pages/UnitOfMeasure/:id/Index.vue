@@ -3,76 +3,49 @@
     <PageBreadcrumb :pageTitle="currentPageTitle" />
     <div class="space-y-5 sm:space-y-6">
       <ComponentCard :title="currentPageTitle">
+        <PulseLoading v-if="!status" />
+
         <Form
           :validation-schema="schema"
           class="space-y-4 sm:space-y-5"
           :initial-values="form"
           @submit="save"
+          v-if="status"
         >
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <custom-input
-                v-model="form.name"
+                v-model="form.NOMBREUNIDADMEDIDA"
                 placeholder="Nombre"
                 label="Nombre"
-                name="name"
+                name="NOMBREUNIDADMEDIDA"
                 type="text"
               />
             </div>
             <div>
-              <SelectInput />
-            </div>
-            <div>
-              <custom-input name="multipleSelect" label="Multiple Select">
-                <template #input>
-                  <!-- Multiple Select Input -->
-                  <MultipleSelect v-model="form.selectedItems" :options="options" class="w-full" />
-                </template>
-              </custom-input>
-            </div>
-            <div>
               <custom-input
-                v-model="form.quantity"
-                placeholder="Valor numérico con decimales"
-                label="Valor numérico con decimales"
-                name="quantity"
-                type="number"
+                v-model="form.SIMBOLOUNIDADMEDIDA"
+                placeholder="Símbolo"
+                label="Símbolo"
+                name="SIMBOLOUNIDADMEDIDA"
+                type="text"
               />
             </div>
 
             <div>
               <custom-input
-                v-model="form.quantity2"
-                placeholder="Valor numérico sin decimales"
-                label="Valor numérico sin decimales"
-                name="quantity2"
-                type="number"
+                v-model="form.DESCRIPCIONUNIDADMEDIDA"
+                type="text"
+                name="DESCRIPCIONUNIDADMEDIDA"
+                label="Descripción"
+                placeholder="Ingrese la descripción"
               />
-            </div>
-          </div>
-          <div>
-            <custom-input name="description" label="Descripción">
-              <template #input>
-                <textarea
-                  v-model="form.description"
-                  rows="4"
-                  class="w-full rounded-lg border border-gray-200 bg-transparent px-3.5 py-3 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-white/3 dark:text-white/90"
-                />
-              </template>
-            </custom-input>
-          </div>
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <custom-input v-model="form.date" label="Fecha" name="date" type="date" />
-            </div>
-            <div>
-              <custom-input v-model="form.time" label="Hora" name="time" type="time" />
             </div>
           </div>
 
           <div class="flex items-center justify-end gap-3">
             <Button variant="outline" @click="cancel">Cancelar</Button>
-            <Button type="submit">Guardar</Button>
+            <Button type="submit" :loading="loading">Guardar</Button>
           </div>
         </Form>
       </ComponentCard>
@@ -84,82 +57,101 @@
 import { Form, useForm } from 'vee-validate'
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useNotificationStore } from '@/stores/notification'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import PageBreadcrumb from '@/components/common/PageBreadcrumb.vue'
 import ComponentCard from '@/components/common/ComponentCard.vue'
 import Button from '@/components/ui/Button.vue'
-import SelectInput from '@/components/forms/FormElements/SelectInput.vue'
-import { object, string, number, array } from 'yup'
+import { object, string } from 'yup'
 import CustomInput from '@/components/common/custom/CustomInput.vue'
-import MultipleSelect from '@/components/forms/FormElements/MultipleSelect.vue'
+import PulseLoading from '@/components/loading/PulseLoading.vue'
+import {
+  EstadoPersistenciaEnum,
+  type CreateBOUnidadMedidaRequest,
+  type UpdateBOUnidadMedidaRequest,
+} from '@/interfaces'
+import { createUnitMeasure, getUnitMeasureById, updateUnitMeasure } from '@/services/unitMeasure'
 
-const currentPageTitle = ref('Editar Unidades de Medida')
+const topic: string = 'Unidad de medida'
+const mainPage: string = 'units-of-measure'
+const currentPageTitle = ref(`Editar ${topic}`)
+const status = ref('')
+const loading = ref(false)
 const route = useRoute()
 const router = useRouter()
-const notifications = useNotificationStore()
+const defaultErrorMsg = 'Valor requerido'
 const schema = object().shape({
-  name: string().required('Valor requerido').min(1),
-  //description: string().required('Valor requerido'),
-  //status: string().required('Valor requerido'),
-  //quantity: number('El valor debe ser un número')
-  //.transform((value) => (Number.isNaN(value) ? null : value))
-  //.required('Valor requerido'),
-  //quantity2: number('El valor debe ser un número'),
-  //.transform((value) => (Number.isNaN(value) ? null : value))
-  //.integer('El valor no debe tener decimales')
-  //.required('Valor requerido'),
-  //selectedItems: array().min(1, 'Valor requerido').required('Valor requerido'),
+  NOMBREUNIDADMEDIDA: string().required(defaultErrorMsg).min(1).max(100),
+  SIMBOLOUNIDADMEDIDA: string().required(defaultErrorMsg).min(1).max(100),
+  DESCRIPCIONUNIDADMEDIDA: string().required(defaultErrorMsg).min(1).max(1000),
 })
 
 const form = ref({
-  id: null,
-  name: '',
-  description: '',
-  status: 'Active',
-  quantity: null,
-  quantity2: null,
-  date: null,
-  time: null,
-  selectedItems: [],
+  IDUNIDADMEDIDA: '',
+  NOMBREUNIDADMEDIDA: '',
+  SIMBOLOUNIDADMEDIDA: '',
+  DESCRIPCIONUNIDADMEDIDA: '',
 })
 
 const { resetForm } = useForm({
   initialValues: form.value, // Opcional: establece los valores iniciales
 })
 
-const options = [
-  { value: 'apple', label: 'Apple' },
-  { value: 'banana', label: 'Banana' },
-  { value: 'cherry', label: 'Cherry' },
-  { value: 'date', label: 'Date' },
-  { value: 'elderberry', label: 'Elderberry' },
-  { value: 'graphs', label: 'Graphs' },
-]
-
-onMounted(() => {
-  const id = route.params.id
-  form.value.id = id
-  if (id && id !== 'new') {
-    currentPageTitle.value = 'Editar unidades de Medida'
-  } else {
-    currentPageTitle.value = 'Nuevas unidades de Medida'
-    resetForm()
-  }
+onMounted(async () => {
+  await handleOnMount()
 })
 
-function save(values: any) {
-  // ...persist your data here
-  notifications.success('El registro fue grabado con éxito.')
-  router.push('/units-of-measure')
+const handleOnMount = async () => {
+  const id = route.params.id
+  if (id && id !== 'new') {
+    form.value.IDUNIDADMEDIDA = id as string
+    currentPageTitle.value = `Editar ${topic}`
+    const response = await getUnitMeasureById(Number(id))
+    if (response?.objeto) {
+      const objectData = response.objeto
+      form.value.NOMBREUNIDADMEDIDA = objectData.nombreunidadmedida
+      form.value.SIMBOLOUNIDADMEDIDA = objectData.simbolounidadmedida
+      form.value.DESCRIPCIONUNIDADMEDIDA = objectData.descripcionunidadmedida
+    }
+    status.value = 'update'
+  } else {
+    currentPageTitle.value = `Nueva ${topic}`
+    resetForm()
+    status.value = 'new'
+  }
+}
+
+const save = async () => {
+  loading.value = true
+  const createUserData: CreateBOUnidadMedidaRequest = {
+    NOMBREUNIDADMEDIDA: form.value.NOMBREUNIDADMEDIDA,
+    SIMBOLOUNIDADMEDIDA: form.value.SIMBOLOUNIDADMEDIDA,
+    DESCRIPCIONUNIDADMEDIDA: form.value.DESCRIPCIONUNIDADMEDIDA,
+    EstadoPersistencia: EstadoPersistenciaEnum.NEW,
+  }
+  if (status.value === 'new') {
+    await handleCreate(createUserData)
+  } else {
+    // TODO: Handle update logic
+    const updateUserData: UpdateBOUnidadMedidaRequest = {
+      ...createUserData,
+      IDUNIDADMEDIDA: Number(route.params.id),
+    }
+    await handleUpdate(updateUserData)
+  }
+  router.push(`/${mainPage}`)
+  loading.value = false
+}
+
+const handleCreate = async (values: CreateBOUnidadMedidaRequest) => {
+  // TODO: Call your API to save the user here
+  await createUnitMeasure(values)
+}
+
+const handleUpdate = async (values: UpdateBOUnidadMedidaRequest) => {
+  await updateUnitMeasure(values)
 }
 
 function cancel() {
   router.back()
-}
-
-const submit = (values) => {
-  // implement your logic here
-  console.log(values)
 }
 </script>

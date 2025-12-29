@@ -115,6 +115,13 @@ export async function deleteUser(
         params: deleteById,
       },
     )
+    if (data?.exito) {
+      // Show success notification
+      notifications.success('Usuario eliminado correctamente')
+    } else {
+      const errorMsg: string = data.errores || 'Error al eliminar el usuario'
+      notifications.error(errorMsg)
+    }
     return data
   } catch (error) {
     console.error(error)

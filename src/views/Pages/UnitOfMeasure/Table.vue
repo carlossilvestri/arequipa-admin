@@ -8,13 +8,14 @@
             <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
               {{ currentPageTitle }}
             </h3>
-            <Button variant="primary" @click="router.push('/units-of-measure/new')">Agregar</Button>
+            <Button variant="primary" @click="router.push(`/${mainRoute}/new`)">Agregar</Button>
           </div>
         </template>
         <DynamicTableOne
           :columns="mockInfoTable.columns"
-          :rows="mockInfoTable.rows"
-          rowKey="id"
+          :rows="unitMeasureStore.unitMeasures"
+          :loading="loading"
+          rowKey="idunidadmedida"
           @edit="onEdit"
           @delete="onDelete"
         />
@@ -23,14 +24,15 @@
           :show-confirm="showConfirm"
           @confirm-no="confirmNo"
           @confirm-yes="confirmYes"
+          :loading="loadingDelete"
         />
       </ComponentCard>
     </div>
   </AdminLayout>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import PageBreadcrumb from '@/components/common/PageBreadcrumb.vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
@@ -38,48 +40,60 @@ import ComponentCard from '@/components/common/ComponentCard.vue'
 import DynamicTableOne from '@/components/tables/dynamic-tables/DynamicTableOne.vue'
 import AreYouSureModal from '@/components/common/custom/AreYouSureModal.vue'
 import Button from '@/components/ui/Button.vue'
+import { useUnitMeasureStore } from '@/stores/unitMeasure'
+import { useUnitMeasure } from '@/composables/useUnitMeasure'
+import type { BOUnidadMedida } from '@/interfaces'
+
+const { loadUnitMeasures, loading, handleDelete, loadingDelete } = useUnitMeasure()
+const unitMeasureStore = useUnitMeasureStore()
 const currentPageTitle = ref('Unidades de Medida')
+const mainRoute = 'units-of-measure'
 const router = useRouter()
-
 const showConfirm = ref(false)
-const rowToDelete = ref(null)
+const rowToDelete = ref<BOUnidadMedida | null>(null)
 
-function onEdit(row) {
-  if (!row || row.id == null) return
-  router.push(`/units-of-measure/${row.id}`)
+function onEdit(row: BOUnidadMedida) {
+  if (!row || row.idunidadmedida == null) return
+  router.push(`/${mainRoute}/${row.idunidadmedida}`)
 }
 
-function onDelete(row) {
+function onDelete(row: BOUnidadMedida) {
   rowToDelete.value = row
   showConfirm.value = true
 }
 
-function confirmNo() {
+function confirmNo(): void {
   showConfirm.value = false
   rowToDelete.value = null
 }
 
-function confirmYes() {
+const confirmYes = async (): Promise<void> => {
+  console.log('Confirming delete for user:', rowToDelete.value)
   if (!rowToDelete.value) return
-  const id = rowToDelete.value.id
-  mockInfoTable.value.rows = mockInfoTable.value.rows.filter((r) => r.id !== id)
+  const id: number = Number(rowToDelete.value.idunidadmedida)
+  await handleDelete(id)
   showConfirm.value = false
-  rowToDelete.value = null
 }
+
+// rows and loading come directly from the store/composable to avoid nested refs
+
+onMounted(async () => {
+  // Load unit measures when component mounts
+  await loadUnitMeasures()
+})
 
 const mockInfoTable = ref({
   columns: [
     {
-      key: 'id',
+      key: 'idunidadmedida',
       label: 'Id',
       thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
     },
-    { key: 'name', label: 'Nombre', thClass: 'px-5 py-3 text-left w-2/11 sm:px-6' },
-    { key: 'description', label: 'Descripción', thClass: 'px-5 py-3 text-left w-2/11 sm:px-6' },
+    { key: 'nombreunidadmedida', label: 'Nombre', thClass: 'px-5 py-3 text-left w-2/11 sm:px-6' },
+    { key: 'simbolounidadmedida', label: 'Símbolo', thClass: 'px-5 py-3 text-left w-2/11 sm:px-6' },
     {
-      key: 'status',
-      label: 'Status',
-      type: 'status',
+      key: 'descripcionunidadmedida',
+      label: 'Descripción',
       thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
     },
     {
@@ -87,42 +101,6 @@ const mockInfoTable = ref({
       label: 'Acciones',
       type: 'actions',
       thClass: 'px-5 py-3 text-left w-2/11 sm:px-6 text-right',
-    },
-  ],
-  rows: [
-    {
-      id: 1,
-      name: 'Metro',
-      description: 'Metro',
-      status: 'Active',
-      actions: 'Acciones',
-    },
-    {
-      id: 2,
-      name: 'Kilometro',
-      description: 'Kilometro',
-      status: 'Pending',
-      actions: 'Acciones',
-    },
-    {
-      id: 3,
-      name: 'Centimetro',
-      description: 'Centimetro',
-      status: 'Active',
-      actions: 'Acciones',
-    },
-    {
-      id: 4,
-      name: 'Gramo',
-      description: 'Gramo',
-      status: 'Cancel',
-      actions: 'Acciones',
-    },
-    {
-      id: 5,
-      name: 'Kilogramo',
-      description: 'Kilogramo',
-      status: 'Active',
     },
   ],
 })

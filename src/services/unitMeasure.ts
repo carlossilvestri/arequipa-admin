@@ -2,11 +2,10 @@ import { axiosInstance } from '@/plugins/axios'
 import type {
   BOResultadoLogicaNegocio,
   BOUnidadMedida,
-  CreateUserRequest,
+  CreateBOUnidadMedidaRequest,
   DeleteByIdRequest,
   FilterBOUnidadMedida,
-  LoginRequest,
-  UpdateUserRequest,
+  UpdateBOUnidadMedidaRequest,
 } from '@/interfaces'
 import { useNotificationStore } from '@/stores/notification'
 import { useUnitMeasureStore } from '@/stores/unitMeasure'
@@ -44,18 +43,18 @@ export async function getUnitMeasures(filter: FilterBOUnidadMedida): Promise<BOU
 
 /**
  * Create unit measure.
- * @Param userData: CreateUserRequest.
+ * @Param unitMeasureData: CreateBOUnidadMedidaRequest.
  * @Return Promise<BOResultadoLogicaNegocio<BOUnidadMedida>>
  */
 export async function createUnitMeasure(
-  userData: CreateUserRequest,
+  unitMeasureData: CreateBOUnidadMedidaRequest,
 ): Promise<BOResultadoLogicaNegocio<BOUnidadMedida>> {
   try {
     const { data } = await axiosInstance.post<BOResultadoLogicaNegocio<BOUnidadMedida>>(
       '/api/UnidadMedida/Grabar',
       null,
       {
-        params: userData,
+        params: unitMeasureData,
       },
     )
     if (data?.exito) {
@@ -73,19 +72,19 @@ export async function createUnitMeasure(
 }
 
 /**
- * Update user.
- * @Param userData: UpdateUserRequest.
+ * Update unit measure.
+ * @Param unitMeasureData: UpdateBOUnidadMedidaRequest.
  * @Return Promise<BOResultadoLogicaNegocio<BOUnidadMedida>>
  */
-export async function updateUser(
-  userData: UpdateUserRequest,
+export async function updateUnitMeasure(
+  unitMeasureData: UpdateBOUnidadMedidaRequest,
 ): Promise<BOResultadoLogicaNegocio<BOUnidadMedida>> {
   try {
     const { data } = await axiosInstance.post<BOResultadoLogicaNegocio<BOUnidadMedida>>(
       '/api/UnidadMedida/Editar',
       null,
       {
-        params: userData,
+        params: unitMeasureData,
       },
     )
     if (data?.exito) {
@@ -156,7 +155,7 @@ export async function getUnitMeasureById(
 export default {
   getUnitMeasures,
   createUnitMeasure,
-  updateUser,
+  updateUnitMeasure,
   deleteUnitMeasure,
   getUnitMeasureById,
 }

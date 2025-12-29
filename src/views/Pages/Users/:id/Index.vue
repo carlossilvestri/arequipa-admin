@@ -83,7 +83,9 @@ import {
 } from '@/interfaces'
 import { createUser } from '@/services/users'
 
-const currentPageTitle = ref('Editar Usuario')
+const topic: string = 'Usuario'
+const mainPage: string = 'users'
+const currentPageTitle = ref(`Editar ${topic}`)
 const status = ref('')
 const loading = ref(false)
 const route = useRoute()
@@ -116,7 +118,7 @@ const handleOnMount = async () => {
   const id = route.params.id
   if (id && id !== 'new') {
     form.value.IDUSUARIO = id as string
-    currentPageTitle.value = 'Editar Usuario'
+    currentPageTitle.value = `Editar ${topic}`
     const response = await getUserById(Number(id))
     if (response?.objeto) {
       const user = response.objeto
@@ -127,7 +129,7 @@ const handleOnMount = async () => {
     }
     status.value = 'update'
   } else {
-    currentPageTitle.value = 'Nuevo Usuario'
+    currentPageTitle.value = `Nueva ${topic}`
     resetForm()
     status.value = 'new'
   }
@@ -152,7 +154,7 @@ const save = async () => {
     }
     await handleUpdate(updateUserData)
   }
-  router.push('/users')
+  router.push(`/${mainPage}`)
   loading.value = false
 }
 

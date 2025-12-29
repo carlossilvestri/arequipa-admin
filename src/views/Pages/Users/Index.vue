@@ -8,7 +8,7 @@
             <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
               {{ currentPageTitle }}
             </h3>
-            <Button variant="primary" @click="router.push('/users/new')">Agregar</Button>
+            <Button variant="primary" @click="router.push(`/${mainRoute}/new`)">Agregar</Button>
           </div>
         </template>
         <DynamicTableOne
@@ -47,13 +47,14 @@ import type { BOUsuario } from '@/interfaces'
 const { loadUsers, loadingUsers, handleDelete, loadingDelete } = useUser()
 const userStore = useUserStore()
 const currentPageTitle = ref('Usuarios')
+const mainRoute = 'users'
 const router = useRouter()
 const showConfirm = ref(false)
 const rowToDelete = ref<BOUsuario | null>(null)
 
 function onEdit(row: BOUsuario) {
   if (!row || row.idusuario == null) return
-  router.push(`/users/${row.idusuario}`)
+  router.push(`/${mainRoute}/${row.idusuario}`)
 }
 
 function onDelete(row: BOUsuario) {
