@@ -30,21 +30,21 @@
                   @submit="handleSubmit"
                 >
                   <div class="space-y-5">
-                    <!-- Email -->
+                    <!-- nick -->
                     <div>
-                      <CustomInput type="email" name="email">
+                      <CustomInput type="nick" name="nick">
                         <template #input="{ value, meta, onBlur, onInput, errorMessage }">
                           <label
-                            for="email"
+                            for="nick"
                             class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
                           >
-                            Email<span class="text-error-500">*</span>
+                            Nick<span class="text-error-500">*</span>
                           </label>
                           <input
                             :value="value"
-                            type="email"
-                            id="email"
-                            name="email"
+                            type="text"
+                            id="nick"
+                            name="nick"
                             placeholder="info@gmail.com"
                             class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                             @input="onInput"
@@ -185,36 +185,39 @@ import { object, string } from 'yup'
 import Alert from '@/components/ui/Alert.vue'
 import CustomInput from '@/components/common/custom/CustomInput.vue'
 import PasswordInput from '@/components/common/custom/PasswordInput.vue'
+import { login } from '@/services/users'
+import type { LoginRequest } from '@/interfaces'
 
 const router = useRouter()
 
 const error = ref(false)
 const form = ref({
-  email: '',
+  nick: '',
   password: '',
 })
 const showPassword = ref(false)
 const keepLoggedIn = ref(false)
 
 const schema = object().shape({
-  email: string().required('Valor requerido').email('Formato de correo electrónico inválido'),
+  nick: string().required('Valor requerido'),
   password: string().required('Valor requerido'),
 })
 
-const togglePasswordVisibility = () => {
-  showPassword.value = !showPassword.value
-}
-
-const handleSubmit = (values: { email: string; password: string }) => {
-  const loginMock = { email: 'prueba@prueba.com', password: '1234' }
-
-  console.log('Form submitted', {
-    email: values.email,
+const handleSubmit = async (values: { nick: string; password: string }) => {
+  const loginMock = {
+    nick: values.nick,
     password: values.password,
     keepLoggedIn: keepLoggedIn.value,
-  })
+  }
+  const loginRequest: LoginRequest = {
+    nick: values.nick,
+    password: values.password,
+  }
 
-  if (values.email === loginMock.email && values.password === loginMock.password) {
+  console.log('Form submitted', loginMock)
+
+  const response = await login(loginRequest)
+  if (response.exito) {
     router.push('/')
   } else {
     error.value = true

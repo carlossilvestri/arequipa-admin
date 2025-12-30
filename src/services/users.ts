@@ -162,7 +162,12 @@ export async function login(loginData: LoginRequest): Promise<BOResultadoLogicaN
       },
     )
 
-    userStore.saveLoggedUserOnStore(data.objeto)
+    if (data?.exito) {
+      userStore.saveLoggedUserOnStore(data.objeto)
+    } else {
+      const errorMsg = data?.errores || 'Error en el inicio de sesión'
+      notifications.error(errorMsg)
+    }
     return data
   } catch (error) {
     console.error(error)
