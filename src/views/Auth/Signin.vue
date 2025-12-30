@@ -28,38 +28,41 @@
                   class="space-y-4 sm:space-y-5"
                   :initial-values="form"
                   @submit="handleSubmit"
+                  autocomplete="off"
                 >
+                  <!-- Hidden dummy fields to absorb browser autofill -->
+                  <input
+                    type="text"
+                    name="fake-username"
+                    autocomplete="username"
+                    class="hidden"
+                    tabindex="-1"
+                  />
+                  <input
+                    type="password"
+                    name="fake-password"
+                    autocomplete="new-password"
+                    class="hidden"
+                    tabindex="-1"
+                  />
                   <div class="space-y-5">
                     <!-- nick -->
                     <div>
-                      <CustomInput type="nick" name="nick">
-                        <template #input="{ value, meta, onBlur, onInput, errorMessage }">
-                          <label
-                            for="nick"
-                            class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                          >
-                            Nick<span class="text-error-500">*</span>
-                          </label>
-                          <input
-                            :value="value"
-                            type="text"
-                            id="nick"
-                            name="nick"
-                            placeholder="info@gmail.com"
-                            class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                            @input="onInput"
-                            @blur="onBlur"
-                          />
-                        </template>
-                      </CustomInput>
+                      <custom-input
+                        v-model="form.nick"
+                        placeholder="Nick"
+                        label="Nick"
+                        name="nick"
+                        type="text"
+                      />
                     </div>
                     <!-- Password -->
                     <div>
-                      <CustomInput type="password" name="password">
-                        <template #input="{ value, meta, onBlur, onInput }">
+                      <custom-input type="password" name="password" v-model="form.password">
+                        <template #input="{ value, onBlur, onInput }">
                           <password-input @blur="onBlur" @input="onInput" :value="value" />
                         </template>
-                      </CustomInput>
+                      </custom-input>
                     </div>
                     <div v-if="error">
                       <Alert
@@ -70,6 +73,7 @@
                       />
                     </div>
                     <!-- Checkbox -->
+                    <!--
                     <div class="flex items-center justify-between">
                       <div>
                         <label
@@ -119,14 +123,16 @@
                         >¿Olvidaste tu contraseña?</router-link
                       >
                     </div>
+                    -->
                     <!-- Button -->
                     <div>
-                      <button
+                      <Button
                         type="submit"
+                        :loading="loading"
                         class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600"
                       >
                         Iniciar sesión
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </Form>
@@ -176,18 +182,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Form } from 'vee-validate'
+import { Form, useForm } from 'vee-validate'
+import { ref, onMounted } from 'vue'
 import CommonGridShape from '@/components/common/CommonGridShape.vue'
 import FullScreenLayout from '@/components/layout/FullScreenLayout.vue'
 import { useRouter } from 'vue-router'
 import { object, string } from 'yup'
+import Button from '@/components/ui/Button.vue'
 import Alert from '@/components/ui/Alert.vue'
 import CustomInput from '@/components/common/custom/CustomInput.vue'
 import PasswordInput from '@/components/common/custom/PasswordInput.vue'
 import { login } from '@/services/users'
 import type { LoginRequest } from '@/interfaces'
-
+const loading = ref(false)
 const router = useRouter()
 
 const error = ref(false)
@@ -202,7 +209,21 @@ const schema = object().shape({
   password: string().required('Valor requerido'),
 })
 
-const handleSubmit = async (values: { nick: string; password: string }) => {
+const { resetForm } = useForm({
+  initialValues: form.value, // Opcional: establece los valores iniciales
+})
+
+onMounted(() => {
+  handleOnMount()
+})
+
+const handleOnMount = async () => {
+  console.log('handleOnMount')
+  resetForm()
+}
+
+const handleSubmit = async (values: any) => {
+  loading.value = true
   const loginRequest: LoginRequest = {
     nick: values.nick,
     password: values.password,
@@ -214,5 +235,6 @@ const handleSubmit = async (values: { nick: string; password: string }) => {
   } else {
     error.value = true
   }
+  loading.value = false
 }
 </script>

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -153,6 +154,7 @@ const router = createRouter({
       component: () => import('../views/Pages/Periods/Index.vue'),
       meta: {
         title: 'Períodos',
+        requiresAuth: true,
       },
     },
     {
@@ -161,6 +163,7 @@ const router = createRouter({
       component: () => import('../views/Pages/Territory/:id/Index.vue'),
       meta: {
         title: `Nuevo Territorio`,
+        requiresAuth: true,
       },
     },
     {
@@ -169,6 +172,7 @@ const router = createRouter({
       component: () => import('../views/Pages/Territory/:id/Index.vue'),
       meta: {
         title: `Editar Territorio`,
+        requiresAuth: true,
       },
     },
     {
@@ -177,6 +181,7 @@ const router = createRouter({
       component: () => import('../views/Pages/Territory/Index.vue'),
       meta: {
         title: 'Territorios',
+        requiresAuth: true,
       },
     },
     {
@@ -185,6 +190,7 @@ const router = createRouter({
       component: () => import('../views/Pages/Periods/:id/Index.vue'),
       meta: {
         title: `Nuevo Período`,
+        requiresAuth: true,
       },
     },
     {
@@ -193,6 +199,7 @@ const router = createRouter({
       component: () => import('../views/Pages/Periods/:id/Index.vue'),
       meta: {
         title: `Editar Período`,
+        requiresAuth: true,
       },
     },
     {
@@ -201,6 +208,7 @@ const router = createRouter({
       component: () => import('../views/Pages/TerritoryTypes/Index.vue'),
       meta: {
         title: 'Tipos de territorio',
+        requiresAuth: true,
       },
     },
     {
@@ -209,6 +217,7 @@ const router = createRouter({
       component: () => import('../views/Pages/TerritoryTypes/:id/Index.vue'),
       meta: {
         title: `Nuevo Tipo de Territorio`,
+        requiresAuth: true,
       },
     },
     {
@@ -217,6 +226,7 @@ const router = createRouter({
       component: () => import('../views/Pages/TerritoryTypes/:id/Index.vue'),
       meta: {
         title: `Editar Tipo de Territorio`,
+        requiresAuth: true,
       },
     },
     {
@@ -225,6 +235,7 @@ const router = createRouter({
       component: () => import('../views/Pages/PeriodTypes/Index.vue'),
       meta: {
         title: 'Tipos de período',
+        requiresAuth: true,
       },
     },
     {
@@ -233,6 +244,7 @@ const router = createRouter({
       component: () => import('../views/Pages/PeriodTypes/:id/Index.vue'),
       meta: {
         title: `Nuevo Tipo de Período`,
+        requiresAuth: true,
       },
     },
     {
@@ -241,6 +253,7 @@ const router = createRouter({
       component: () => import('../views/Pages/PeriodTypes/:id/Index.vue'),
       meta: {
         title: `Editar Tipo de Período`,
+        requiresAuth: true,
       },
     },
     {
@@ -249,6 +262,7 @@ const router = createRouter({
       component: () => import('../views/Pages/Subgroups/Index.vue'),
       meta: {
         title: 'Subgrupos',
+        requiresAuth: true,
       },
     },
     {
@@ -257,6 +271,7 @@ const router = createRouter({
       component: () => import('../views/Pages/Subgroups/:id/Index.vue'),
       meta: {
         title: 'Nuevo Subgrupo',
+        requiresAuth: true,
       },
     },
     {
@@ -265,6 +280,7 @@ const router = createRouter({
       component: () => import('../views/Pages/Subgroups/:id/Index.vue'),
       meta: {
         title: 'Editar Subgrupo',
+        requiresAuth: true,
       },
     },
     {
@@ -273,6 +289,7 @@ const router = createRouter({
       component: () => import('../views/Pages/Groups/Index.vue'),
       meta: {
         title: 'Grupos',
+        requiresAuth: true,
       },
     },
     {
@@ -281,6 +298,7 @@ const router = createRouter({
       component: () => import('../views/Pages/Groups/:id/Index.vue'),
       meta: {
         title: 'Nuevo Grupo',
+        requiresAuth: true,
       },
     },
     {
@@ -289,6 +307,7 @@ const router = createRouter({
       component: () => import('../views/Pages/Groups/:id/Index.vue'),
       meta: {
         title: 'Editar Grupo',
+        requiresAuth: true,
       },
     },
     {
@@ -297,6 +316,7 @@ const router = createRouter({
       component: () => import('../views/Pages/UnitOfMeasure/Table.vue'),
       meta: {
         title: 'Unidades de Medida',
+        requiresAuth: true,
       },
     },
     {
@@ -305,6 +325,7 @@ const router = createRouter({
       component: () => import('../views/Pages/UnitOfMeasure/:id/Index.vue'),
       meta: {
         title: 'Nueva Unidad de Medida',
+        requiresAuth: true,
       },
     },
     {
@@ -313,6 +334,7 @@ const router = createRouter({
       component: () => import('../views/Pages/UnitOfMeasure/:id/Index.vue'),
       meta: {
         title: 'Unidades de Medida',
+        requiresAuth: true,
       },
     },
     {
@@ -321,6 +343,7 @@ const router = createRouter({
       component: () => import('../views/Pages/Users/Index.vue'),
       meta: {
         title: 'Usuarios',
+        requiresAuth: true,
       },
     },
 
@@ -330,6 +353,7 @@ const router = createRouter({
       component: () => import('../views/Pages/Users/:id/Index.vue'),
       meta: {
         title: 'Nuevo Usuario',
+        requiresAuth: true,
       },
     },
     {
@@ -338,6 +362,7 @@ const router = createRouter({
       component: () => import('../views/Pages/Users/:id/Index.vue'),
       meta: {
         title: 'Editar Usuario',
+        requiresAuth: true,
       },
     },
   ],
@@ -346,6 +371,25 @@ const router = createRouter({
 export default router
 
 router.beforeEach((to, from, next) => {
-  document.title = `${to.meta.title}`
+  // Set document title
+  document.title = `${to.meta.title || ''}`
+
+  const userStore = useUserStore()
+  const isAuthenticated = !!userStore.loggedUser
+  const requiresAuth = !!to.meta.requiresAuth
+
+  // If route requires auth and user is not authenticated, redirect to signin
+  if (requiresAuth && !isAuthenticated) {
+    if (to.path !== '/signin') {
+      return next({ path: '/signin' })
+    }
+  }
+
+  // Prevent authenticated users from visiting signin/signup
+  if ((to.path === '/signin' || to.path === '/signup') && isAuthenticated) {
+    const redirect = (to.query.redirect as string) || '/'
+    return next(redirect)
+  }
+
   next()
 })

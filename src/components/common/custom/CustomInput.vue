@@ -75,7 +75,12 @@ watch(
       />
     </slot>
 
-    <small :class="errorMessage ? 'error_message' : ''">{{ errorMessage }}</small>
+    <small
+      v-if="errorMessage && (meta.touched || meta.dirty || meta.validated)"
+      class="error_message"
+    >
+      {{ errorMessage }}
+    </small>
   </div>
 </template>
 <style scoped>

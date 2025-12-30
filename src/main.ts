@@ -17,10 +17,10 @@ import { VueDatePicker } from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 const app = createApp(App)
 
-app.use(router)
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
+app.use(router)
 app.use(VueApexCharts)
 app.use(axiosPlugin)
 app.component('VueDatePicker', VueDatePicker)
