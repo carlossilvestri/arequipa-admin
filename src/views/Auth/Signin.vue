@@ -195,7 +195,6 @@ const form = ref({
   nick: '',
   password: '',
 })
-const showPassword = ref(false)
 const keepLoggedIn = ref(false)
 
 const schema = object().shape({
@@ -204,17 +203,10 @@ const schema = object().shape({
 })
 
 const handleSubmit = async (values: { nick: string; password: string }) => {
-  const loginMock = {
-    nick: values.nick,
-    password: values.password,
-    keepLoggedIn: keepLoggedIn.value,
-  }
   const loginRequest: LoginRequest = {
     nick: values.nick,
     password: values.password,
   }
-
-  console.log('Form submitted', loginMock)
 
   const response = await login(loginRequest)
   if (response.exito) {

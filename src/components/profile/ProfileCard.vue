@@ -15,7 +15,7 @@
             <h4
               class="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left"
             >
-              Prueba
+              {{ userStore.loggedUser?.nombre }}
             </h4>
           </div>
         </div>
@@ -42,12 +42,16 @@
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32 mt-3">
           <div>
             <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Nombre</p>
-            <p class="text-sm font-medium text-gray-800 dark:text-white/90">Prueba</p>
+            <p class="text-sm font-medium text-gray-800 dark:text-white/90">
+              {{ userStore.loggedUser?.nombre }}
+            </p>
           </div>
 
           <div>
-            <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Email</p>
-            <p class="text-sm font-medium text-gray-800 dark:text-white/90">prueba@prueba.com</p>
+            <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Nick</p>
+            <p class="text-sm font-medium text-gray-800 dark:text-white/90">
+              {{ userStore.loggedUser?.nick }}
+            </p>
           </div>
         </div>
       </div>
@@ -102,7 +106,7 @@
                     </label>
                     <input
                       type="text"
-                      value="Prueba"
+                      :value="userStore.loggedUser?.nombre"
                       class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                     />
                   </div>
@@ -111,11 +115,11 @@
                     <label
                       class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
                     >
-                      Email
+                      Nick
                     </label>
                     <input
                       type="text"
-                      value="prueba@prueba.com"
+                      :value="userStore.loggedUser?.nick"
                       class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                     />
                   </div>
@@ -135,7 +139,7 @@
                     </label>
                     <input
                       type="password"
-                      value="Prueba"
+                      :value="userStore.loggedUser?.clave"
                       class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                     />
                   </div>
@@ -148,7 +152,7 @@
                     </label>
                     <input
                       type="password"
-                      value="prueba@prueba.com"
+                      :value="userStore.loggedUser?.clave"
                       class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                     />
                   </div>
@@ -182,8 +186,10 @@
 import { ref } from 'vue'
 import Modal from './Modal.vue'
 import { UserCircleIcon } from '@/icons'
+import { useUserStore } from '@/stores/user'
 
 const isProfileInfoModal = ref(false)
+const userStore = useUserStore()
 
 const saveProfile = () => {
   // Implement save profile logic here

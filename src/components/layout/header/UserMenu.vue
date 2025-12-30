@@ -11,7 +11,7 @@
         -->
       </span>
 
-      <span class="block mr-1 font-medium text-theme-sm">Prueba </span>
+      <span class="block mr-1 font-medium text-theme-sm">{{ userStore.loggedUser?.nombre }} </span>
 
       <ChevronDownIcon :class="{ 'rotate-180': dropdownOpen }" />
     </button>
@@ -23,10 +23,10 @@
     >
       <div>
         <span class="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-          Prueba
+          {{ userStore.loggedUser?.nombre }}
         </span>
         <span class="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-          prueba@prueba.com
+          {{ userStore.loggedUser?.nick }}
         </span>
       </div>
 
@@ -64,9 +64,11 @@
 import { ChevronDownIcon, LogoutIcon, UserCircleIcon } from '@/icons'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 
 const dropdownOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
+const userStore = useUserStore()
 
 const menuItems = [
   { href: '/profile', icon: UserCircleIcon, text: 'Editar perfil' },

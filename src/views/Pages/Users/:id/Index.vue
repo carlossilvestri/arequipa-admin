@@ -125,7 +125,7 @@ const handleOnMount = async () => {
       form.value.NOMBRE = user.nombre
       form.value.NICK = user.nick
       form.value.ESTADO = user.estado
-      form.value.CLAVE = user.clave || 'CAMBIAR CONTRASEÑA'
+      form.value.CLAVE = user.clave
     }
     status.value = 'update'
   } else {

@@ -156,6 +156,30 @@ const router = createRouter({
       },
     },
     {
+      path: '/territories/new',
+      name: 'TerritoryNew',
+      component: () => import('../views/Pages/Territory/:id/Index.vue'),
+      meta: {
+        title: `Nuevo Territorio`,
+      },
+    },
+    {
+      path: '/territories/:id',
+      name: 'TerritoryEdit',
+      component: () => import('../views/Pages/Territory/:id/Index.vue'),
+      meta: {
+        title: `Editar Territorio`,
+      },
+    },
+    {
+      path: '/territories',
+      name: 'Territorios',
+      component: () => import('../views/Pages/Territory/Index.vue'),
+      meta: {
+        title: 'Territorios',
+      },
+    },
+    {
       path: '/periods/new',
       name: 'PeriodNew',
       component: () => import('../views/Pages/Periods/:id/Index.vue'),

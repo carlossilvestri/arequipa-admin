@@ -273,6 +273,11 @@ const menuGroups = [
         icon: ListIcon,
         path: '/periods',
       },
+      {
+        name: 'Territorios',
+        icon: ListIcon,
+        path: '/territories',
+      },
     ],
   },
   /*
