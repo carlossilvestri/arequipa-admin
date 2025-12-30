@@ -51,16 +51,7 @@ export interface BOTerritorio {
   idterritorio: number
   idtipoterritorio: number
   idterritoriopadre: number
-  nombreterritorio: string | null
-}
-
-export interface BOTipoTerritorio {
-  estadoPersistencia: EstadoPersistenciaEnum
-  errores: string | null
-  listaErrores: string[] | null
-  idtipoterritorio: number
-  nombretipoterritorio: string | null
-  ordenjerarquico: number
+  nombreterritorio: string
 }
 
 export interface BOUsuario {
@@ -195,4 +186,29 @@ export interface CreateBOTipoPeriodoRequest {
 
 export interface UpdateBOTipoPeriodoRequest extends CreateBOTipoPeriodoRequest {
   IDTIPOPERIODO: number
+}
+
+/* TIPOTERRITORIO */
+export interface BOTipoTerritorio {
+  estadoPersistencia: EstadoPersistenciaEnum
+  errores: string | null
+  listaErrores: string[] | null
+  idtipoterritorio: number
+  nombretipoterritorio: string
+  ordenjerarquico: number
+}
+
+export interface FilterBOTipoTerritorio {
+  NOMBRE?: string
+}
+
+export interface CreateBOTipoTerritorioRequest {
+  IDTIPOTERRITORIO?: number
+  NOMBRETIPOTERRITORIO: string
+  ORDENJERARQUICO: number
+  EstadoPersistencia: EstadoPersistenciaEnum
+}
+
+export interface UpdateBOTipoTerritorioRequest extends CreateBOTipoTerritorioRequest {
+  IDTIPOTERRITORIO: number
 }

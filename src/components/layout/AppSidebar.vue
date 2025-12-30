@@ -264,9 +264,9 @@ const menuGroups = [
         path: '/period-types',
       },
       {
-        name: 'Categorías',
+        name: 'Tipos de territorios',
         icon: ListIcon,
-        path: '/categories',
+        path: '/territory-types',
       },
       {
         name: 'Indicadores',

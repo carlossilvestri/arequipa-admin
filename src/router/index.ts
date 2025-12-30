@@ -148,6 +148,30 @@ const router = createRouter({
     },
     /* New custom modules */
     {
+      path: '/territory-types',
+      name: 'Tipos de territorio',
+      component: () => import('../views/Pages/TerritoryTypes/Index.vue'),
+      meta: {
+        title: 'Tipos de territorio',
+      },
+    },
+    {
+      path: '/territory-types/new',
+      name: 'TerritoryTypeNew',
+      component: () => import('../views/Pages/TerritoryTypes/:id/Index.vue'),
+      meta: {
+        title: `Nuevo Tipo de Territorio`,
+      },
+    },
+    {
+      path: '/territory-types/:id',
+      name: 'TerritoryTypeEdit',
+      component: () => import('../views/Pages/TerritoryTypes/:id/Index.vue'),
+      meta: {
+        title: `Editar Tipo de Territorio`,
+      },
+    },
+    {
       path: '/period-types',
       name: 'Tipos de período',
       component: () => import('../views/Pages/PeriodTypes/Index.vue'),
@@ -180,6 +204,14 @@ const router = createRouter({
       },
     },
     {
+      path: '/subgroups/new',
+      name: 'SubgroupNew',
+      component: () => import('../views/Pages/Subgroups/:id/Index.vue'),
+      meta: {
+        title: 'Nuevo Subgrupo',
+      },
+    },
+    {
       path: '/subgroups/:id',
       name: 'SubgroupEdit',
       component: () => import('../views/Pages/Subgroups/:id/Index.vue'),
@@ -193,6 +225,14 @@ const router = createRouter({
       component: () => import('../views/Pages/Groups/Index.vue'),
       meta: {
         title: 'Grupos',
+      },
+    },
+    {
+      path: '/groups/new',
+      name: 'GroupNew',
+      component: () => import('../views/Pages/Groups/:id/Index.vue'),
+      meta: {
+        title: 'Nuevo Grupo',
       },
     },
     {
@@ -212,6 +252,14 @@ const router = createRouter({
       },
     },
     {
+      path: '/units-of-measure/new',
+      name: 'UnitOfMeasureNew',
+      component: () => import('../views/Pages/UnitOfMeasure/:id/Index.vue'),
+      meta: {
+        title: 'Nueva Unidad de Medida',
+      },
+    },
+    {
       path: '/units-of-measure/:id',
       name: 'UnitOfMeasureEdit',
       component: () => import('../views/Pages/UnitOfMeasure/:id/Index.vue'),
@@ -225,6 +273,15 @@ const router = createRouter({
       component: () => import('../views/Pages/Users/Index.vue'),
       meta: {
         title: 'Usuarios',
+      },
+    },
+
+    {
+      path: '/users/new',
+      name: 'UserNew',
+      component: () => import('../views/Pages/Users/:id/Index.vue'),
+      meta: {
+        title: 'Nuevo Usuario',
       },
     },
     {
