@@ -269,9 +269,9 @@ const menuGroups = [
         path: '/territory-types',
       },
       {
-        name: 'Indicadores',
+        name: 'Períodos',
         icon: ListIcon,
-        path: '/indicators',
+        path: '/periods',
       },
     ],
   },

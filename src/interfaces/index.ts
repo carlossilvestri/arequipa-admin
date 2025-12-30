@@ -13,19 +13,6 @@ export interface BOGrupo {
   nombregrupo: string
 }
 
-export interface BOPeriodo {
-  estadoPersistencia: EstadoPersistenciaEnum
-  errores: string | null
-  listaErrores: string[] | null
-  idtipoperiodo: number
-  anio: number
-  numeroperiodo: number
-  etiquetacorta: string | null
-  etiquetalarga: string | null
-  fechainicio: string | null
-  fechafin: string | null
-}
-
 export interface BOResultadoLogicaNegocio<T> {
   objeto: T
   exito: boolean
@@ -42,16 +29,6 @@ export interface BOSubGrupo {
   idsubgrupo: number
   idgrupo: number
   nombresubgrupo: string
-}
-
-export interface BOTerritorio {
-  estadoPersistencia: EstadoPersistenciaEnum
-  errores: string | null
-  listaErrores: string[] | null
-  idterritorio: number
-  idtipoterritorio: number
-  idterritoriopadre: number
-  nombreterritorio: string
 }
 
 export interface BOUsuario {
@@ -211,4 +188,71 @@ export interface CreateBOTipoTerritorioRequest {
 
 export interface UpdateBOTipoTerritorioRequest extends CreateBOTipoTerritorioRequest {
   IDTIPOTERRITORIO: number
+}
+
+/* PERIODO */
+export interface BOPeriodo {
+  estadoPersistencia: EstadoPersistenciaEnum
+  errores: string | null
+  listaErrores: string[] | null
+  idperiodo: number
+  idtipoperiodo: number
+  anio: number
+  numeroperiodo: number
+  etiquetacorta: string
+  etiquetalarga: string
+  fechainicio: string
+  fechafin: string
+}
+
+export interface FilterBOPeriodo {
+  IDTIPOPERIODO?: string
+  ANIO?: number
+  NUMEROPERIODO?: number
+  ETIQUETA?: string
+}
+
+export interface CreateBOPeriodoRequest {
+  IDPERIODO?: number
+  IDTIPOPERIODO: number
+  ANIO: number
+  NUMEROPERIODO: number
+  ETIQUETACORTA: string
+  ETIQUETALARGA: string
+  FECHAINICIO: string
+  FECHAFIN: string
+  EstadoPersistencia: EstadoPersistenciaEnum
+}
+
+export interface UpdateBOPeriodoRequest extends CreateBOPeriodoRequest {
+  IDPERIODO: number
+}
+
+/* TERRITORIO */
+export interface BOTerritorio {
+  estadoPersistencia: EstadoPersistenciaEnum
+  errores: string | null
+  listaErrores: string[] | null
+  idterritorio: number
+  idtipoterritorio: number
+  idterritoriopadre: number
+  nombreterritorio: string
+}
+
+export interface FilterBOTerritorio {
+  IDTIPOTERRITORIO?: number
+  IDTERRITORIOPADRE?: number
+  NOMBRE?: string
+}
+
+export interface CreateBOTerritorioRequest {
+  IDTERRITORIO?: number
+  IDTIPOTERRITORIO: number
+  IDTERRITORIOPADRE: number
+  NOMBRETERRITORIO: string
+  EstadoPersistencia: EstadoPersistenciaEnum
+}
+
+export interface UpdateBOTerritorioRequest extends CreateBOTerritorioRequest {
+  IDTERRITORIO: number
 }

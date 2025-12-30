@@ -71,6 +71,7 @@ watch(
         :placeholder="placeholder"
         :type="type || 'text'"
         @blur="handleBlur"
+        autocomplete="off"
       />
     </slot>
 

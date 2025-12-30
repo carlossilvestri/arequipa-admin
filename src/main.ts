@@ -13,7 +13,8 @@ import VueApexCharts from 'vue3-apexcharts'
 import { createPinia } from 'pinia' // Import createPinia
 import axiosPlugin from './plugins/axios'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
-
+import { VueDatePicker } from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
 const app = createApp(App)
 
 app.use(router)
@@ -22,5 +23,5 @@ pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
 app.use(VueApexCharts)
 app.use(axiosPlugin)
-
+app.component('VueDatePicker', VueDatePicker)
 app.mount('#app')

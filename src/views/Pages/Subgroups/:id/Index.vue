@@ -24,7 +24,7 @@
             </div>
             <div>
               <custom-input name="IDGRUPO" v-model="form.IDGRUPO">
-                <template #input="{ value, onBlur, onInput }">
+                <template #input="{ value, onInput }">
                   <SelectInput
                     :model-value="value"
                     @update:model-value="onInput"

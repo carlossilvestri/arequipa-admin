@@ -148,6 +148,30 @@ const router = createRouter({
     },
     /* New custom modules */
     {
+      path: '/periods',
+      name: 'Períodos',
+      component: () => import('../views/Pages/Periods/Index.vue'),
+      meta: {
+        title: 'Períodos',
+      },
+    },
+    {
+      path: '/periods/new',
+      name: 'PeriodNew',
+      component: () => import('../views/Pages/Periods/:id/Index.vue'),
+      meta: {
+        title: `Nuevo Período`,
+      },
+    },
+    {
+      path: '/periods/:id',
+      name: 'PeriodEdit',
+      component: () => import('../views/Pages/Periods/:id/Index.vue'),
+      meta: {
+        title: `Editar Período`,
+      },
+    },
+    {
       path: '/territory-types',
       name: 'Tipos de territorio',
       component: () => import('../views/Pages/TerritoryTypes/Index.vue'),
