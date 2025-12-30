@@ -14,7 +14,7 @@
                   Iniciar sesión
                 </h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">
-                  Ingrese su correo electrónico y contraseña para iniciar sesión!
+                  Ingrese su nick y contraseña para iniciar sesión!
                 </p>
               </div>
               <div>
