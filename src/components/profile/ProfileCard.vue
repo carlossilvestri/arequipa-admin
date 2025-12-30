@@ -90,7 +90,12 @@
               Actualiza tus datos para mantener tu perfil actualizado.
             </p>
           </div>
-          <form class="flex flex-col">
+          <Form
+            :validation-schema="schema"
+            class="flex flex-col"
+            :initial-values="form"
+            @submit="saveProfile"
+          >
             <div class="custom-scrollbar h-[458px] overflow-y-auto p-2">
               <div>
                 <h5 class="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
@@ -99,28 +104,36 @@
 
                 <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div class="col-span-2 lg:col-span-1">
-                    <label
-                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                    >
-                      Nombre
-                    </label>
-                    <input
+                    <custom-input
+                      v-model="form.NOMBRE"
                       type="text"
+                      label="Nombre"
+                      placeholder="Nombre"
+                      name="NOMBRE"
                       :value="userStore.loggedUser?.nombre"
-                      class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                     />
                   </div>
 
                   <div class="col-span-2 lg:col-span-1">
-                    <label
-                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                    >
-                      Nick
-                    </label>
-                    <input
+                    <custom-input
+                      v-model="form.NICK"
                       type="text"
                       :value="userStore.loggedUser?.nick"
-                      class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                      name="NICK"
+                      label="Nick"
+                      placeholder="Nick"
+                    />
+                  </div>
+
+                  <div class="col-span-2 lg:col-span-1">
+                    <SelectInput
+                      v-model="form.ESTADO"
+                      :options="[
+                        { value: 'ACTIVO', label: 'ACTIVO' },
+                        { value: 'INACTIVO', label: 'INACTIVO' },
+                      ]"
+                      label="Estado"
+                      placeholder="Seleccione un estado"
                     />
                   </div>
                 </div>
@@ -132,29 +145,19 @@
 
                 <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div class="col-span-2 lg:col-span-1">
-                    <label
-                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                    >
-                      Contraseña
-                    </label>
-                    <input
-                      type="password"
-                      :value="userStore.loggedUser?.clave"
-                      class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                    />
+                    <custom-input type="password" name="CLAVE" v-model="form.CLAVE">
+                      <template #input="{ value, onBlur, onInput }">
+                        <password-input @blur="onBlur" @input="onInput" :value="value" />
+                      </template>
+                    </custom-input>
                   </div>
 
                   <div class="col-span-2 lg:col-span-1">
-                    <label
-                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
-                    >
-                      Repetir Contraseña
-                    </label>
-                    <input
-                      type="password"
-                      :value="userStore.loggedUser?.clave"
-                      class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                    />
+                    <custom-input type="password" name="REPETIRCLAVE" v-model="form.REPETIRCLAVE">
+                      <template #input="{ value, onBlur, onInput }">
+                        <password-input @blur="onBlur" @input="onInput" :value="value" />
+                      </template>
+                    </custom-input>
                   </div>
                 </div>
               </div>
@@ -167,33 +170,77 @@
               >
                 Cancelar
               </button>
-              <button
-                @click="saveProfile"
-                type="button"
+              <Button
+                type="submit"
                 class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto"
               >
                 Guardar cambios
-              </button>
+              </Button>
             </div>
-          </form>
+          </Form>
         </div>
       </template>
     </Modal>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
+import * as Yup from 'yup'
+import { Form, useForm } from 'vee-validate'
+import CustomInput from '@/components/common/custom/CustomInput.vue'
 import Modal from './Modal.vue'
 import { UserCircleIcon } from '@/icons'
 import { useUserStore } from '@/stores/user'
+import Button from '@/components/ui/Button.vue'
+import PasswordInput from '@/components/common/custom/PasswordInput.vue'
+import SelectInput from '@/components/forms/FormElements/SelectInput.vue'
+import { EstadoPersistenciaEnum, type UpdateUserRequest } from '@/interfaces'
+import { updateUser } from '@/services/users'
 
 const isProfileInfoModal = ref(false)
 const userStore = useUserStore()
 
-const saveProfile = () => {
+const defaultErrorMsg = 'Valor requerido'
+const schema = Yup.object().shape({
+  NOMBRE: Yup.string().required(defaultErrorMsg).min(1),
+  NICK: Yup.string().required(defaultErrorMsg).min(1),
+  CLAVE: Yup.string().required(defaultErrorMsg).min(1),
+  REPETIRCLAVE: Yup.string().when('CLAVE', (CLAVE, field) =>
+    CLAVE
+      ? field.required(defaultErrorMsg).oneOf([Yup.ref('CLAVE')], 'Las contraseñas no coinciden')
+      : field,
+  ),
+  ESTADO: Yup.string().required(defaultErrorMsg),
+})
+
+const form = ref({
+  IDUSUARIO: userStore.loggedUser?.idusuario,
+  NOMBRE: userStore.loggedUser?.nombre,
+  NICK: userStore.loggedUser?.nick,
+  CLAVE: userStore.loggedUser?.clave,
+  ESTADO: userStore.loggedUser?.estado,
+  REPETIRCLAVE: userStore.loggedUser?.clave,
+})
+
+const { resetForm } = useForm({
+  initialValues: form.value, // Opcional: establece los valores iniciales
+})
+
+const saveProfile = async () => {
   // Implement save profile logic here
-  console.log('Profile saved')
+  const updateUserData: UpdateUserRequest = {
+    IDUSUARIO: Number(form.value.IDUSUARIO),
+    NOMBRE: form.value.NOMBRE!,
+    NICK: form.value.NICK!,
+    CLAVE: form.value.CLAVE!,
+    ESTADO: form.value.ESTADO!,
+    EstadoPersistencia: EstadoPersistenciaEnum.MODIFIED,
+  }
+  const response = await updateUser(updateUserData)
+  if (response.exito) {
+    userStore.saveLoggedUserOnStore(response.objeto)
+  }
   isProfileInfoModal.value = false
 }
 </script>
