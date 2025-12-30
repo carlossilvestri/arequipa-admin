@@ -15,38 +15,23 @@
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <custom-input
-                v-model="form.NOMBRE"
+                v-model="form.NOMBRESUBGRUPO"
                 placeholder="Nombre"
                 label="Nombre"
-                name="NOMBRE"
+                name="NOMBRESUBGRUPO"
                 type="text"
               />
             </div>
             <div>
-              <SelectInput
-                v-model="form.ESTADO"
-                :options="[
-                  { value: 'ACTIVO', label: 'ACTIVO' },
-                  { value: 'INACTIVO', label: 'INACTIVO' },
-                ]"
-                label="Estado"
-                placeholder="Seleccione un estado"
-              />
-            </div>
-            <div>
-              <custom-input
-                v-model="form.NICK"
-                placeholder="Nick"
-                label="Nick"
-                name="NICK"
-                type="text"
-              />
-            </div>
-
-            <div>
-              <custom-input type="password" name="CLAVE" v-model="form.CLAVE">
+              <custom-input name="IDGRUPO" v-model="form.IDGRUPO">
                 <template #input="{ value, onBlur, onInput }">
-                  <password-input @blur="onBlur" @input="onInput" :value="value" />
+                  <SelectInput
+                    :model-value="value"
+                    @update:model-value="onInput"
+                    :options="computedValues.groups"
+                    label="Grupo"
+                    placeholder="Seleccione un grupo"
+                  />
                 </template>
               </custom-input>
             </div>
@@ -64,7 +49,7 @@
 
 <script setup lang="ts">
 import { Form, useForm } from 'vee-validate'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import PageBreadcrumb from '@/components/common/PageBreadcrumb.vue'
@@ -74,36 +59,34 @@ import SelectInput from '@/components/forms/FormElements/SelectInput.vue'
 import { object, string } from 'yup'
 import CustomInput from '@/components/common/custom/CustomInput.vue'
 import PulseLoading from '@/components/loading/PulseLoading.vue'
-import PasswordInput from '@/components/common/custom/PasswordInput.vue'
-import { getUserById, updateUser } from '@/services/users'
 import {
   EstadoPersistenciaEnum,
-  type CreateUserRequest,
-  type UpdateUserRequest,
+  type CreateBOSubGrupoRequest,
+  type UpdateBOSubGrupoRequest,
+  type BOGrupo,
 } from '@/interfaces'
-import { createUser } from '@/services/users'
+import { createSubGroup, getSubGroupById, updateSubGroup } from '@/services/subgroup'
+import { getGroups } from '@/services/group'
 
-const topic: string = 'Usuario'
-const mainPage: string = 'users'
+const topic: string = 'Subgrupo'
+const mainPage: string = 'subgroups'
 const currentPageTitle = ref(`Editar ${topic}`)
 const status = ref('')
 const loading = ref(false)
 const route = useRoute()
 const router = useRouter()
 const defaultErrorMsg = 'Valor requerido'
+const groups = ref<BOGrupo[]>([])
+
 const schema = object().shape({
-  NOMBRE: string().required(defaultErrorMsg).min(1),
-  NICK: string().required(defaultErrorMsg).min(1),
-  CLAVE: string().required(defaultErrorMsg).min(1),
-  ESTADO: string().required(defaultErrorMsg),
+  NOMBRESUBGRUPO: string().required(defaultErrorMsg).min(1).max(100),
+  IDGRUPO: string().required(defaultErrorMsg),
 })
 
 const form = ref({
-  IDUSUARIO: '',
-  NOMBRE: '',
-  NICK: '',
-  CLAVE: '',
-  ESTADO: 'ACTIVO',
+  IDSUBGRUPO: '',
+  IDGRUPO: '',
+  NOMBRESUBGRUPO: '',
 })
 
 const { resetForm } = useForm({
@@ -114,18 +97,26 @@ onMounted(async () => {
   await handleOnMount()
 })
 
+const computedValues = computed(() => ({
+  groups: groups.value.map((group) => ({
+    value: group.idgrupo.toString(),
+    label: group.nombregrupo,
+  })),
+}))
+
 const handleOnMount = async () => {
   const id = route.params.id
+  const result = await getGroups({})
+  groups.value = result ?? []
+
   if (id && id !== 'new') {
-    form.value.IDUSUARIO = id as string
+    form.value.IDSUBGRUPO = id as string
     currentPageTitle.value = `Editar ${topic}`
-    const response = await getUserById(Number(id))
+    const response = await getSubGroupById(Number(id))
     if (response?.objeto) {
-      const user = response.objeto
-      form.value.NOMBRE = user.nombre
-      form.value.NICK = user.nick
-      form.value.ESTADO = user.estado
-      form.value.CLAVE = user.clave || 'CAMBIAR CONTRASEÑA'
+      const objectData = response.objeto
+      form.value.IDGRUPO = objectData.idgrupo.toString()
+      form.value.NOMBRESUBGRUPO = objectData.nombresubgrupo
     }
     status.value = 'update'
   } else {
@@ -137,20 +128,19 @@ const handleOnMount = async () => {
 
 const save = async () => {
   loading.value = true
-  const createUserData: CreateUserRequest = {
-    NOMBRE: form.value.NOMBRE,
-    NICK: form.value.NICK,
-    CLAVE: form.value.CLAVE,
-    ESTADO: form.value.ESTADO,
+  const objectData: CreateBOSubGrupoRequest = {
+    IDGRUPO: +form.value.IDGRUPO,
+    NOMBRESUBGRUPO: form.value.NOMBRESUBGRUPO,
     EstadoPersistencia: EstadoPersistenciaEnum.NEW,
   }
   if (status.value === 'new') {
-    await handleCreate(createUserData)
+    await handleCreate(objectData)
   } else {
     // TODO: Handle update logic
-    const updateUserData: UpdateUserRequest = {
-      ...createUserData,
-      IDUSUARIO: Number(route.params.id),
+    const updateUserData: UpdateBOSubGrupoRequest = {
+      ...objectData,
+      IDSUBGRUPO: +route.params.id,
+      EstadoPersistencia: EstadoPersistenciaEnum.MODIFIED,
     }
     await handleUpdate(updateUserData)
   }
@@ -158,13 +148,13 @@ const save = async () => {
   loading.value = false
 }
 
-const handleCreate = async (values: CreateUserRequest) => {
+const handleCreate = async (values: CreateBOSubGrupoRequest) => {
   // TODO: Call your API to save the user here
-  await createUser(values)
+  await createSubGroup(values)
 }
 
-const handleUpdate = async (values: UpdateUserRequest) => {
-  await updateUser(values)
+const handleUpdate = async (values: UpdateBOSubGrupoRequest) => {
+  await updateSubGroup(values)
 }
 
 function cancel() {

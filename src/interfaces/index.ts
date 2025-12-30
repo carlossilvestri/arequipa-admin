@@ -157,3 +157,26 @@ export interface CreateBOGrupoRequest {
 export interface UpdateBOGrupoRequest extends CreateBOGrupoRequest {
   IDGRUPO: number
 }
+
+/* SUBGRUPO */
+export interface BOSubGrupo {
+  estadoPersistencia: EstadoPersistenciaEnum
+  errores: string | null
+  listaErrores: string[] | null
+  idsubgrupo: number
+  nombresubgrupo: string
+}
+
+export interface FilterBOSubGrupo {
+  NOMBRESUBGRUPO?: string
+}
+
+export interface CreateBOSubGrupoRequest {
+  IDGRUPO: number
+  NOMBRESUBGRUPO: string
+  EstadoPersistencia: EstadoPersistenciaEnum
+}
+
+export interface UpdateBOSubGrupoRequest extends CreateBOSubGrupoRequest {
+  IDSUBGRUPO: number
+}

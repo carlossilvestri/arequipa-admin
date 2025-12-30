@@ -148,6 +148,22 @@ const router = createRouter({
     },
     /* New custom modules */
     {
+      path: '/subgroups',
+      name: 'Subgrupos',
+      component: () => import('../views/Pages/Subgroups/Index.vue'),
+      meta: {
+        title: 'Subgrupos',
+      },
+    },
+    {
+      path: '/subgroups/:id',
+      name: 'SubgroupEdit',
+      component: () => import('../views/Pages/Subgroups/:id/Index.vue'),
+      meta: {
+        title: 'Editar Subgrupo',
+      },
+    },
+    {
       path: '/groups',
       name: 'Grupos',
       component: () => import('../views/Pages/Groups/Index.vue'),

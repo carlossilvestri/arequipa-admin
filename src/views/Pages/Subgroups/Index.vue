@@ -2,7 +2,7 @@
   <AdminLayout>
     <PageBreadcrumb :pageTitle="currentPageTitle" />
     <div class="space-y-5 sm:space-y-6">
-      <ComponentCard title="Grupos">
+      <ComponentCard title="Unidades de Medida">
         <template #header>
           <div class="flex justify-between">
             <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
@@ -13,9 +13,9 @@
         </template>
         <DynamicTableOne
           :columns="mockInfoTable.columns"
-          :rows="unitMeasureStore.groups"
+          :rows="unitSubgroupStore.subgroups"
           :loading="loading"
-          rowKey="idgrupo"
+          rowKey="idsubgrupo"
           @edit="onEdit"
           @delete="onDelete"
         />
@@ -40,24 +40,24 @@ import ComponentCard from '@/components/common/ComponentCard.vue'
 import DynamicTableOne from '@/components/tables/dynamic-tables/DynamicTableOne.vue'
 import AreYouSureModal from '@/components/common/custom/AreYouSureModal.vue'
 import Button from '@/components/ui/Button.vue'
-import { useGroupStore } from '@/stores/group'
-import { useGroup } from '@/composables/useGroup'
-import type { BOGrupo } from '@/interfaces'
+import { useSubGroupStore } from '@/stores/subgroup'
+import { useSubGroup } from '@/composables/useSubGroup'
+import type { BOSubGrupo } from '@/interfaces'
 
-const { loadGroups, loading, handleDelete, loadingDelete } = useGroup()
-const unitMeasureStore = useGroupStore()
-const currentPageTitle = ref('Grupos')
-const mainRoute = 'groups'
+const { loadSubgroups, loading, handleDelete, loadingDelete } = useSubGroup()
+const unitSubgroupStore = useSubGroupStore()
+const currentPageTitle = ref('Subgrupos')
+const mainRoute = 'subgroups'
 const router = useRouter()
 const showConfirm = ref(false)
-const rowToDelete = ref<BOGrupo | null>(null)
+const rowToDelete = ref<BOSubGrupo | null>(null)
 
-function onEdit(row: BOGrupo) {
-  if (!row || row.idgrupo == null) return
-  router.push(`/${mainRoute}/${row.idgrupo}`)
+function onEdit(row: BOSubGrupo) {
+  if (!row || row.idsubgrupo == null) return
+  router.push(`/${mainRoute}/${row.idsubgrupo}`)
 }
 
-function onDelete(row: BOGrupo) {
+function onDelete(row: BOSubGrupo) {
   rowToDelete.value = row
   showConfirm.value = true
 }
@@ -69,7 +69,7 @@ function confirmNo(): void {
 
 const confirmYes = async (): Promise<void> => {
   if (!rowToDelete.value) return
-  const id: number = Number(rowToDelete.value.idgrupo)
+  const id: number = Number(rowToDelete.value.idsubgrupo)
   await handleDelete(id)
   showConfirm.value = false
 }
@@ -77,18 +77,23 @@ const confirmYes = async (): Promise<void> => {
 // rows and loading come directly from the store/composable to avoid nested refs
 
 onMounted(async () => {
-  // Load groups when component mounts
-  await loadGroups()
+  // Load subgroups when component mounts
+  await loadSubgroups()
 })
 
 const mockInfoTable = ref({
   columns: [
     {
-      key: 'idgrupo',
+      key: 'idsubgrupo',
       label: 'Id',
       thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
     },
-    { key: 'nombregrupo', label: 'Nombre', thClass: 'px-5 py-3 text-left w-2/11 sm:px-6' },
+    { key: 'nombresubgrupo', label: 'Nombre', thClass: 'px-5 py-3 text-left w-2/11 sm:px-6' },
+    {
+      key: 'idgrupo',
+      label: 'Id grupo',
+      thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
+    },
     {
       key: 'actions',
       label: 'Acciones',

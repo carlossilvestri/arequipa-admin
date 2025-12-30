@@ -254,6 +254,11 @@ const menuGroups = [
         path: '/groups',
       },
       {
+        name: 'Subgrupos',
+        icon: ListIcon,
+        path: '/subgroups',
+      },
+      {
         name: 'Ámbitos geográficos',
         icon: ListIcon,
         path: '/geographic-scopes',
@@ -262,11 +267,6 @@ const menuGroups = [
         name: 'Categorías',
         icon: ListIcon,
         path: '/categories',
-      },
-      {
-        name: 'Subcategorías',
-        icon: ListIcon,
-        path: '/subcategories',
       },
       {
         name: 'Indicadores',
