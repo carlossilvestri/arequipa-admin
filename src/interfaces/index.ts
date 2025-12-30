@@ -54,15 +54,6 @@ export interface BOTerritorio {
   nombreterritorio: string | null
 }
 
-export interface BOTipoPeriodo {
-  estadoPersistencia: EstadoPersistenciaEnum
-  errores: string | null
-  listaErrores: string[] | null
-  idtipoperiodo: number
-  nombretipoperiodo: string | null
-  cantidadmeses: number
-}
-
 export interface BOTipoTerritorio {
   estadoPersistencia: EstadoPersistenciaEnum
   errores: string | null
@@ -179,4 +170,29 @@ export interface CreateBOSubGrupoRequest {
 
 export interface UpdateBOSubGrupoRequest extends CreateBOSubGrupoRequest {
   IDSUBGRUPO: number
+}
+
+/* TIPOPERIODO */
+export interface BOTipoPeriodo {
+  estadoPersistencia: EstadoPersistenciaEnum
+  errores: string | null
+  listaErrores: string[] | null
+  idtipoperiodo: number
+  nombretipoperiodo: string
+  cantidadmeses: number
+}
+
+export interface FilterBOTipoPeriodo {
+  NOMBRE?: string
+}
+
+export interface CreateBOTipoPeriodoRequest {
+  IDTIPOPERIODO?: number
+  NOMBRETIPOPERIODO: string
+  CANTIDADMESES: number
+  EstadoPersistencia: EstadoPersistenciaEnum
+}
+
+export interface UpdateBOTipoPeriodoRequest extends CreateBOTipoPeriodoRequest {
+  IDTIPOPERIODO: number
 }

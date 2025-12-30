@@ -148,6 +148,30 @@ const router = createRouter({
     },
     /* New custom modules */
     {
+      path: '/period-types',
+      name: 'Tipos de período',
+      component: () => import('../views/Pages/PeriodTypes/Index.vue'),
+      meta: {
+        title: 'Tipos de período',
+      },
+    },
+    {
+      path: '/period-types/new',
+      name: 'PeriodTypeNew',
+      component: () => import('../views/Pages/PeriodTypes/:id/Index.vue'),
+      meta: {
+        title: `Nuevo Tipo de Período`,
+      },
+    },
+    {
+      path: '/period-types/:id',
+      name: 'PeriodTypeEdit',
+      component: () => import('../views/Pages/PeriodTypes/:id/Index.vue'),
+      meta: {
+        title: `Editar Tipo de Período`,
+      },
+    },
+    {
       path: '/subgroups',
       name: 'Subgrupos',
       component: () => import('../views/Pages/Subgroups/Index.vue'),

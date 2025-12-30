@@ -259,9 +259,9 @@ const menuGroups = [
         path: '/subgroups',
       },
       {
-        name: 'Ámbitos geográficos',
+        name: 'Tipos de períodos',
         icon: ListIcon,
-        path: '/geographic-scopes',
+        path: '/period-types',
       },
       {
         name: 'Categorías',
