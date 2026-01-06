@@ -9,6 +9,7 @@ const props = defineProps({
   label: String,
   // nuevo prop
   showValidOnSubmit: { type: Boolean, default: false },
+  disabled: { type: Boolean, default: false },
 })
 
 defineSlots<{
@@ -66,12 +67,14 @@ watch(
           field_error: errorMessage && (meta.touched || meta.dirty || meta.validated),
           // usa el prop para decidir si incluir meta.validated
           valid: showValidOnSubmit && meta.valid && (meta.touched || meta.dirty),
+          'cursor-not-allowed opacity-50': disabled,
         }"
         v-model="value"
         :placeholder="placeholder"
         :type="type || 'text'"
         @blur="handleBlur"
         autocomplete="off"
+        :disabled="disabled"
       />
     </slot>
 

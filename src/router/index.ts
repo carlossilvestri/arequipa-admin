@@ -150,6 +150,33 @@ const router = createRouter({
     },
     /* New custom modules */
     {
+      path: '/indicators',
+      name: 'Indicadores',
+      component: () => import('../views/Pages/Indicators/Index.vue'),
+      meta: {
+        title: 'Indicadores',
+        requiresAuth: true,
+      },
+    },
+    {
+      path: '/indicators/new',
+      name: 'IndicatorNew',
+      component: () => import('../views/Pages/Indicators/:id/Index.vue'),
+      meta: {
+        title: `Nuevo Indicador`,
+        requiresAuth: true,
+      },
+    },
+    {
+      path: '/indicators/:id',
+      name: 'IndicatorEdit',
+      component: () => import('../views/Pages/Indicators/:id/Index.vue'),
+      meta: {
+        title: `Editar Indicador`,
+        requiresAuth: true,
+      },
+    },
+    {
       path: '/periods',
       name: 'Períodos',
       component: () => import('../views/Pages/Periods/Index.vue'),

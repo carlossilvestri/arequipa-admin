@@ -127,7 +127,8 @@ export interface BOSubGrupo {
 }
 
 export interface FilterBOSubGrupo {
-  NOMBRESUBGRUPO?: string
+  NOMBRE?: string
+  IDGRUPO?: number
 }
 
 export interface CreateBOSubGrupoRequest {
@@ -255,4 +256,58 @@ export interface CreateBOTerritorioRequest {
 
 export interface UpdateBOTerritorioRequest extends CreateBOTerritorioRequest {
   IDTERRITORIO: number
+}
+
+/* INDICADOR */
+export interface BOIndicador {
+  estadoPersistencia: EstadoPersistenciaEnum
+  errores: string | null
+  listaErrores: string[] | null
+  idindicador: number
+  codigoindicador: string
+  nombreindicador: string
+  descripcionindicador: string
+  idgrupo: number
+  idsubgrupo: number
+  idunidadmedida: number
+  permitecomparacion: boolean
+  disponibilidadreferencial: string
+  urlfuente: string
+  activo: boolean
+}
+
+export interface BOIndicadorDto {
+  descripcionunidadmedida: string
+  errores: string | null
+  estadoPersistencia: EstadoPersistenciaEnum
+  idunidadmedida: number
+  listaErrores: string[] | null
+  nombreunidadmedida: string
+  simbolounidadmedida: string
+}
+
+export interface FilterBOIndicador {
+  CODIGO?: string
+  IDGRUPO?: number
+  IDSUBGRUPO?: number
+  NOMBRE?: string
+}
+
+export interface CreateBOIndicadorRequest {
+  IDINDICADOR?: number
+  CODIGOINDICADOR: string
+  NOMBREINDICADOR: string
+  DESCRIPCIONINDICADOR: string
+  IDGRUPO: number
+  IDSUBGRUPO: number
+  IDUNIDADMEDIDA: number
+  PERMITECOMPARACION: boolean
+  DISPONIBILIDADREFERENCIAL: string
+  URLFUENTE: string
+  ACTIVO: boolean
+  EstadoPersistencia: EstadoPersistenciaEnum
+}
+
+export interface UpdateBOIndicadorRequest extends CreateBOIndicadorRequest {
+  IDINDICADOR: number
 }

@@ -278,6 +278,11 @@ const menuGroups = [
         icon: ListIcon,
         path: '/territories',
       },
+      {
+        name: 'Indicadores',
+        icon: ListIcon,
+        path: '/indicators',
+      },
     ],
   },
   /*
