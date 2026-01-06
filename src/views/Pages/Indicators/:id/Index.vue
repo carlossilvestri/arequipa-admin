@@ -229,6 +229,7 @@ const computedValues = computed(() => ({
 watch([() => computedValues.value.idGroup, () => subgroups.value], ([newGroupId]) => {
   if (newGroupId) {
     subgroupsFilter.value = subgroups.value.filter((subgroup) => subgroup.idgrupo === +newGroupId)
+    form.value.IDSUBGRUPO = ''
   } else {
     subgroupsFilter.value = []
   }
