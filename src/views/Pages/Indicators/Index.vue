@@ -254,9 +254,5 @@ const onReset = async () => {
     subgroupId: '',
     unitMeasureId: '',
   }
-
-  loading.value = true
-  await getIndicators({})
-  loading.value = false
 }
 </script>
