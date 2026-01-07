@@ -1,143 +1,181 @@
 <template>
   <AdminLayout>
     <PageBreadcrumb :pageTitle="currentPageTitle" />
+
     <div class="space-y-5 sm:space-y-6">
       <ComponentCard :title="currentPageTitle">
-        <PulseLoading v-if="!status" />
-
-        <Form
-          :validation-schema="schema"
-          class="space-y-4 sm:space-y-5"
-          :initial-values="form"
-          @submit="save"
-          v-if="status"
-        >
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <custom-input
-                v-model="form.IDINDICADOR"
-                placeholder="ID"
-                label="ID"
-                name="IDINDICADOR"
-                type="text"
-                disabled
-              />
-            </div>
-            <div>
-              <custom-input
-                v-model="form.CODIGOINDICADOR"
-                placeholder="Código"
-                label="Código"
-                name="CODIGOINDICADOR"
-                type="text"
-              />
-            </div>
-            <div>
-              <custom-input
-                v-model="form.NOMBREINDICADOR"
-                placeholder="Nombre"
-                label="Nombre"
-                name="NOMBREINDICADOR"
-                type="text"
-              />
-            </div>
-
-            <div>
-              <custom-input name="IDGRUPO" v-model="form.IDGRUPO">
-                <template #input="{ value, onInput }">
-                  <select-input
-                    :model-value="value"
-                    @update:model-value="onInput"
-                    :options="computedValues.groupOptions"
-                    label="Grupo"
-                    placeholder="Seleccione un grupo"
-                  />
-                </template>
-              </custom-input>
-            </div>
-
-            <div>
-              <custom-input name="IDSUBGRUPO" v-model="form.IDSUBGRUPO">
-                <template #input="{ value, onInput }">
-                  <select-input
-                    :model-value="value"
-                    @update:model-value="onInput"
-                    :options="computedValues.subgroupsFilter"
-                    label="Subgrupo"
-                    placeholder="Seleccione un subgrupo"
-                  />
-                </template>
-              </custom-input>
-            </div>
-
-            <div>
-              <custom-input name="IDUNIDADMEDIDA" v-model="form.IDUNIDADMEDIDA">
-                <template #input="{ value, onInput }">
-                  <select-input
-                    :model-value="value"
-                    @update:model-value="onInput"
-                    :options="computedValues.unitMeasureOptions"
-                    label="Unidad de medida"
-                    placeholder="Seleccione una unidad de medida"
-                  />
-                </template>
-              </custom-input>
-            </div>
-            <div class="flex items-center">
-              <Checkbox
-                name="PERMITECOMPARACION"
-                :modelValue="form.PERMITECOMPARACION"
-                @update:modelValue="form.PERMITECOMPARACION = $event"
-                label="Permite comparación"
-              />
-            </div>
-            <div class="flex items-center">
-              <Checkbox
-                name="ACTIVO"
-                :modelValue="form.ACTIVO"
-                @update:modelValue="form.ACTIVO = $event"
-                label="Activo"
-              />
-            </div>
-
-            <div>
-              <custom-input
-                v-model="form.DISPONIBILIDADREFERENCIAL"
-                placeholder="Disponibilidad referencial"
-                label="Disponibilidad referencial"
-                name="DISPONIBILIDADREFERENCIAL"
-                type="text"
-              />
-            </div>
-
-            <div>
-              <custom-input
-                v-model="form.URLFUENTE"
-                placeholder="URL de la fuente"
-                label="URL de la fuente"
-                name="URLFUENTE"
-                type="text"
-              />
-            </div>
-          </div>
-          <div>
-            <label class="text-gray-700 dark:text-gray-400 text-sm font-semibold"
-              >Descripción</label
+        <div>
+          <!-- Encabezado de los tabs -->
+          <div class="flex border-b border-gray-200">
+            <button
+              v-for="tab in tabs"
+              :key="tab.id"
+              @click="selectTab(tab.id)"
+              :class="[
+                'px-6 py-3 font-medium text-sm md:text-base transition-colors duration-200',
+                activeTab === tab.id
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-500 hover:text-gray-700 hover:border-gray-300',
+              ]"
             >
-            <div class="mt-2">
-              <QuillEditor
-                theme="snow"
-                content-type="html"
-                v-model:content="form.DESCRIPCIONINDICADOR"
-              />
-            </div>
+              {{ tab.label }}
+            </button>
           </div>
 
-          <div class="flex items-center justify-end gap-3">
-            <Button variant="outline" @click="cancel">Cancelar</Button>
-            <Button type="submit" :loading="loading">Guardar</Button>
+          <!-- Contenido de los tabs -->
+          <div class="mt-6">
+            <!-- Tab: Datos Generales -->
+            <Transition name="fade" mode="out-in">
+              <div v-if="activeTab === 'datos-generales'" class="animate-fade-in">
+                <!-- Formulario -->
+                <div>
+                  <PulseLoading v-if="!status" />
+
+                  <Form
+                    :validation-schema="schema"
+                    class="space-y-4 sm:space-y-5"
+                    :initial-values="form"
+                    @submit="save"
+                    v-if="status"
+                  >
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <custom-input
+                          v-model="form.IDINDICADOR"
+                          placeholder="ID"
+                          label="ID"
+                          name="IDINDICADOR"
+                          type="text"
+                          disabled
+                        />
+                      </div>
+                      <div>
+                        <custom-input
+                          v-model="form.CODIGOINDICADOR"
+                          placeholder="Código"
+                          label="Código*"
+                          name="CODIGOINDICADOR"
+                          type="text"
+                        />
+                      </div>
+                      <div>
+                        <custom-input
+                          v-model="form.NOMBREINDICADOR"
+                          placeholder="Nombre"
+                          label="Nombre*"
+                          name="NOMBREINDICADOR"
+                          type="text"
+                        />
+                      </div>
+
+                      <div>
+                        <custom-input name="IDGRUPO" v-model="form.IDGRUPO">
+                          <template #input="{ value, onInput }">
+                            <select-input
+                              :model-value="value"
+                              @update:model-value="onInput"
+                              :options="computedValues.groupOptions"
+                              label="Grupo*"
+                              placeholder="Seleccione un grupo"
+                            />
+                          </template>
+                        </custom-input>
+                      </div>
+
+                      <div>
+                        <custom-input name="IDSUBGRUPO" v-model="form.IDSUBGRUPO">
+                          <template #input="{ value, onInput }">
+                            <select-input
+                              :model-value="value"
+                              @update:model-value="onInput"
+                              :options="computedValues.subgroupsFilter"
+                              label="Subgrupo"
+                              placeholder="Seleccione un subgrupo"
+                            />
+                          </template>
+                        </custom-input>
+                      </div>
+
+                      <div>
+                        <custom-input name="IDUNIDADMEDIDA" v-model="form.IDUNIDADMEDIDA">
+                          <template #input="{ value, onInput }">
+                            <select-input
+                              :model-value="value"
+                              @update:model-value="onInput"
+                              :options="computedValues.unitMeasureOptions"
+                              label="Unidad de medida*"
+                              placeholder="Seleccione una unidad de medida"
+                            />
+                          </template>
+                        </custom-input>
+                      </div>
+                      <div class="flex items-center">
+                        <Checkbox
+                          name="PERMITECOMPARACION"
+                          :modelValue="form.PERMITECOMPARACION"
+                          @update:modelValue="form.PERMITECOMPARACION = $event"
+                          label="Permite comparación"
+                        />
+                      </div>
+                      <div class="flex items-center">
+                        <Checkbox
+                          name="ACTIVO"
+                          :modelValue="form.ACTIVO"
+                          @update:modelValue="form.ACTIVO = $event"
+                          label="Activo"
+                        />
+                      </div>
+
+                      <div>
+                        <custom-input
+                          v-model="form.DISPONIBILIDADREFERENCIAL"
+                          placeholder="Disponibilidad referencial"
+                          label="Disponibilidad referencial"
+                          name="DISPONIBILIDADREFERENCIAL"
+                          type="text"
+                        />
+                      </div>
+
+                      <div>
+                        <custom-input
+                          v-model="form.URLFUENTE"
+                          placeholder="URL de la fuente"
+                          label="URL de la fuente"
+                          name="URLFUENTE"
+                          type="text"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label class="text-gray-700 dark:text-gray-400 text-sm font-semibold"
+                        >Descripción</label
+                      >
+                      <div class="mt-2">
+                        <QuillEditor
+                          theme="snow"
+                          content-type="html"
+                          v-model:content="form.DESCRIPCIONINDICADOR"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-3">
+                      <Button variant="outline" @click="cancel">Cancelar</Button>
+                      <Button type="submit" :loading="loading">Guardar</Button>
+                    </div>
+                  </Form>
+                </div>
+              </div>
+            </Transition>
+
+            <!-- Tab: Valores -->
+            <Transition name="fade" mode="out-in">
+              <div v-if="activeTab === 'valores'" class="animate-fade-in">
+                <div></div>
+              </div>
+            </Transition>
           </div>
-        </Form>
+        </div>
       </ComponentCard>
     </div>
   </AdminLayout>
@@ -160,6 +198,7 @@ import {
   type BOSubGrupo,
   type BOUnidadMedida,
   type CreateBOIndicadorRequest,
+  type Tab,
   type UpdateBOIndicadorRequest,
 } from '@/interfaces'
 import { createIndicator, getIndicatorById, updateIndicator } from '@/services/indicator'
@@ -175,22 +214,35 @@ const subgroupsFilter = ref<BOSubGrupo[]>([])
 const unitMeasures = ref<BOUnidadMedida[]>([])
 const topic: string = 'Indicador'
 const mainPage: string = 'indicators'
-const currentPageTitle = ref(`Editar ${topic}`)
+const currentPageTitle = ref(`${topic}`)
 const status = ref('')
 const loading = ref(false)
 const route = useRoute()
 const router = useRouter()
 const defaultErrorMsg = 'Valor requerido'
 const schema = object().shape({
-  CODIGOINDICADOR: string().required(defaultErrorMsg).min(1).max(20),
+  CODIGOINDICADOR: string()
+    .required(defaultErrorMsg)
+    .min(1, 'Mínimo 1 caracter')
+    .max(20, 'Máximo 20 caracteres'),
   IDGRUPO: string().required(defaultErrorMsg),
-  NOMBREINDICADOR: string().required(defaultErrorMsg).min(1).max(200),
-  URLFUENTE: string().max(500),
-  DISPONIBILIDADREFERENCIAL: string().max(150),
+  NOMBREINDICADOR: string()
+    .required(defaultErrorMsg)
+    .min(1, 'Mínimo 1 caracter')
+    .max(200, 'Máximo 200 caracteres'),
+  URLFUENTE: string().max(500, 'Máximo 500 caracteres'),
+  DISPONIBILIDADREFERENCIAL: string().max(150, 'Máximo 150 caracteres'),
   IDUNIDADMEDIDA: string().required(defaultErrorMsg),
   PERMITECOMPARACION: boolean(),
   ACTIVO: boolean(),
 })
+// Tab activo
+const activeTab = ref<string>('datos-generales')
+// Lista de tabs disponibles
+const tabs: Tab[] = [
+  { id: 'datos-generales', label: 'Datos Generales' },
+  { id: 'valores', label: 'Valores' },
+]
 
 const form = ref({
   IDINDICADOR: '0',
@@ -226,14 +278,20 @@ const computedValues = computed(() => ({
   })),
 }))
 
-watch([() => computedValues.value.idGroup, () => subgroups.value], ([newGroupId]) => {
-  if (newGroupId) {
-    subgroupsFilter.value = subgroups.value.filter((subgroup) => subgroup.idgrupo === +newGroupId)
-    form.value.IDSUBGRUPO = ''
-  } else {
-    subgroupsFilter.value = []
-  }
-})
+watch(
+  () => computedValues.value.idGroup,
+  (newGroupId, oldGroupId) => {
+    if (newGroupId && oldGroupId) {
+      form.value.IDSUBGRUPO = ''
+    }
+
+    if (!newGroupId) {
+      subgroupsFilter.value = []
+    } else {
+      subgroupsFilter.value = subgroups.value.filter((subgroup) => subgroup.idgrupo === +newGroupId)
+    }
+  },
+)
 
 const { resetForm } = useForm({
   initialValues: form.value, // Opcional: establece los valores iniciales
@@ -260,10 +318,10 @@ const handleOnMount = async () => {
   await handleLoadThirdPartyData()
   if (id && id !== 'new') {
     form.value.IDINDICADOR = id as string
-    currentPageTitle.value = `Editar ${topic}`
     const response = await getIndicatorById(Number(id))
     if (response?.objeto) {
       const objectData = response.objeto
+      currentPageTitle.value = `Editar ${topic}: ${objectData.nombreindicador}`
       form.value.NOMBREINDICADOR = objectData.nombreindicador
       form.value.IDGRUPO = objectData.idgrupo.toString()
       form.value.IDSUBGRUPO = objectData.idsubgrupo.toString()
@@ -329,7 +387,39 @@ const handleUpdate = async (values: UpdateBOIndicadorRequest) => {
   return response
 }
 
-function cancel() {
+const cancel = () => {
   router.back()
 }
+
+// Función para seleccionar un tab
+const selectTab = (tabId: string) => {
+  activeTab.value = tabId
+}
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+</style>

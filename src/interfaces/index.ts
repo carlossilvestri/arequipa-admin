@@ -1,3 +1,8 @@
+export interface Tab {
+  id: string
+  label: string
+}
+
 export enum EstadoPersistenciaEnum {
   NEW = 0,
   UNCHANGED = 1,
