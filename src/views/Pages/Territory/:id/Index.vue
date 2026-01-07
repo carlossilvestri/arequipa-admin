@@ -31,6 +31,7 @@
                     :options="computedValues.territoryTypes"
                     label="Tipo Territorio"
                     placeholder="Seleccione un tipo territorio"
+                    id="IDTIPOTERRITORIO"
                   />
                 </template>
               </custom-input>
@@ -44,6 +45,7 @@
                     :options="computedValues.territoryParents"
                     label="Territorio padre"
                     placeholder="Seleccione un territorio padre"
+                    id="IDTERRITORIOPADRE"
                   />
                 </template>
               </custom-input>

@@ -57,6 +57,7 @@
                     @update:model-value="onInput"
                     :options="computedValues.periodTypes"
                     label="Tipo de período"
+                    id="IDTIPOPERIODO"
                     placeholder="Seleccione un tipo de período"
                   />
                 </template>

@@ -77,6 +77,7 @@
                               :options="computedValues.groupOptions"
                               label="Grupo*"
                               placeholder="Seleccione un grupo"
+                              id="IDGRUPO"
                             />
                           </template>
                         </custom-input>
@@ -91,6 +92,7 @@
                               :options="computedValues.subgroupsFilter"
                               label="Subgrupo"
                               placeholder="Seleccione un subgrupo"
+                              id="IDSUBGRUPO"
                             />
                           </template>
                         </custom-input>
@@ -105,6 +107,7 @@
                               :options="computedValues.unitMeasureOptions"
                               label="Unidad de medida*"
                               placeholder="Seleccione una unidad de medida"
+                              id="IDUNIDADMEDIDA"
                             />
                           </template>
                         </custom-input>
@@ -150,7 +153,7 @@
                       <label class="text-gray-700 dark:text-gray-400 text-sm font-semibold"
                         >Descripción</label
                       >
-                      <div class="mt-2">
+                      <div class="mt-2 dark:text-gray-400">
                         <QuillEditor
                           theme="snow"
                           content-type="html"

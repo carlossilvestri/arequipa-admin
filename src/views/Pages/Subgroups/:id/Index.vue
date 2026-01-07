@@ -31,6 +31,7 @@
                     :options="computedValues.groups"
                     label="Grupo"
                     placeholder="Seleccione un grupo"
+                    id="IDGRUPO"
                   />
                 </template>
               </custom-input>
