@@ -155,7 +155,12 @@
                   <div class="col-span-2 lg:col-span-1">
                     <custom-input type="password" name="REPETIRCLAVE" v-model="form.REPETIRCLAVE">
                       <template #input="{ value, onBlur, onInput }">
-                        <password-input @blur="onBlur" @input="onInput" :value="value" />
+                        <password-input
+                          @blur="onBlur"
+                          @input="onInput"
+                          label="Repetir contraseña"
+                          :value="value"
+                        />
                       </template>
                     </custom-input>
                   </div>
