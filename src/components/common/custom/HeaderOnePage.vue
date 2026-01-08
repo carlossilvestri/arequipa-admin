@@ -28,6 +28,7 @@
             >
               <nav class="bricks-nav-menu-wrapper mobile_landscape">
                 <ul id="menu-menu-principal" class="bricks-nav-menu">
+                  <!--
                   <li
                     id="menu-item-104"
                     class="menu-item menu-item-type-post_type menu-item-object-page menu-item-104 bricks-menu-item font-bold"
@@ -41,6 +42,7 @@
                   >
                     <a href="#opcion-2" aria-current="page">Descripción</a>
                   </li>
+                  -->
                 </ul>
               </nav>
               <button
@@ -56,6 +58,7 @@
               </button>
               <nav class="bricks-mobile-menu-wrapper left fade-in">
                 <ul id="menu-menu-principal-1" class="bricks-mobile-menu">
+                  <!--
                   <li
                     class="menu-item menu-item-type-post_type menu-item-object-page menu-item-104 bricks-menu-item"
                   >
@@ -67,6 +70,7 @@
                   >
                     <a href="#opcion-2" aria-current="page">Descripción</a>
                   </li>
+                  -->
                 </ul>
               </nav>
               <div class="bricks-mobile-menu-overlay" @click="closeMobileMenu"></div>
@@ -78,9 +82,7 @@
   </div>
   <section id="brxe-bgklew" class="brxe-section bricks-lazy-hidden">
     <div id="brxe-tnoabo" class="brxe-container bricks-lazy-hidden">
-      <h1 id="brxe-ilymwi" class="brxe-heading title">
-        Contribuyendo <span>al desarrollo regional</span>
-      </h1>
+      <h1 id="brxe-ilymwi" class="brxe-heading title">Tu Región <span>en tus manos</span></h1>
       <h2 id="brxe-lchvcu" class="brxe-heading">El Instituto de Economía de Arequipa,</h2>
       <div id="brxe-yorxes" class="brxe-text-basic">
         Promueve el desarrollo económico y social de la región a través de propuestas de políticas
@@ -6744,7 +6746,7 @@ body.bricks-is-frontend :focus {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.2);
   pointer-events: none;
 }
 
@@ -8168,9 +8170,5 @@ header.sticky.scrolling {
 
 #brx-header.sticky .brxe-search button {
   transition: all 0.5s;
-}
-
-.custom-bg {
-  background: rgba(4, 0, 2, 0.09);
 }
 </style>
