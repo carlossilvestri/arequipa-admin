@@ -167,6 +167,12 @@ const mockInfoTable = ref({
       thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
     },
     {
+      key: 'activo',
+      label: 'Activo',
+      type: 'boolean',
+      thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
+    },
+    {
       key: 'actions',
       label: 'Acciones',
       type: 'actions',

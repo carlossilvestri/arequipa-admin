@@ -293,6 +293,7 @@ export interface FilterBOIndicador {
   IDGRUPO?: number
   IDSUBGRUPO?: number
   NOMBRE?: string
+  ACTIVO?: boolean
 }
 
 export interface CreateBOIndicadorRequest {

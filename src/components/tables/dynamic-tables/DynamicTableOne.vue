@@ -84,6 +84,21 @@
                     {{ row[col.key] }}
                   </span>
                 </template>
+                <template v-else-if="col.type === 'boolean'">
+                  <span
+                    :class="[
+                      'rounded-full px-2 py-0.5 text-theme-xs font-medium',
+                      {
+                        'bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-500':
+                          row[col.key],
+                        'bg-error-50 text-error-700 dark:bg-error-500/15 dark:text-error-500':
+                          !row[col.key],
+                      },
+                    ]"
+                  >
+                    {{ row[col.key] ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </template>
                 <template v-else-if="col.type === 'actions'">
                   <div class="text-right">
                     <button

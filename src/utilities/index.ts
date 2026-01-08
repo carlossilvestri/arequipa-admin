@@ -20,3 +20,20 @@ export const increaseOneDay = (date: string): string => {
 export const decreaseOneDay = (date: string): string => {
   return dayjs(date).subtract(1, 'day').format('YYYY-MM-DD')
 }
+
+export const truncateText = ({
+  text,
+  maxLength,
+  symbol,
+}: {
+  text: string
+  maxLength: number
+  symbol?: string
+}): string => {
+  if (text.length <= maxLength) return text
+  return text.slice(0, maxLength) + symbol
+}
+
+export const truncateTextWithEllipsis = (text: string, maxLength: number): string => {
+  return truncateText({ text, maxLength, symbol: '...' })
+}

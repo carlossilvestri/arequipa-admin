@@ -22,37 +22,35 @@
             >
               {{ indicador.codigoindicador }}
             </span>
-            <span
-              class="text-xs font-medium px-2 py-1 rounded transition-colors"
-              :class="themeClasses.badge.secondary"
-            >
-              ID: {{ indicador.idindicador }}
-            </span>
           </div>
           <h3
             class="text-lg font-bold leading-tight transition-colors"
             :class="themeClasses.text.primary"
           >
-            {{ indicador.nombreindicador }}
+            {{ truncateTextWithEllipsis(indicador.nombreindicador, 86) }}
           </h3>
         </div>
-
-        <!-- Estado activo/inactivo -->
-        <div class="flex flex-col items-end">
-          <span
-            class="px-3 py-1 text-xs font-semibold rounded-full mb-2 border transition-colors"
-            :class="indicador.activo ? themeClasses.status.active : themeClasses.status.inactive"
-          >
-            {{ indicador.activo ? 'ACTIVO' : 'INACTIVO' }}
-          </span>
-          <span
-            v-if="indicador.permitecomparacion"
-            class="px-2 py-1 text-xs font-medium rounded border transition-colors"
-            :class="themeClasses.badge.comparacion"
-          >
-            Permite comparación
-          </span>
-        </div>
+        <!-- Botón para deseleccionar -->
+        <button
+          @click="$emit('deseleccionar', indicador)"
+          class="ml-3 p-1.5 rounded-md transition-colors"
+          :class="
+            isDark
+              ? 'text-gray-300 hover:text-white hover:bg-gray-700'
+              : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
+          "
+          aria-label="Deseleccionar indicador"
+          title="Quitar"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
       </div>
 
       <!-- Jerarquía grupo/subgrupo -->
@@ -138,12 +136,14 @@
               </div>
             </div>
           </div>
+          <!--
           <div class="text-right">
             <div class="text-xs transition-colors" :class="themeClasses.text.label">ID</div>
             <div class="font-mono text-sm transition-colors" :class="themeClasses.text.mono">
               {{ indicador.idunidadmedida }}
             </div>
           </div>
+          -->
         </div>
 
         <!-- Disponibilidad referencial -->
@@ -325,6 +325,7 @@ import { useTheme } from '@/composables/useTheme'
 import { QuillEditor } from '@vueup/vue-quill'
 import GraphicButtons from './GraphicButtons.vue'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
+import { truncateTextWithEllipsis } from '@/utilities'
 
 // Props
 interface Props {
@@ -338,6 +339,7 @@ const emit = defineEmits<{
   editar: [indicator: BOIndicadorDto]
   'toggle-activo': [indicator: BOIndicadorDto]
   'ver-detalle': [indicator: BOIndicadorDto]
+  deseleccionar: [indicator: BOIndicadorDto]
 }>()
 
 // Tema actual (puede venir de un store, prop o composable)

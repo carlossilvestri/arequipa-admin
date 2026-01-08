@@ -12,51 +12,63 @@
       <div class="m-3">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <div>
-              <p>Seleccionar indicadores</p>
+            <div class="flex">
+              <span
+                class="inline-flex items-center rounded-md bg-blue-400/10 px-2 py-1 text-xs font-medium text-blue-400 inset-ring inset-ring-blue-400/30"
+                >1</span
+              >
+              <p class="pl-2 font-bold">Selecciona uno o más indicadores</p>
             </div>
             <MultipleSelect
               v-model="form.selectedItems"
               :options="computedValues.indicatorOptions"
               class="w-full mb-6 mt-3"
+              :key="`multiselect-key-${form.selectedItems.length}`"
             />
-          </div>
-          <div class="flex items-center justify-end">
-            <Button>Generar gráfico</Button>
+            <p class="text-gray-900/50 text-[14px] italic mt-3 mb-5 ml-2">
+              Selecciona uno o más indicadores para analizarlos individualmente o compararlos en una
+              sola gráfica
+            </p>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          <IndicatorCard
-            v-for="indicator in displayIndicators"
-            :key="indicator.idindicador"
-            :indicador="indicator"
-            @editar="handleEditar"
-            @toggle-activo="handleToggleActivo"
-            @ver-detalle="handleVerDetalle"
-          />
+        <div v-if="form.selectedItems.length > 0">
+          <div class="flex mb-3">
+            <span
+              class="inline-flex items-center rounded-md bg-blue-400/10 px-2 py-1 text-xs font-medium text-blue-400 inset-ring inset-ring-blue-400/30"
+              >2</span
+            >
+            <p class="pl-2 font-bold">Configura los indicadores seleccionados</p>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <IndicatorCard
+              v-for="indicator in displayIndicators"
+              :key="indicator.idindicador"
+              :indicador="indicator"
+              @editar="handleEditar"
+              @toggle-activo="handleToggleActivo"
+              @ver-detalle="handleVerDetalle"
+              @deseleccionar="handleDeseleccionar"
+            />
+          </div>
+        </div>
+
+        <div v-if="form.selectedItems.length > 0">
+          <div class="flex my-4">
+            <span
+              class="inline-flex items-center rounded-md bg-blue-400/10 px-2 py-1 text-xs font-medium text-blue-400 inset-ring inset-ring-blue-400/30"
+              >3</span
+            >
+            <p class="pl-2 font-bold">Genera el gráfico</p>
+          </div>
+          <div class="flex items-center justify-start">
+            <Button>Generar gráfico</Button>
+          </div>
         </div>
       </div>
       <div class="grid">
         <MultiChartDashboard />
-
-        <div class="flex justify-end">
-          <Button class-name="m-2 p-2">Exportar</Button>
-          <Button variant="outline" class-name="m-2 p-2">Generar gráfico</Button>
-        </div>
       </div>
-    </section>
-
-    <!-- Sección Descripción (contenido placeholder) -->
-    <section
-      id="opcion-2"
-      class="scroll-mt-24 mx-auto max-w-(--breakpoint-2xl) px-4 md:px-6 py-12 md:py-16"
-    >
-      <h3 class="text-2xl font-semibold mb-4">Descripción</h3>
-      <p class="text-gray-600 dark:text-gray-300">
-        Contenido de ejemplo para la Descripción. Puedes colocar aquí tarjetas, métricas o cualquier
-        componente adicional.
-      </p>
     </section>
 
     <!-- Footer simple -->
@@ -82,14 +94,14 @@ import IndicatorCard from '@/components/common/custom/IndicatorCard.vue'
 
 const indicators = ref<BOIndicadorDto[]>([])
 
-const form = ref({
+const form = ref<{ selectedItems: { value: string; label: string }[] }>({
   selectedItems: [],
 })
 
 const year = ref(classicFormatDate(new Date(), 'YYYY'))
 
 onMounted(async () => {
-  indicators.value = await getIndicators({})
+  indicators.value = await getIndicators({ ACTIVO: true })
 })
 
 const computedValues = computed(() => ({
@@ -119,6 +131,12 @@ const handleToggleActivo = (indicador: BOIndicadorDto) => {
 const handleVerDetalle = (indicador: BOIndicadorDto) => {
   console.log('Ver detalle del indicador:', indicador)
   // Navegación o modal de detalle
+}
+
+const handleDeseleccionar = (indicador: BOIndicadorDto) => {
+  const id: string = String(indicador.idindicador)
+
+  form.value.selectedItems = form.value.selectedItems.filter((item) => item.value !== id)
 }
 </script>
 

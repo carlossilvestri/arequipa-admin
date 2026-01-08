@@ -82,7 +82,7 @@
   </div>
   <section id="brxe-bgklew" class="brxe-section bricks-lazy-hidden">
     <div id="brxe-tnoabo" class="brxe-container bricks-lazy-hidden">
-      <h1 id="brxe-ilymwi" class="brxe-heading title">Tu Región <span>en tus manos</span></h1>
+      <h1 id="brxe-ilymwi" class="brxe-heading title">Tu Región en tus manos<span></span></h1>
       <h2 id="brxe-lchvcu" class="brxe-heading">El Instituto de Economía de Arequipa,</h2>
       <div id="brxe-yorxes" class="brxe-text-basic">
         Promueve el desarrollo económico y social de la región a través de propuestas de políticas
@@ -6384,7 +6384,7 @@ body.bricks-is-frontend :focus {
 }
 
 #brxe-fgeduv {
-  width: 35%;
+  width: 25%;
   align-items: flex-start;
 }
 
@@ -6610,8 +6610,11 @@ body.bricks-is-frontend :focus {
 }
 
 #brxe-nwyrew {
-  flex-direction: row;
+  /*flex-direction: row; Comment it to center the logo */
   align-items: center;
+  @media (max-width: 767px) {
+    flex-direction: row;
+  }
 }
 
 #brxe-alamyh {
