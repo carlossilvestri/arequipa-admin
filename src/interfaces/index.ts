@@ -281,14 +281,11 @@ export interface BOIndicador {
   activo: boolean
 }
 
-export interface BOIndicadorDto {
-  descripcionunidadmedida: string
-  errores: string | null
-  estadoPersistencia: EstadoPersistenciaEnum
-  idunidadmedida: number
-  listaErrores: string[] | null
+export interface BOIndicadorDto extends BOIndicador {
+  nombregrupo: string
   nombreunidadmedida: string
   simbolounidadmedida: string
+  nombresubgrupo: string
 }
 
 export interface FilterBOIndicador {

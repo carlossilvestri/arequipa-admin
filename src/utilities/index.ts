@@ -1,7 +1,10 @@
 import dayjs from 'dayjs'
 
-export const classicFormatDate = (date: string): string => {
-  return dayjs(date).format('YYYY-MM-DD')
+export const classicFormatDate = (
+  date: string | number | Date | dayjs.Dayjs | null | undefined,
+  format: string = 'YYYY-MM-DD',
+): string => {
+  return dayjs(date).format(format)
 }
 
 export const toDateString = (v: string | Date | null): string => {

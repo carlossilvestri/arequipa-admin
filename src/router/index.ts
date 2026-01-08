@@ -11,7 +11,7 @@ const router = createRouter({
       path: '/one-page',
       name: 'OnePage',
       component: () => import('../views/OnePage.vue'),
-      meta: { title: 'One Page' },
+      meta: { title: 'Indicadores' },
     },
     {
       path: '/',

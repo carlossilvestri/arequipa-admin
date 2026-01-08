@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gray-50 p-4 md:p-6">
     <!-- Header -->
     <div class="mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">Dashboard de Gráficos Interactivo</h1>
+      <h1 class="text-3xl font-bold text-gray-800">Gráfico</h1>
       <p class="text-gray-600 mt-2">Visualiza y analiza tus datos en tiempo real</p>
     </div>
 
@@ -149,6 +149,7 @@
     <!-- Filtro de fecha y controles adicionales -->
     <div class="bg-white rounded-xl shadow-sm p-4">
       <div class="flex flex-wrap items-center justify-between gap-4">
+        <!--
         <div class="flex flex-col space-y-2">
           <span class="text-sm font-medium text-gray-700">Filtro de Fechas:</span>
           <div class="flex flex-wrap gap-2 items-center">
@@ -171,7 +172,7 @@
             </button>
           </div>
         </div>
-
+        -->
         <div class="flex flex-col space-y-2">
           <span class="text-sm font-medium text-gray-700">Acciones:</span>
           <div class="flex gap-2">
@@ -214,6 +215,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import VueApexCharts from 'vue3-apexcharts'
+import { useTheme } from '@/composables/useTheme'
 
 // Configuración inicial
 const currentChartType = ref('line')
@@ -226,7 +228,7 @@ const dateRange = ref({
 })
 const showLegend = ref(true)
 const highlightedMetric = ref(null)
-const isDarkMode = ref(false)
+const { isDark, toggleTheme, enableDarkMode, enableLightMode } = useTheme()
 
 // Tipos de gráficos disponibles (incluyendo pie)
 const chartTypes = [
@@ -323,7 +325,7 @@ const mainPieOptions = computed(() => ({
     fontSize: '14px',
     fontFamily: 'inherit',
     labels: {
-      colors: isDarkMode.value ? '#E5E7EB' : '#374151',
+      colors: isDark.value ? '#E5E7EB' : '#374151',
     },
   },
   dataLabels: {
@@ -432,7 +434,7 @@ const chartOptions = computed(() => ({
     style: {
       fontSize: '16px',
       fontWeight: 'bold',
-      color: isDarkMode.value ? '#E5E7EB' : '#111827',
+      color: isDark.value ? '#E5E7EB' : '#111827',
     },
   },
   xaxis: {
@@ -452,7 +454,7 @@ const chartOptions = computed(() => ({
     ],
     labels: {
       style: {
-        colors: isDarkMode.value ? '#9CA3AF' : '#6B7280',
+        colors: isDark.value ? '#9CA3AF' : '#6B7280',
       },
     },
   },
@@ -460,14 +462,14 @@ const chartOptions = computed(() => ({
     labels: {
       formatter: (value) => `$${value}K`,
       style: {
-        colors: isDarkMode.value ? '#9CA3AF' : '#6B7280',
+        colors: isDark.value ? '#9CA3AF' : '#6B7280',
       },
     },
   },
   grid: {
-    borderColor: isDarkMode.value ? '#374151' : '#E5E7EB',
+    borderColor: isDark.value ? '#374151' : '#E5E7EB',
     row: {
-      colors: isDarkMode.value ? ['#1F2937', 'transparent'] : ['#F9FAFB', 'transparent'],
+      colors: isDark.value ? ['#1F2937', 'transparent'] : ['#F9FAFB', 'transparent'],
     },
   },
   legend: {
@@ -475,11 +477,11 @@ const chartOptions = computed(() => ({
     position: 'top',
     horizontalAlign: 'right',
     labels: {
-      colors: isDarkMode.value ? '#E5E7EB' : '#374151',
+      colors: isDark.value ? '#E5E7EB' : '#374151',
     },
   },
   tooltip: {
-    theme: isDarkMode.value ? 'dark' : 'light',
+    theme: isDark.value ? 'dark' : 'light',
     y: {
       formatter: (value) => `$${value}K`,
     },
@@ -619,8 +621,8 @@ const toggleLegend = () => {
 }
 
 const toggleDarkMode = () => {
-  isDarkMode.value = !isDarkMode.value
-  if (isDarkMode.value) {
+  isDark.value = !isDark.value
+  if (isDark.value) {
     document.documentElement.classList.add('dark')
   } else {
     document.documentElement.classList.remove('dark')

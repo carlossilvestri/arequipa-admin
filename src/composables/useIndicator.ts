@@ -1,10 +1,10 @@
-import type { BOIndicador } from '@/interfaces'
+import type { BOIndicadorDto } from '@/interfaces'
 import { ref } from 'vue'
 import { deleteIndicator, getIndicators } from '@/services/indicator'
 import { useIndicatorStore } from '@/stores/indicator'
 
 export function useIndicator() {
-  const indicators = ref<BOIndicador[]>([])
+  const indicators = ref<BOIndicadorDto[]>([])
   const loading = ref(true)
   const loadingDelete = ref(false)
   const indicatorStore = useIndicatorStore()

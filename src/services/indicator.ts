@@ -1,6 +1,7 @@
 import { axiosInstance } from '@/plugins/axios'
 import type {
   BOIndicador,
+  BOIndicadorDto,
   BOResultadoLogicaNegocio,
   CreateBOIndicadorRequest,
   DeleteByIdRequest,
@@ -24,9 +25,9 @@ const handleShowError = (error: any) => {
  * @Param filter: FilterBOIndicador. The object you want to filter.
  * @Return Promise<BOIndicador[]>
  */
-export async function getIndicators(filter: FilterBOIndicador): Promise<BOIndicador[]> {
+export async function getIndicators(filter: FilterBOIndicador): Promise<BOIndicadorDto[]> {
   try {
-    const { data } = await axiosInstance.get<BOIndicador[]>('/api/Indicador/LeerPorCriterio', {
+    const { data } = await axiosInstance.get<BOIndicadorDto[]>('/api/Indicador/LeerPorCriterio', {
       params: filter,
     })
     indicatorStore.saveIndicatorsOnStore(data)
