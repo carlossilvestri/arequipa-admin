@@ -181,6 +181,54 @@
             </div>
           </div>
         </div>
+
+        <div
+          class="flex items-center justify-between p-3 rounded-lg transition-colors"
+          :class="themeClasses.panel.secondary"
+        >
+          <div class="flex items-center space-x-3">
+            <div
+              class="p-2 rounded-lg shadow-sm transition-colors"
+              :class="themeClasses.panel.iconContainer"
+            >
+              <svg
+                class="w-5 h-5 transition-colors"
+                :class="themeClasses.icon.secondary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 19h16"
+                />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 15v4" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 11v8"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 8v11"
+                />
+              </svg>
+            </div>
+            <div>
+              <div class="text-xs transition-colors pb-3" :class="themeClasses.text.label">
+                Tipo de gráfico
+              </div>
+              <div class="font-medium transition-colors" :class="themeClasses.text.primary">
+                <GraphicButtons v-model="chartType" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- URL de la fuente -->
@@ -271,10 +319,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import type { BOIndicadorDto } from '@/interfaces/index'
 import { useTheme } from '@/composables/useTheme'
 import { QuillEditor } from '@vueup/vue-quill'
+import GraphicButtons from './GraphicButtons.vue'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 
 // Props
@@ -294,6 +343,9 @@ const emit = defineEmits<{
 // Tema actual (puede venir de un store, prop o composable)
 // En una app real, esto vendría de un composable useTheme o store
 const { isDark } = useTheme()
+
+// Tipo de gráfico seleccionado para este indicador
+const chartType = ref<'line' | 'bar' | 'area' | 'pie' | 'scatter' | 'radar'>('line')
 
 // Clases dinámicas según el tema
 const themeClasses = computed(() => ({

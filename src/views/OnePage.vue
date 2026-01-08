@@ -10,14 +10,21 @@
     >
       <h3 class="text-2xl font-semibold mb-6">Indicadores</h3>
       <div class="m-3">
-        <div>
-          <p>Seleccionar indicadores</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <div>
+              <p>Seleccionar indicadores</p>
+            </div>
+            <MultipleSelect
+              v-model="form.selectedItems"
+              :options="computedValues.indicatorOptions"
+              class="w-full mb-6 mt-3"
+            />
+          </div>
+          <div class="flex items-center justify-end">
+            <Button>Generar gráfico</Button>
+          </div>
         </div>
-        <MultipleSelect
-          v-model="form.selectedItems"
-          :options="computedValues.indicatorOptions"
-          class="w-full mb-6 mt-3"
-        />
 
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           <IndicatorCard

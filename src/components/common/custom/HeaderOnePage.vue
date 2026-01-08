@@ -21,7 +21,11 @@
             /></a>
           </div>
           <div id="brxe-pwacjg" class="brxe-block">
-            <div id="brxe-kwvmvm" data-script-id="kwvmvm" class="brxe-nav-menu">
+            <div
+              id="brxe-kwvmvm"
+              data-script-id="kwvmvm"
+              :class="['brxe-nav-menu', { 'show-mobile-menu': isMobileMenuOpen }]"
+            >
               <nav class="bricks-nav-menu-wrapper mobile_landscape">
                 <ul id="menu-menu-principal" class="bricks-nav-menu">
                   <li
@@ -43,7 +47,8 @@
                 class="bricks-mobile-menu-toggle"
                 aria-haspopup="true"
                 aria-label="Menú movil"
-                aria-expanded="false"
+                :aria-expanded="isMobileMenuOpen"
+                @click="toggleMobileMenu"
               >
                 <span class="bar-top"></span>
                 <span class="bar-center"></span>
@@ -54,58 +59,17 @@
                   <li
                     class="menu-item menu-item-type-post_type menu-item-object-page menu-item-104 bricks-menu-item"
                   >
-                    <a href="./publicaciones/">Publicaciones</a>
-                  </li>
-
-                  <li
-                    class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-home current-menu-ancestor current-menu-parent menu-item-has-children menu-item-22 bricks-menu-item"
-                  >
-                    <div class="brx-submenu-toggle icon-right aria-current">
-                      <a href="#nosotros" aria-current="page">Nosotros</a
-                      ><button aria-expanded="false" aria-label="Nosotros Submenú">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 12 12"
-                          fill="none"
-                          class="menu-item-icon"
-                        >
-                          <path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path>
-                        </svg>
-                      </button>
-                    </div>
-                    <ul class="sub-menu">
-                      <li
-                        class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-home menu-item-98 bricks-menu-item"
-                      >
-                        <a href="#objetivos" aria-current="page">Nuestros Objetivos</a>
-                      </li>
-                      <li
-                        class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-home menu-item-99 bricks-menu-item"
-                      >
-                        <a href="#lineas" aria-current="page">Líneas de Acción</a>
-                      </li>
-                      <li
-                        class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-home menu-item-100 bricks-menu-item"
-                      >
-                        <a href="#consejo" aria-current="page">Consejo Directivo</a>
-                      </li>
-                    </ul>
+                    <a href="#opcion-1">Indicadores</a>
                   </li>
 
                   <li
                     class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-home menu-item-101 bricks-menu-item"
                   >
-                    <a href="#asociados" aria-current="page">Asociados</a>
-                  </li>
-
-                  <li
-                    class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-home menu-item-103 bricks-menu-item"
-                  >
-                    <a href="#contacto" aria-current="page">Contacto</a>
+                    <a href="#opcion-2" aria-current="page">Descripción</a>
                   </li>
                 </ul>
               </nav>
-              <div class="bricks-mobile-menu-overlay"></div>
+              <div class="bricks-mobile-menu-overlay" @click="closeMobileMenu"></div>
             </div>
           </div>
         </div>
@@ -123,15 +87,23 @@
         públicas, participación en el debate sobre asuntos de desarrollo y la difusión de ideas de
         libertad y eficiencia económicas
       </div>
-      <!-- <a id="brxe-chvkxf" class="brxe-button bricks-button bricks-background-primary" href="#objetivos">Nuestros Objetivos</a> -->
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount } from 'vue'
+import { onMounted, onBeforeUnmount, ref } from 'vue'
 
 let ticking = false
+
+// Mobile menu state
+const isMobileMenuOpen = ref(false)
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+const closeMobileMenu = () => {
+  isMobileMenuOpen.value = false
+}
 
 const updateHeaderClass = () => {
   const header = document.getElementById('brx-header')
@@ -6742,12 +6714,13 @@ body.bricks-is-frontend :focus {
   background-attachment: fixed;
   background-position: center center;
   background-repeat: no-repeat;
-  background-image: url(@/assets/img/banners/banner-01.jpg) !important;
+  background-image: url(@/assets/img/banners/banner-02.png) !important;
   background-size: cover;
   height: 100vh;
   min-height: 651px;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 #brxe-htqmck {
@@ -6764,6 +6737,21 @@ body.bricks-is-frontend :focus {
   max-width: 120%;
   position: relative;
   left: -55px;
+}
+
+/* Dark overlay to improve white text contrast while keeping the banner visible */
+#brxe-bgklew::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}
+
+/* Ensure inner content is above the overlay */
+#brxe-tnoabo {
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 767px) {
@@ -8180,5 +8168,9 @@ header.sticky.scrolling {
 
 #brx-header.sticky .brxe-search button {
   transition: all 0.5s;
+}
+
+.custom-bg {
+  background: rgba(4, 0, 2, 0.09);
 }
 </style>
