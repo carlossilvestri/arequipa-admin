@@ -25,7 +25,7 @@
               class="w-full mb-6 mt-3"
               :key="`multiselect-key-${form.selectedItems.length}`"
             />
-            <p class="text-gray-900/50 text-[14px] italic mt-3 mb-5 ml-2">
+            <p class="text-gray-900/50 text-[14px] italic mt-3 mb-5 ml-2 dark:text-gray-100/50">
               Selecciona uno o más indicadores para analizarlos individualmente o compararlos en una
               sola gráfica
             </p>
