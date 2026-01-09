@@ -27,7 +27,7 @@
             class="text-lg font-bold leading-tight transition-colors mt-2"
             :class="themeClasses.text.primary"
           >
-            {{ truncateTextWithEllipsis(indicador.nombreindicador, 86) }}
+            {{ truncateTextWithEllipsis(indicador.nombreindicador, 40) }}
           </h3>
         </div>
         <!-- Botón para deseleccionar -->
@@ -54,7 +54,10 @@
       </div>
 
       <!-- Jerarquía grupo/subgrupo -->
-      <div class="flex items-center text-sm transition-colors" :class="themeClasses.text.secondary">
+      <div
+        class="flex items-center text-sm transition-colors min-h-[40px]"
+        :class="themeClasses.text.secondary"
+      >
         <div class="flex items-center space-x-2">
           <svg
             class="w-4 h-4 transition-colors"
@@ -71,10 +74,12 @@
             />
           </svg>
           <span class="font-medium transition-colors" :class="themeClasses.text.accent">
-            {{ indicador.nombregrupo }}
+            {{ truncateTextWithEllipsis(indicador.nombregrupo, 80) }}
           </span>
           <span :class="themeClasses.text.muted">/</span>
-          <span :class="themeClasses.text.accent">{{ indicador.nombresubgrupo }}</span>
+          <span :class="themeClasses.text.accent">{{
+            truncateTextWithEllipsis(indicador.nombresubgrupo, 80)
+          }}</span>
         </div>
       </div>
     </div>

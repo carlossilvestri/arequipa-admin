@@ -8,13 +8,13 @@
       id="opcion-1"
       class="scroll-mt-24 mx-auto max-w-(--breakpoint-2xl) px-4 md:px-6 py-12 md:py-16"
     >
-      <h3 class="text-2xl font-semibold mb-6">Indicadores</h3>
+      <h3 class="text-3xl font-semibold mb-6">Indicadores</h3>
       <div class="m-3">
         <div
           class="grid grid-cols-1 md:grid-cols-2 gap-6 border border-gray-300 rounded-md p-4 m-3"
         >
           <div>
-            <div class="flex">
+            <div class="flex text-3xl">
               <span
                 class="inline-flex items-center rounded-md bg-blue-400/10 px-2 py-1 text-xs font-medium text-blue-400 inset-ring inset-ring-blue-400/30"
                 >1</span
@@ -34,9 +34,9 @@
           </div>
         </div>
 
-        <div v-if="form.selectedItems.length > 0">
+        <div>
           <div class="border border-gray-300 rounded-md p-4 m-3">
-            <div class="flex mb-3">
+            <div class="flex mb-3 text-3xl">
               <span
                 class="inline-flex items-center rounded-md bg-blue-400/10 px-2 py-1 text-xs font-medium text-blue-400 inset-ring inset-ring-blue-400/30"
                 >2</span
@@ -62,7 +62,7 @@
         </div>
 
         <div v-if="form.selectedItems.length > 0">
-          <div class="border border-gray-300 rounded-md p-4 m-3">
+          <div class="border border-gray-300 rounded-md p-4 m-3 text-3xl">
             <div class="flex mt-2 mb-4">
               <span
                 class="inline-flex items-center rounded-md bg-blue-400/10 px-2 py-1 text-xs font-medium text-blue-400 inset-ring inset-ring-blue-400/30"
