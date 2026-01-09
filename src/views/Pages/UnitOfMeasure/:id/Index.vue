@@ -70,9 +70,9 @@ import {
   type UpdateBOUnidadMedidaRequest,
 } from '@/interfaces'
 import { createUnitMeasure, getUnitMeasureById, updateUnitMeasure } from '@/services/unitMeasure'
+import { routes } from '@/utilities/constants'
 
 const topic: string = 'Unidad de medida'
-const mainPage: string = 'units-of-measure'
 const currentPageTitle = ref(`Editar ${topic}`)
 const status = ref('')
 const loading = ref(false)
@@ -81,7 +81,7 @@ const router = useRouter()
 const defaultErrorMsg = 'Valor requerido'
 const schema = object().shape({
   NOMBREUNIDADMEDIDA: string().required(defaultErrorMsg).min(1).max(100),
-  SIMBOLOUNIDADMEDIDA: string().required(defaultErrorMsg).min(1).max(100),
+  SIMBOLOUNIDADMEDIDA: string().required(defaultErrorMsg).min(1).max(10, 'Máximo 10 caracteres'),
   DESCRIPCIONUNIDADMEDIDA: string().required(defaultErrorMsg).min(1).max(1000),
 })
 
@@ -139,7 +139,7 @@ const save = async () => {
     }
     await handleUpdate(updateUserData)
   }
-  router.push(`/${mainPage}`)
+  router.push(routes.admin.unitsOfMeasure.path)
   loading.value = false
 }
 

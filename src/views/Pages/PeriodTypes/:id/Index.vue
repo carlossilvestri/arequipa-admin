@@ -60,9 +60,9 @@ import {
   type UpdateBOTipoPeriodoRequest,
 } from '@/interfaces'
 import { createPeriodType, getPeriodTypeById, updatePeriodType } from '@/services/periodType'
+import { routes } from '@/utilities/constants'
 
 const topic: string = 'Tipo de período'
-const mainPage: string = 'period-types'
 const currentPageTitle = ref(`Editar ${topic}`)
 const status = ref('')
 const loading = ref(false)
@@ -130,7 +130,7 @@ const save = async () => {
     }
     await handleUpdate(updateData)
   }
-  router.push(`/${mainPage}`)
+  router.push(routes.admin.periodTypes.path)
   loading.value = false
 }
 

@@ -51,9 +51,9 @@ import {
   type UpdateBOGrupoRequest,
 } from '@/interfaces'
 import { createGroup, getGroupById, updateGroup } from '@/services/group'
+import { routes } from '@/utilities/constants'
 
 const topic: string = 'Grupo'
-const mainPage: string = 'groups'
 const currentPageTitle = ref(`Editar ${topic}`)
 const status = ref('')
 const loading = ref(false)
@@ -112,7 +112,7 @@ const save = async () => {
     }
     await handleUpdate(updateUserData)
   }
-  router.push(`/${mainPage}`)
+  router.push(`${routes.admin.groups.path}`)
   loading.value = false
 }
 

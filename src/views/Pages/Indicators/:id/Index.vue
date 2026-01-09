@@ -210,13 +210,13 @@ import SelectInput from '@/components/forms/FormElements/SelectInput.vue'
 import { getSubgroups } from '@/services/subgroup'
 import { getUnitMeasures } from '@/services/unitMeasure'
 import Checkbox from '@/components/common/custom/Checkbox.vue'
+import { routes } from '@/utilities/constants'
 
 const groups = ref<BOGrupo[]>([])
 const subgroups = ref<BOSubGrupo[]>([])
 const subgroupsFilter = ref<BOSubGrupo[]>([])
 const unitMeasures = ref<BOUnidadMedida[]>([])
 const topic: string = 'Indicador'
-const mainPage: string = 'indicators'
 const currentPageTitle = ref(`${topic}`)
 const status = ref('')
 const loading = ref(false)
@@ -361,7 +361,12 @@ const save = async () => {
   }
   if (status.value === 'new') {
     const response = await handleCreate(createUserData)
-    router.push(`/${mainPage}/${response.objeto?.idindicador}`)
+    router.push(
+      routes.admin.indicators.edit.path.replace(
+        ':id',
+        response.objeto?.idindicador.toString() || '',
+      ),
+    )
     // Reload page to show the new indicator
     setTimeout(async () => {
       await handleOnMount()

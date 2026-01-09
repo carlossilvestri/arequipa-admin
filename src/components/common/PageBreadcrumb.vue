@@ -6,7 +6,7 @@
         <li>
           <router-link
             class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400"
-            to="/"
+            :to="routes.admin.path"
           >
             Inicio
             <svg
@@ -36,8 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
-import GoBack from '@/components/common/custom/GoBack.vue'
+import { routes } from '@/utilities/constants'
+
 interface BreadcrumbProps {
   pageTitle: string
 }

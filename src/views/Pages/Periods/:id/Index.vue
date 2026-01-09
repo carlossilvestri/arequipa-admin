@@ -124,10 +124,10 @@ import { createPeriod, getPeriodById, updatePeriod } from '@/services/period'
 import SelectInput from '@/components/forms/FormElements/SelectInput.vue'
 import DatePicker from '@/components/forms/FormElements/DatePicker.vue'
 import { getPeriodTypes } from '@/services/periodType'
+import { routes } from '@/utilities/constants'
 
 const periodTypes = ref<BOTipoPeriodo[]>([])
 const topic: string = 'Período'
-const mainPage: string = 'periods'
 const currentPageTitle = ref(`Editar ${topic}`)
 const presentYear = new Date().getFullYear()
 const MIN_YEAR = 1900
@@ -237,7 +237,7 @@ const save = async () => {
     }
     await handleUpdate(updateData)
   }
-  router.push(`/${mainPage}`)
+  router.push(routes.admin.periods.path)
   loading.value = false
 }
 

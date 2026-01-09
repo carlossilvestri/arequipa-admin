@@ -88,9 +88,9 @@ import {
   updateTerritory,
 } from '@/services/territories'
 import { getTerritoryTypes } from '@/services/territoryType'
+import { routes } from '@/utilities/constants'
 
 const topic: string = 'Territorio'
-const mainPage: string = 'territories'
 const currentPageTitle = ref(`Editar ${topic}`)
 const status = ref('')
 const loading = ref(false)
@@ -177,7 +177,7 @@ const save = async () => {
     }
     await handleUpdate(updateUserData)
   }
-  router.push(`/${mainPage}`)
+  router.push(routes.admin.territories.path)
   loading.value = false
 }
 

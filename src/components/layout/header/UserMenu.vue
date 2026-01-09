@@ -65,13 +65,14 @@ import { ChevronDownIcon, LogoutIcon, UserCircleIcon } from '@/icons'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { routes } from '@/utilities/constants'
 
 const dropdownOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
 const userStore = useUserStore()
 
 const menuItems = [
-  { href: '/profile', icon: UserCircleIcon, text: 'Editar perfil' },
+  { href: routes.admin.profile.path, icon: UserCircleIcon, text: 'Editar perfil' },
   //{ href: '/profile', icon: SettingsIcon, text: 'Account settings' },
   //{ href: '/profile', icon: InfoCircleIcon, text: 'Soporte' },
 ]

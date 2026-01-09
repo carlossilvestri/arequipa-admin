@@ -8,7 +8,9 @@
             <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
               {{ currentPageTitle }}
             </h3>
-            <Button variant="primary" @click="router.push(`/${mainRoute}/new`)">Agregar</Button>
+            <Button variant="primary" @click="router.push(routes.admin.territoryTypes.new.path)"
+              >Agregar</Button
+            >
           </div>
         </template>
         <DynamicTableOne
@@ -43,18 +45,18 @@ import Button from '@/components/ui/Button.vue'
 import { useTerritoryTypeStore } from '@/stores/territoryType'
 import { useTerritoryType } from '@/composables/useTerritoryType'
 import type { BOTipoTerritorio } from '@/interfaces'
+import { routes } from '@/utilities/constants'
 
 const { loadTerritoryTypes, loading, handleDelete, loadingDelete } = useTerritoryType()
 const territoryTypeStore = useTerritoryTypeStore()
 const currentPageTitle = ref('Tipos de territorio')
-const mainRoute = 'territory-types'
 const router = useRouter()
 const showConfirm = ref(false)
 const rowToDelete = ref<BOTipoTerritorio | null>(null)
 
 function onEdit(row: BOTipoTerritorio) {
   if (!row || row.idtipoterritorio == null) return
-  router.push(`/${mainRoute}/${row.idtipoterritorio}`)
+  router.push(routes.admin.territoryTypes.edit.path.replace(':id', row.idtipoterritorio.toString()))
 }
 
 function onDelete(row: BOTipoTerritorio) {

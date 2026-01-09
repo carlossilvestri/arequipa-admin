@@ -8,7 +8,9 @@
             <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
               {{ currentPageTitle }}
             </h3>
-            <Button variant="primary" @click="router.push(`/${mainRoute}/new`)">Agregar</Button>
+            <Button variant="primary" @click="router.push(routes.admin.unitsOfMeasure.new.path)"
+              >Agregar</Button
+            >
           </div>
         </template>
         <DynamicTableOne
@@ -43,18 +45,18 @@ import Button from '@/components/ui/Button.vue'
 import { useUnitMeasureStore } from '@/stores/unitMeasure'
 import { useUnitMeasure } from '@/composables/useUnitMeasure'
 import type { BOUnidadMedida } from '@/interfaces'
+import { routes } from '@/utilities/constants'
 
 const { loadUnitMeasures, loading, handleDelete, loadingDelete } = useUnitMeasure()
 const unitMeasureStore = useUnitMeasureStore()
 const currentPageTitle = ref('Unidades de Medida')
-const mainRoute = 'units-of-measure'
 const router = useRouter()
 const showConfirm = ref(false)
 const rowToDelete = ref<BOUnidadMedida | null>(null)
 
 function onEdit(row: BOUnidadMedida) {
   if (!row || row.idunidadmedida == null) return
-  router.push(`/${mainRoute}/${row.idunidadmedida}`)
+  router.push(routes.admin.unitsOfMeasure.edit.path.replace(':id', row.idunidadmedida.toString()))
 }
 
 function onDelete(row: BOUnidadMedida) {

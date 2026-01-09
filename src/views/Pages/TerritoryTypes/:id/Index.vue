@@ -64,9 +64,9 @@ import {
   getTerritoryTypeById,
   updateTerritoryType,
 } from '@/services/territoryType'
+import { routes } from '@/utilities/constants'
 
 const topic: string = 'Tipo de territorio'
-const mainPage: string = 'territory-types'
 const currentPageTitle = ref(`Editar ${topic}`)
 const status = ref('')
 const loading = ref(false)
@@ -134,7 +134,7 @@ const save = async () => {
     }
     await handleUpdate(updateData)
   }
-  router.push(`/${mainPage}`)
+  router.push(routes.admin.territoryTypes.path)
   loading.value = false
 }
 

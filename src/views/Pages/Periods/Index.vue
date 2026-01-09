@@ -8,7 +8,9 @@
             <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
               {{ currentPageTitle }}
             </h3>
-            <Button variant="primary" @click="router.push(`/${mainRoute}/new`)">Agregar</Button>
+            <Button variant="primary" @click="router.push(routes.admin.periods.new.path)"
+              >Agregar</Button
+            >
           </div>
         </template>
         <DynamicTableOne
@@ -43,18 +45,18 @@ import Button from '@/components/ui/Button.vue'
 import { usePeriodStore } from '@/stores/period'
 import { usePeriod } from '@/composables/usePeriod'
 import type { BOPeriodo } from '@/interfaces'
+import { routes } from '@/utilities/constants'
 
 const { loadPeriods, loading, handleDelete, loadingDelete } = usePeriod()
 const periodTypeStore = usePeriodStore()
 const currentPageTitle = ref('Períodos')
-const mainRoute = 'periods'
 const router = useRouter()
 const showConfirm = ref(false)
 const rowToDelete = ref<BOPeriodo | null>(null)
 
 function onEdit(row: BOPeriodo) {
   if (!row || row.idperiodo == null) return
-  router.push(`/${mainRoute}/${row.idperiodo}`)
+  router.push(routes.admin.periods.edit.path.replace(':id', row.idperiodo.toString()))
 }
 
 function onDelete(row: BOPeriodo) {

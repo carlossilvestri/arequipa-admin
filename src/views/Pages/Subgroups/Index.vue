@@ -8,7 +8,9 @@
             <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
               {{ currentPageTitle }}
             </h3>
-            <Button variant="primary" @click="router.push(`/${mainRoute}/new`)">Agregar</Button>
+            <Button variant="primary" @click="router.push(routes.admin.subgroups.new.path)"
+              >Agregar</Button
+            >
           </div>
         </template>
         <DynamicTableOne
@@ -43,18 +45,18 @@ import Button from '@/components/ui/Button.vue'
 import { useSubGroupStore } from '@/stores/subgroup'
 import { useSubGroup } from '@/composables/useSubGroup'
 import type { BOSubGrupo } from '@/interfaces'
+import { routes } from '@/utilities/constants'
 
 const { loadSubgroups, loading, handleDelete, loadingDelete } = useSubGroup()
 const unitSubgroupStore = useSubGroupStore()
 const currentPageTitle = ref('Subgrupos')
-const mainRoute = 'subgroups'
 const router = useRouter()
 const showConfirm = ref(false)
 const rowToDelete = ref<BOSubGrupo | null>(null)
 
 function onEdit(row: BOSubGrupo) {
   if (!row || row.idsubgrupo == null) return
-  router.push(`/${mainRoute}/${row.idsubgrupo}`)
+  router.push(routes.admin.subgroups.edit.path.replace(':id', row.idsubgrupo.toString()))
 }
 
 function onDelete(row: BOSubGrupo) {

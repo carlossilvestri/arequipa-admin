@@ -8,7 +8,9 @@
             <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
               {{ currentPageTitle }}
             </h3>
-            <Button variant="primary" @click="router.push(`/${mainRoute}/new`)">Agregar</Button>
+            <Button variant="primary" @click="router.push(`${routes.admin.indicators.new.path}`)"
+              >Agregar</Button
+            >
           </div>
           <!-- Filtros -->
           <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
@@ -103,18 +105,18 @@ import { getIndicators } from '@/services/indicator'
 import { getGroups } from '@/services/group'
 import { getSubgroups } from '@/services/subgroup'
 import { getUnitMeasures } from '@/services/unitMeasure'
+import { routes } from '@/utilities/constants'
 
 const { loadIndicators, loading, handleDelete, loadingDelete } = useIndicator()
 const indicatorStore = useIndicatorStore()
 const currentPageTitle = ref('Indicadores')
-const mainRoute = 'indicators'
 const router = useRouter()
 const showConfirm = ref(false)
 const rowToDelete = ref<BOIndicador | null>(null)
 
 function onEdit(row: BOIndicador) {
   if (!row || row.idindicador == null) return
-  router.push(`/${mainRoute}/${row.idindicador}`)
+  router.push(routes.admin.indicators.edit.path.replace(':id', row.idindicador.toString()))
 }
 
 function onDelete(row: BOIndicador) {

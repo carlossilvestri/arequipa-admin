@@ -194,6 +194,7 @@ import CustomInput from '@/components/common/custom/CustomInput.vue'
 import PasswordInput from '@/components/common/custom/PasswordInput.vue'
 import { login } from '@/services/users'
 import type { LoginRequest } from '@/interfaces'
+import { routes } from '@/utilities/constants'
 const loading = ref(false)
 const router = useRouter()
 
@@ -231,7 +232,7 @@ const handleSubmit = async (values: any) => {
 
   const response = await login(loginRequest)
   if (response.exito) {
-    router.push('/')
+    router.push(routes.admin.path)
   } else {
     error.value = true
   }

@@ -82,9 +82,9 @@ import {
   type UpdateUserRequest,
 } from '@/interfaces'
 import { createUser } from '@/services/users'
+import { routes } from '@/utilities/constants'
 
 const topic: string = 'Usuario'
-const mainPage: string = 'users'
 const currentPageTitle = ref(`Editar ${topic}`)
 const status = ref('')
 const loading = ref(false)
@@ -154,7 +154,7 @@ const save = async () => {
     }
     await handleUpdate(updateUserData)
   }
-  router.push(`/${mainPage}`)
+  router.push(`/${routes.admin.users.path}`)
   loading.value = false
 }
 

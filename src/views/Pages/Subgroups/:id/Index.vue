@@ -68,9 +68,9 @@ import {
 } from '@/interfaces'
 import { createSubGroup, getSubGroupById, updateSubGroup } from '@/services/subgroup'
 import { getGroups } from '@/services/group'
+import { routes } from '@/utilities/constants'
 
 const topic: string = 'Subgrupo'
-const mainPage: string = 'subgroups'
 const currentPageTitle = ref(`Editar ${topic}`)
 const status = ref('')
 const loading = ref(false)
@@ -145,7 +145,7 @@ const save = async () => {
     }
     await handleUpdate(updateUserData)
   }
-  router.push(`/${mainPage}`)
+  router.push(routes.admin.subgroups.path)
   loading.value = false
 }
 

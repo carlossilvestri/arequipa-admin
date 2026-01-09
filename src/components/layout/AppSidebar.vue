@@ -14,7 +14,7 @@
     @mouseleave="isHovered = false"
   >
     <div :class="['py-8 flex', !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start']">
-      <router-link to="/">
+      <router-link :to="routes.admin.path">
         <img
           v-if="isExpanded || isHovered || isMobileOpen"
           class="dark:hidden"
@@ -193,6 +193,7 @@ import {
 import SidebarWidget from './SidebarWidget.vue'
 import BoxCubeIcon from '@/icons/BoxCubeIcon.vue'
 import { useSidebar } from '@/composables/useSidebar'
+import { routes } from '@/utilities/constants'
 
 const route = useRoute()
 
@@ -241,47 +242,47 @@ const menuGroups = [
       {
         name: 'Usuarios',
         icon: ListIcon,
-        path: '/users',
+        path: routes.admin.users.path,
       },
       {
         name: 'Unidades de medida',
         icon: ListIcon,
-        path: '/units-of-measure',
+        path: routes.admin.unitsOfMeasure.path,
       },
       {
         name: 'Grupos',
         icon: ListIcon,
-        path: '/groups',
+        path: routes.admin.groups.path,
       },
       {
         name: 'Subgrupos',
         icon: ListIcon,
-        path: '/subgroups',
+        path: routes.admin.subgroups.path,
       },
       {
         name: 'Tipos de períodos',
         icon: ListIcon,
-        path: '/period-types',
+        path: routes.admin.periodTypes.path,
       },
       {
         name: 'Tipos de territorios',
         icon: ListIcon,
-        path: '/territory-types',
+        path: routes.admin.territoryTypes.path,
       },
       {
         name: 'Períodos',
         icon: ListIcon,
-        path: '/periods',
+        path: routes.admin.periods.path,
       },
       {
         name: 'Territorios',
         icon: ListIcon,
-        path: '/territories',
+        path: routes.admin.territories.path,
       },
       {
         name: 'Indicadores',
         icon: ListIcon,
-        path: '/indicators',
+        path: routes.admin.indicators.path,
       },
     ],
   },

@@ -8,7 +8,9 @@
             <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
               {{ currentPageTitle }}
             </h3>
-            <Button variant="primary" @click="router.push(`/${mainRoute}/new`)">Agregar</Button>
+            <Button variant="primary" @click="router.push(routes.admin.groups.new.path)"
+              >Agregar</Button
+            >
           </div>
         </template>
         <DynamicTableOne
@@ -43,18 +45,18 @@ import Button from '@/components/ui/Button.vue'
 import { useGroupStore } from '@/stores/group'
 import { useGroup } from '@/composables/useGroup'
 import type { BOGrupo } from '@/interfaces'
+import { routes } from '@/utilities/constants'
 
 const { loadGroups, loading, handleDelete, loadingDelete } = useGroup()
 const unitMeasureStore = useGroupStore()
 const currentPageTitle = ref('Grupos')
-const mainRoute = 'groups'
 const router = useRouter()
 const showConfirm = ref(false)
 const rowToDelete = ref<BOGrupo | null>(null)
 
 function onEdit(row: BOGrupo) {
   if (!row || row.idgrupo == null) return
-  router.push(`/${mainRoute}/${row.idgrupo}`)
+  router.push(routes.admin.groups.edit.path.replace(':id', row.idgrupo.toString()))
 }
 
 function onDelete(row: BOGrupo) {

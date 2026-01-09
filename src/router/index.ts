@@ -8,13 +8,13 @@ const router = createRouter({
   },
   routes: [
     {
-      path: '/one-page',
+      path: '/',
       name: 'OnePage',
       component: () => import('../views/OnePage.vue'),
       meta: { title: 'Indicadores' },
     },
     {
-      path: '/',
+      path: '/admin',
       name: 'Ecommerce',
       component: () => import('../views/Ecommerce.vue'),
       meta: {
@@ -23,95 +23,11 @@ const router = createRouter({
       },
     },
     {
-      path: '/calendar',
-      name: 'Calendar',
-      component: () => import('../views/Others/Calendar.vue'),
-      meta: {
-        title: 'Calendar',
-      },
-    },
-    {
-      path: '/profile',
+      path: '/admin/profile',
       name: 'Profile',
       component: () => import('../views/Others/UserProfile.vue'),
       meta: {
         title: 'Profile',
-      },
-    },
-    {
-      path: '/form-elements',
-      name: 'Form Elements',
-      component: () => import('../views/Forms/FormElements.vue'),
-      meta: {
-        title: 'Form Elements',
-      },
-    },
-    {
-      path: '/basic-tables',
-      name: 'Basic Tables',
-      component: () => import('../views/Tables/BasicTables.vue'),
-      meta: {
-        title: 'Basic Tables',
-      },
-    },
-    {
-      path: '/line-chart',
-      name: 'Line Chart',
-      component: () => import('../views/Chart/LineChart/LineChart.vue'),
-    },
-    {
-      path: '/bar-chart',
-      name: 'Bar Chart',
-      component: () => import('../views/Chart/BarChart/BarChart.vue'),
-    },
-    {
-      path: '/alerts',
-      name: 'Alerts',
-      component: () => import('../views/UiElements/Alerts.vue'),
-      meta: {
-        title: 'Alerts',
-      },
-    },
-    {
-      path: '/avatars',
-      name: 'Avatars',
-      component: () => import('../views/UiElements/Avatars.vue'),
-      meta: {
-        title: 'Avatars',
-      },
-    },
-    {
-      path: '/badge',
-      name: 'Badge',
-      component: () => import('../views/UiElements/Badges.vue'),
-      meta: {
-        title: 'Badge',
-      },
-    },
-
-    {
-      path: '/buttons',
-      name: 'Buttons',
-      component: () => import('../views/UiElements/Buttons.vue'),
-      meta: {
-        title: 'Buttons',
-      },
-    },
-
-    {
-      path: '/images',
-      name: 'Images',
-      component: () => import('../views/UiElements/Images.vue'),
-      meta: {
-        title: 'Images',
-      },
-    },
-    {
-      path: '/videos',
-      name: 'Videos',
-      component: () => import('../views/UiElements/Videos.vue'),
-      meta: {
-        title: 'Videos',
       },
     },
     {
@@ -150,7 +66,7 @@ const router = createRouter({
     },
     /* New custom modules */
     {
-      path: '/indicators',
+      path: '/admin/indicators',
       name: 'Indicadores',
       component: () => import('../views/Pages/Indicators/Index.vue'),
       meta: {
@@ -159,7 +75,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/indicators/new',
+      path: '/admin/indicators/new',
       name: 'IndicatorNew',
       component: () => import('../views/Pages/Indicators/:id/Index.vue'),
       meta: {
@@ -168,7 +84,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/indicators/:id',
+      path: '/admin/indicators/:id',
       name: 'IndicatorEdit',
       component: () => import('../views/Pages/Indicators/:id/Index.vue'),
       meta: {
@@ -177,16 +93,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/periods',
-      name: 'Períodos',
-      component: () => import('../views/Pages/Periods/Index.vue'),
-      meta: {
-        title: 'Períodos',
-        requiresAuth: true,
-      },
-    },
-    {
-      path: '/territories/new',
+      path: '/admin/territories/new',
       name: 'TerritoryNew',
       component: () => import('../views/Pages/Territory/:id/Index.vue'),
       meta: {
@@ -195,7 +102,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/territories/:id',
+      path: '/admin/territories/:id',
       name: 'TerritoryEdit',
       component: () => import('../views/Pages/Territory/:id/Index.vue'),
       meta: {
@@ -204,7 +111,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/territories',
+      path: '/admin/territories',
       name: 'Territorios',
       component: () => import('../views/Pages/Territory/Index.vue'),
       meta: {
@@ -213,7 +120,16 @@ const router = createRouter({
       },
     },
     {
-      path: '/periods/new',
+      path: '/admin/periods',
+      name: 'Períodos',
+      component: () => import('../views/Pages/Periods/Index.vue'),
+      meta: {
+        title: 'Períodos',
+        requiresAuth: true,
+      },
+    },
+    {
+      path: '/admin/periods/new',
       name: 'PeriodNew',
       component: () => import('../views/Pages/Periods/:id/Index.vue'),
       meta: {
@@ -222,7 +138,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/periods/:id',
+      path: '/admin/periods/:id',
       name: 'PeriodEdit',
       component: () => import('../views/Pages/Periods/:id/Index.vue'),
       meta: {
@@ -231,7 +147,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/territory-types',
+      path: '/admin/territory-types',
       name: 'Tipos de territorio',
       component: () => import('../views/Pages/TerritoryTypes/Index.vue'),
       meta: {
@@ -240,7 +156,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/territory-types/new',
+      path: '/admin/territory-types/new',
       name: 'TerritoryTypeNew',
       component: () => import('../views/Pages/TerritoryTypes/:id/Index.vue'),
       meta: {
@@ -249,7 +165,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/territory-types/:id',
+      path: '/admin/territory-types/:id',
       name: 'TerritoryTypeEdit',
       component: () => import('../views/Pages/TerritoryTypes/:id/Index.vue'),
       meta: {
@@ -258,7 +174,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/period-types',
+      path: '/admin/period-types',
       name: 'Tipos de período',
       component: () => import('../views/Pages/PeriodTypes/Index.vue'),
       meta: {
@@ -267,7 +183,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/period-types/new',
+      path: '/admin/period-types/new',
       name: 'PeriodTypeNew',
       component: () => import('../views/Pages/PeriodTypes/:id/Index.vue'),
       meta: {
@@ -276,7 +192,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/period-types/:id',
+      path: '/admin/period-types/:id',
       name: 'PeriodTypeEdit',
       component: () => import('../views/Pages/PeriodTypes/:id/Index.vue'),
       meta: {
@@ -285,7 +201,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/subgroups',
+      path: '/admin/subgroups',
       name: 'Subgrupos',
       component: () => import('../views/Pages/Subgroups/Index.vue'),
       meta: {
@@ -294,7 +210,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/subgroups/new',
+      path: '/admin/subgroups/new',
       name: 'SubgroupNew',
       component: () => import('../views/Pages/Subgroups/:id/Index.vue'),
       meta: {
@@ -303,7 +219,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/subgroups/:id',
+      path: '/admin/subgroups/:id',
       name: 'SubgroupEdit',
       component: () => import('../views/Pages/Subgroups/:id/Index.vue'),
       meta: {
@@ -312,7 +228,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/groups',
+      path: '/admin/groups',
       name: 'Grupos',
       component: () => import('../views/Pages/Groups/Index.vue'),
       meta: {
@@ -321,7 +237,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/groups/new',
+      path: '/admin/groups/new',
       name: 'GroupNew',
       component: () => import('../views/Pages/Groups/:id/Index.vue'),
       meta: {
@@ -330,7 +246,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/groups/:id',
+      path: '/admin/groups/:id',
       name: 'GroupEdit',
       component: () => import('../views/Pages/Groups/:id/Index.vue'),
       meta: {
@@ -339,7 +255,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/units-of-measure',
+      path: '/admin/units-of-measure',
       name: 'Unidades de Medida',
       component: () => import('../views/Pages/UnitOfMeasure/Table.vue'),
       meta: {
@@ -348,7 +264,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/units-of-measure/new',
+      path: '/admin/units-of-measure/new',
       name: 'UnitOfMeasureNew',
       component: () => import('../views/Pages/UnitOfMeasure/:id/Index.vue'),
       meta: {
@@ -357,7 +273,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/units-of-measure/:id',
+      path: '/admin/units-of-measure/:id',
       name: 'UnitOfMeasureEdit',
       component: () => import('../views/Pages/UnitOfMeasure/:id/Index.vue'),
       meta: {
@@ -366,7 +282,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/users',
+      path: '/admin/users',
       name: 'Usuarios',
       component: () => import('../views/Pages/Users/Index.vue'),
       meta: {
@@ -376,7 +292,7 @@ const router = createRouter({
     },
 
     {
-      path: '/users/new',
+      path: '/admin/users/new',
       name: 'UserNew',
       component: () => import('../views/Pages/Users/:id/Index.vue'),
       meta: {
@@ -385,7 +301,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/users/:id',
+      path: '/admin/users/:id',
       name: 'UserEdit',
       component: () => import('../views/Pages/Users/:id/Index.vue'),
       meta: {
