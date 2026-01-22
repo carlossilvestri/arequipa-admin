@@ -1,11 +1,5 @@
 <template>
   <div class="min-h-screen bg-gray-50 p-4 md:p-6">
-    <!-- Header -->
-    <div class="mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">Gráfico</h1>
-      <p class="text-gray-600 mt-2">Visualiza y analiza tus datos en tiempo real</p>
-    </div>
-
     <!-- Vista principal condicional -->
     <div v-if="currentChartType === 'pie'" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
       <!-- Gráfico de Pie principal -->
@@ -61,9 +55,7 @@
     <!-- Gráfico principal (para otros tipos) -->
     <div v-else class="bg-white rounded-xl shadow-sm p-4 mb-6">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-semibold text-gray-800">
-          Vista Principal - {{ currentChartTypeLabel }}
-        </h2>
+        <h2 class="text-xl font-semibold text-gray-800">Resultados del análisis</h2>
         <div class="flex items-center space-x-4">
           <div class="text-sm text-gray-500">Actualizado: {{ lastUpdate }}</div>
           <button
@@ -82,137 +74,43 @@
         height="400"
         ref="mainChart"
       />
-    </div>
 
-    <!-- Controles -->
-    <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
-      <div class="flex flex-wrap items-center justify-between gap-4">
-        <!-- Selector de tipo de gráfico -->
-        <!--
-        <div class="flex flex-col space-y-2 w-full md:w-auto">
-          <span class="text-sm font-medium text-gray-700">Tipo de Gráfico Principal:</span>
-          <div class="flex flex-wrap gap-2">
-            <button
-              v-for="chartType in chartTypes"
-              :key="chartType.value"
-              @click="changeChartType(chartType.value)"
-              :class="[
-                'px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2',
-                currentChartType === chartType.value
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
-              ]"
-            >
-              <span>{{ chartType.icon }}</span>
-              <span>{{ chartType.label }}</span>
-            </button>
-          </div>
-        </div>
-        -->
+      <!-- Controles de exportación -->
+      <div class="flex flex-col space-y-2">
+        <span class="text-sm font-medium text-gray-700">Exportar Datos:</span>
+        <div class="flex items-center space-x-3">
+          <button
+            @click="exportToCSV"
+            class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center space-x-2 text-xl"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            <span>CSV</span>
+          </button>
 
-        <!-- Controles de exportación -->
-        <div class="flex flex-col space-y-2">
-          <span class="text-sm font-medium text-gray-700">Exportar Datos:</span>
-          <div class="flex items-center space-x-3">
-            <button
-              @click="exportToCSV"
-              class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center space-x-2"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-              <span>CSV</span>
-            </button>
-
-            <button
-              @click="exportToPNG"
-              class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center space-x-2"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              <span>PNG</span>
-            </button>
-          </div>
+          <button
+            @click="exportToPNG"
+            class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center space-x-2 text-xl"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            <span>PNG</span>
+          </button>
         </div>
       </div>
     </div>
-
-    <!-- Filtro de fecha y controles adicionales -->
-    <!--
-    <div class="bg-white rounded-xl shadow-sm p-4">
-      <div class="flex flex-wrap items-center justify-between gap-4">
-
-        <div class="flex flex-col space-y-2">
-          <span class="text-sm font-medium text-gray-700">Filtro de Fechas:</span>
-          <div class="flex flex-wrap gap-2 items-center">
-            <input
-              type="date"
-              v-model="dateRange.start"
-              class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <span class="text-gray-400">hasta</span>
-            <input
-              type="date"
-              v-model="dateRange.end"
-              class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <button
-              @click="applyDateFilter"
-              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Aplicar
-            </button>
-          </div>
-        </div>
-        <div class="flex flex-col space-y-2">
-          <span class="text-sm font-medium text-gray-700">Acciones:</span>
-          <div class="flex gap-2">
-            <button
-              @click="resetFilters"
-              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors flex items-center space-x-2"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-              <span>Restablecer</span>
-            </button>
-
-            <button
-              @click="toggleDarkMode"
-              class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors flex items-center space-x-2"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                />
-              </svg>
-              <span>Modo Oscuro</span>
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-        -->
   </div>
 </template>
 

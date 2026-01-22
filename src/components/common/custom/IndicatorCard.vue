@@ -15,19 +15,12 @@
       <div class="flex justify-between items-start mb-3">
         <!-- Código y nombre -->
         <div class="flex-1">
-          <div class="flex items-center space-x-3 mb-1">
-            <span
-              class="px-3 py-1 text-sm font-bold rounded-lg transition-colors"
-              :class="themeClasses.badge.primary"
-            >
-              {{ indicador.codigoindicador }}
-            </span>
-          </div>
+          <div class="flex items-center space-x-3 mb-1"></div>
           <h3
             class="text-lg font-bold leading-tight transition-colors mt-2"
             :class="themeClasses.text.primary"
           >
-            {{ truncateTextWithEllipsis(indicador.nombreindicador, 40) }}
+            {{ truncateTextWithEllipsis(indicador.nombreindicador, 80) }}
           </h3>
         </div>
         <!-- Botón para deseleccionar -->
@@ -42,14 +35,7 @@
           aria-label="Deseleccionar indicador"
           title="Quitar"
         >
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+          <TrashIcon />
         </button>
       </div>
 
@@ -62,25 +48,32 @@
           <svg
             class="w-4 h-4 transition-colors"
             :class="themeClasses.icon"
+            viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            viewBox="0 0 24 24"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-            />
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke-width="2" />
+            <!-- Barras verticales desde abajo: larga, corta, larga -->
+            <path d="M8 17V8" stroke-width="2" stroke-linecap="round" />
+            <path d="M12 17V12" stroke-width="2" stroke-linecap="round" />
+            <path d="M16 17V8" stroke-width="2" stroke-linecap="round" />
           </svg>
-          <span class="font-medium transition-colors" :class="themeClasses.text.accent">
-            {{ truncateTextWithEllipsis(indicador.nombregrupo, 80) }}
-          </span>
-          <span :class="themeClasses.text.muted">/</span>
+
           <span :class="themeClasses.text.accent">{{
-            truncateTextWithEllipsis(indicador.nombresubgrupo, 80)
+            truncateTextWithEllipsis(indicador.nombreunidadmedida, 80)
           }}</span>
         </div>
+      </div>
+
+      <!-- Botón para abrir detalles -->
+      <div class="mt-1">
+        <button
+          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+          :class="themeClasses.button.primary"
+          @click="showDetails = true"
+        >
+          Ver más detalles
+        </button>
       </div>
     </div>
 
@@ -99,32 +92,63 @@
         id="GRAFICO"
         placeholder="Seleccione un tipo de gráfico"
       />
-
-      <!-- Elegir periodo -->
+      <!-- Elegir tipo de territorio -->
       <div class="mt-3">
         <SelectInput
-          v-model="selectedPeriodType"
+          v-model="selectedTerritoryType"
           :options="
-            periodTypeStore.periodTypes.map((pt) => ({
-              value: pt.idtipoperiodo,
-              label: pt.nombretipoperiodo,
+            territoryTypeStore.territoryTypes.map((pt) => ({
+              value: pt.idtipoterritorio,
+              label: pt.nombretipoterritorio,
             }))
           "
-          label="Tipo de período"
-          id="IDTIPOPERIODO"
-          placeholder="Seleccione un tipo de período"
+          label="Tipo de territorio"
+          id="IDTIPOTERREITORIO"
+          placeholder="Seleccione un tipo de territorio"
         />
       </div>
-
-      <!-- Botón para abrir detalles -->
-      <div class="mt-4">
-        <button
-          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
-          :class="themeClasses.button.primary"
-          @click="showDetails = true"
+      <!-- Elegir periodo -->
+      <div class="mt-3">
+        <label
+          for="IDTIPOPERIODO"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-400"
+          >Tipo de periodo</label
         >
-          Ver más detalles
-        </button>
+        <div class="flex items-center space-x-2">
+          <SelectInput
+            v-model="selectedPeriodType"
+            :options="
+              periodTypeStore.periodTypes.map((pt) => ({
+                value: pt.idtipoperiodo,
+                label: pt.nombretipoperiodo,
+              }))
+            "
+            label=""
+            id="IDTIPOPERIODO"
+            placeholder="Seleccione un tipo de período"
+          />
+          <SelectInput
+            v-model="selectedPeriodTypeUntil"
+            :options="
+              periodTypeStore.periodTypes.map((pt) => ({
+                value: pt.idtipoperiodo,
+                label: pt.nombretipoperiodo,
+              }))
+            "
+            id="IDTIPOPERIODO"
+            label=""
+            placeholder="Seleccione un tipo de período"
+          />
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <Checkbox
+          :name="`ENLAGRAFICA-${props.indicador.idindicador}`"
+          :modelValue="checkboxValue"
+          @update:modelValue="checkboxValue = $event"
+          label="Incluir este indicador en la gráfica"
+        />
       </div>
     </div>
   </div>
@@ -260,14 +284,6 @@
               </div>
             </div>
           </div>
-          <!--
-          <div class="text-right">
-            <div class="text-xs transition-colors" :class="themeClasses.text.label">ID</div>
-            <div class="font-mono text-sm transition-colors" :class="themeClasses.text.mono">
-              {{ indicador.idunidadmedida }}
-            </div>
-          </div>
-          -->
         </div>
 
         <!-- Disponibilidad referencial -->
@@ -377,6 +393,9 @@ import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import { truncateTextWithEllipsis } from '@/utilities'
 import SelectInput from '@/components/forms/FormElements/SelectInput.vue'
 import { usePeriodTypeStore } from '@/stores/periodType'
+import { useTerritoryTypeStore } from '@/stores/territoryType'
+import TrashIcon from '@/icons/TrashIcon.vue'
+import Checkbox from '@/components/common/custom/Checkbox.vue'
 
 // Props
 interface Props {
@@ -385,7 +404,7 @@ interface Props {
 
 const props = defineProps<Props>()
 const periodTypeStore = usePeriodTypeStore()
-
+const territoryTypeStore = useTerritoryTypeStore()
 // Emits
 const emit = defineEmits<{
   editar: [indicator: BOIndicadorDto]
@@ -401,15 +420,10 @@ const { isDark } = useTheme()
 // Tipo de gráfico seleccionado para este indicador
 const chartType = ref<'line' | 'bar' | 'area' | 'pie' | 'scatter' | 'radar'>('line')
 const selectedPeriodType = ref<string | number | null>(null)
+const selectedPeriodTypeUntil = ref<string | number | null>(null)
+const selectedTerritoryType = ref<string | number | null>(null)
 const showDetails = ref(false)
-
-const selectedPeriodLabel = computed(() => {
-  const match = periodTypeStore.periodTypes.find(
-    (p) => p.idtipoperiodo === selectedPeriodType.value,
-  )
-  return match ? match.nombretipoperiodo : '—'
-})
-
+const checkboxValue = ref(false)
 // Descripción: mostrar más/menos en el modal
 const descriptionText = computed(() => {
   const html = props.indicador.descripcionindicador || ''

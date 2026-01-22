@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory('/turegionentusmanos/'),
   scrollBehavior(to, from, savedPosition) {
     return savedPosition || { left: 0, top: 0 }
   },

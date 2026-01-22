@@ -8,46 +8,40 @@
       id="opcion-1"
       class="scroll-mt-24 mx-auto max-w-(--breakpoint-2xl) px-4 md:px-6 py-12 md:py-16"
     >
-      <h3 class="text-3xl font-semibold mb-6">Indicadores</h3>
+      <h3 class="text-3xl font-semibold mb-6 pl-6">Indicadores</h3>
       <div class="m-3">
         <div
           class="grid grid-cols-1 md:grid-cols-2 gap-6 border border-gray-300 rounded-md p-4 m-3"
         >
           <div>
             <div class="flex text-3xl">
-              <span
-                class="inline-flex items-center rounded-md bg-blue-400/10 px-2 py-1 text-xs font-medium text-blue-400 inset-ring inset-ring-blue-400/30"
-                >1</span
-              >
+              <NumberBadge :number="1" />
               <p class="pl-2 font-bold">Selecciona uno o más indicadores</p>
             </div>
-            <MultipleSelect
-              v-model="form.selectedItems"
-              :options="computedValues.indicatorOptions"
-              class="w-full mb-6 mt-3"
-              :key="`multiselect-key-${form.selectedItems.length}`"
-            />
-            <p class="text-gray-900/50 text-[14px] italic mt-3 mb-5 ml-2 dark:text-gray-100/50">
-              Selecciona uno o más indicadores para analizarlos individualmente o compararlos en una
-              sola gráfica
-            </p>
+            <div class="mt-3 ml-2">
+              <p class="text-gray-900/50 text-[14px] italic my-5 ml-2 dark:text-gray-100/50">
+                Haz clic en el botón para buscar indicadores por grupo, subgrupo o nombre
+              </p>
+              <hr class="border-gray-300" />
+              <Button
+                type="submit"
+                variant="primary"
+                class="flex items-center justify-center mt-3 ml-2 px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600"
+                @click="isSearchModalOpen = true"
+              >
+                BUSCAR INDICADORES
+              </Button>
+            </div>
           </div>
         </div>
 
         <div>
           <div class="border border-gray-300 rounded-md p-4 m-3">
             <div class="flex mb-3 text-3xl">
-              <span
-                class="inline-flex items-center rounded-md bg-blue-400/10 px-2 py-1 text-xs font-medium text-blue-400 inset-ring inset-ring-blue-400/30"
-                >2</span
-              >
+              <NumberBadge :number="2" />
               <p class="pl-2 font-bold">Configura los indicadores seleccionados</p>
             </div>
-            <p class="text-gray-900/50 text-[14px] italic mt-3 mb-5 ml-2 dark:text-gray-100/50">
-              Selecciona el tipo de gráfica y tipo de periodos que deseas consultar por cada
-              indicador
-            </p>
-            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div class="pt-3 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               <IndicatorCard
                 v-for="indicator in displayIndicators"
                 :key="indicator.idindicador"
@@ -60,30 +54,281 @@
             </div>
           </div>
         </div>
-
+        <div class="flex items-center justify-center my-5">
+          <Button size="md" class="inline-flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.8"
+              stroke="currentColor"
+              class="w-4 h-4 mr-2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3 3v18h18M6 15l4-4 4 4 6-6"
+              />
+            </svg>
+            Generar gráfico
+          </Button>
+        </div>
         <div v-if="form.selectedItems.length > 0">
           <div class="border border-gray-300 rounded-md p-4 m-3 text-3xl">
             <div class="flex mt-2 mb-4">
-              <span
-                class="inline-flex items-center rounded-md bg-blue-400/10 px-2 py-1 text-xs font-medium text-blue-400 inset-ring inset-ring-blue-400/30"
-                >3</span
-              >
-              <p class="pl-2 font-bold">Genera el gráfico</p>
+              <NumberBadge :number="3" />
+              <p class="pl-2 font-bold">Resultados del análisis</p>
             </div>
-            <div class="flex items-center justify-start">
-              <Button>Generar gráfico</Button>
+            <div class="grid">
+              <MultiChartDashboard />
             </div>
           </div>
         </div>
       </div>
-      <div class="grid">
-        <MultiChartDashboard />
-      </div>
     </section>
+
+    <!-- Modal Buscar Indicadores -->
+    <Modal v-if="isSearchModalOpen" :full-screen-backdrop="true" @close="isSearchModalOpen = false">
+      <template #body>
+        <div
+          class="no-scrollbar relative w-full max-w-[900px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-8"
+        >
+          <!-- close btn -->
+          <button
+            @click="isSearchModalOpen = false"
+            class="transition-color absolute right-5 top-5 z-999 flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:bg-gray-700 dark:bg-white/[0.05] dark:text-gray-400 dark:hover:bg-white/[0.07] dark:hover:text-gray-300"
+          >
+            <svg
+              class="fill-current"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M6.04289 16.5418C5.65237 16.9323 5.65237 17.5655 6.04289 17.956C6.43342 18.3465 7.06658 18.3465 7.45711 17.956L11.9987 13.4144L16.5408 17.9565C16.9313 18.347 17.5645 18.347 17.955 17.9565C18.3455 17.566 18.3455 16.9328 17.955 16.5423L13.4129 12.0002L17.955 7.45808C18.3455 7.06756 18.3455 6.43439 17.955 6.04387C17.5645 5.65335 16.9313 5.65335 16.5408 6.04387L11.9987 10.586L7.45711 6.04439C7.06658 5.65386 6.43342 5.65386 6.04289 6.04439C5.65237 6.43491 5.65237 7.06808 6.04289 7.4586L10.5845 12.0002L6.04289 16.5418Z"
+                fill=""
+              />
+            </svg>
+          </button>
+
+          <div class="px-2 pr-14">
+            <h4 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
+              Buscar y seleccionar indicadores
+            </h4>
+            <p class="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+              Seleccionados: {{ form.selectedItems.length }}
+            </p>
+          </div>
+
+          <!-- Loading -->
+          <div v-if="loadingIndicators" class="mt-6 flex items-center justify-center px-2 py-14">
+            <div class="flex items-center gap-3 text-gray-600 dark:text-gray-300">
+              <svg
+                class="animate-spin h-5 w-5 text-brand-500"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                ></path>
+              </svg>
+              <span class="text-sm">Cargando indicadores...</span>
+            </div>
+          </div>
+
+          <!-- Layout árbol izquierda + resultados derecha -->
+          <div
+            v-else
+            class="mt-4 grid grid-cols-1 gap-6 px-2 lg:grid-cols-12 max-h-[calc(100vh-15rem)]"
+          >
+            <!-- Panel izquierdo: Árbol de grupos/subgrupos -->
+            <aside class="lg:col-span-4 xl:col-span-3">
+              <h5 class="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300 text-center">
+                Grupos
+              </h5>
+              <div class="rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                <ul class="divide-y divide-gray-200 dark:divide-gray-800">
+                  <li v-for="g in treeData" :key="g.id" class="px-3 py-2">
+                    <div class="flex items-center gap-2">
+                      <button
+                        class="h-6 w-6 flex items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                        @click="toggleGroupExpand(g.id)"
+                        :aria-expanded="expandedGroups.has(g.id)"
+                      >
+                        <svg
+                          v-if="expandedGroups.has(g.id)"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M4.79175 12.6045L10.0001 7.39624L15.2084 12.6045"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                        <svg
+                          v-else
+                          width="16"
+                          height="16"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M4.79175 7.39551L10.0001 12.6038L15.2084 7.39551"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        class="text-left grow text-sm"
+                        :class="{
+                          'text-brand-600 font-medium':
+                            filters.groupId === g.id && !filters.subgroupId,
+                        }"
+                        @click="selectGroup(g.id)"
+                      >
+                        {{ g.name }}
+                      </button>
+                    </div>
+                    <ul v-if="expandedGroups.has(g.id)" class="mt-1 pl-8">
+                      <li v-for="sg in g.subgroups" :key="sg.id" class="py-1">
+                        <button
+                          class="text-left text-sm hover:underline"
+                          :class="{ 'text-brand-600 font-medium': filters.subgroupId === sg.id }"
+                          @click="selectSubgroup(g.id, sg.id)"
+                        >
+                          {{ sg.name }}
+                        </button>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+              <div class="mt-3 flex gap-2">
+                <Button type="button" variant="outline" class="w-full" @click="clearGroupFilters">
+                  Limpiar
+                </Button>
+              </div>
+            </aside>
+
+            <!-- Panel derecho: filtro por nombre, lista y paginación -->
+            <section class="lg:col-span-8 xl:col-span-9">
+              <div class="mb-4">
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                  Nombre
+                </label>
+                <div class="flex items-center gap-2">
+                  <input
+                    v-model="filters.name"
+                    type="text"
+                    placeholder="Buscar por nombre"
+                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                  />
+                  <Button type="button" variant="outline" class="shrink-0" @click="clearFilters">
+                    Limpiar filtros
+                  </Button>
+                </div>
+              </div>
+
+              <!-- Lista filtrada -->
+              <div>
+                <div class="overflow-hidden border border-gray-200 rounded-xl dark:border-gray-800">
+                  <ul class="divide-y divide-gray-200 dark:divide-gray-800">
+                    <li
+                      v-for="item in paginatedIndicators"
+                      :key="item.idindicador"
+                      class="flex items-center justify-between gap-4 p-4"
+                    >
+                      <div class="min-w-0">
+                        <p class="truncate text-sm font-medium text-gray-800 dark:text-white/90">
+                          {{ item.nombreindicador }}
+                        </p>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          Grupo: {{ item.nombregrupo }} • Subgrupo: {{ item.nombresubgrupo }}
+                        </p>
+                      </div>
+                      <Button
+                        :variant="isSelected(String(item.idindicador)) ? 'primary' : 'outline'"
+                        class="shrink-0"
+                        @click="toggleSelection(item)"
+                      >
+                        {{ isSelected(String(item.idindicador)) ? 'Seleccionado' : 'Seleccionar' }}
+                      </Button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Controles de paginación -->
+              <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <span>Mostrando</span>
+                  <select
+                    v-model.number="pageSize"
+                    class="dark:bg-dark-900 h-9 w-24 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-1.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
+                  >
+                    <option :value="5">5</option>
+                    <option :value="10">10</option>
+                    <option :value="20">20</option>
+                    <option :value="50">50</option>
+                  </select>
+                  <span>de {{ filteredIndicators.length }} indicadores</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    type="button"
+                    size="sm"
+                    @click="prevPage"
+                    :disabled="page === 1"
+                    >Anterior</Button
+                  >
+                  <span class="text-sm text-gray-600 dark:text-gray-400"
+                    >Página {{ page }} de {{ totalPages }}</span
+                  >
+                  <Button
+                    variant="outline"
+                    type="button"
+                    size="sm"
+                    @click="nextPage"
+                    :disabled="page === totalPages"
+                    >Siguiente</Button
+                  >
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </template>
+    </Modal>
 
     <!-- Footer simple -->
     <footer
-      class="border-t border-gray-200 dark:border-gray-800 py-6 text-center text-sm text-gray-500 dark:text-gray-400"
+      class="border-t border-gray-200 dark:border-gray-800 py-6 text-center text-sm dark:text-gray-400 bg-[#29307feb] text-white"
     >
       © {{ year }} IPE Arequipa
     </footer>
@@ -93,17 +338,20 @@
 <script setup lang="ts">
 // Reutilizamos el componente existente
 import MultiChartDashboard from '@/components/charts/MultiChartDashboard.vue'
-import MultipleSelect from '@/components/forms/FormElements/MultipleSelect.vue'
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import Button from '@/components/ui/Button.vue'
+import Modal from '@/components/ui/Modal.vue'
 import HeaderOnePage from '@/components/common/custom/HeaderOnePage.vue'
 import { classicFormatDate } from '@/utilities'
 import type { BOIndicadorDto } from '@/interfaces'
 import { getIndicators } from '@/services/indicator'
 import IndicatorCard from '@/components/common/custom/IndicatorCard.vue'
+import NumberBadge from '@/components/common/custom/NumberBadge.vue'
 import { getPeriodTypes } from '@/services/periodType'
 
 const indicators = ref<BOIndicadorDto[]>([])
+const loadingIndicators = ref(false)
+const isSearchModalOpen = ref(false)
 
 const form = ref<{ selectedItems: { value: string; label: string }[] }>({
   selectedItems: [],
@@ -112,8 +360,13 @@ const form = ref<{ selectedItems: { value: string; label: string }[] }>({
 const year = ref(classicFormatDate(new Date(), 'YYYY'))
 
 onMounted(async () => {
-  indicators.value = await getIndicators({ ACTIVO: true })
-  await getPeriodTypes({})
+  try {
+    loadingIndicators.value = true
+    indicators.value = await getIndicators({ ACTIVO: true })
+    await getPeriodTypes({})
+  } finally {
+    loadingIndicators.value = false
+  }
 })
 
 const computedValues = computed(() => ({
@@ -150,6 +403,102 @@ const handleDeseleccionar = (indicador: BOIndicadorDto) => {
 
   form.value.selectedItems = form.value.selectedItems.filter((item) => item.value !== id)
 }
+
+// Filtros modal
+const filters = ref<{ name: string; groupId?: number; subgroupId?: number }>({ name: '' })
+
+// Datos del árbol (grupos y subgrupos) derivados de indicadores
+const treeData = computed(() => {
+  const groupsMap = new Map<number, { id: number; name: string; subgroups: Map<number, string> }>()
+  indicators.value.forEach((i) => {
+    if (!groupsMap.has(i.idgrupo)) {
+      groupsMap.set(i.idgrupo, { id: i.idgrupo, name: i.nombregrupo, subgroups: new Map() })
+    }
+    groupsMap.get(i.idgrupo)!.subgroups.set(i.idsubgrupo, i.nombresubgrupo)
+  })
+  return Array.from(groupsMap.values()).map((g) => ({
+    id: g.id,
+    name: g.name,
+    subgroups: Array.from(g.subgroups.entries()).map(([id, name]) => ({ id, name })),
+  }))
+})
+
+// Estado de expansión del árbol y selección
+const expandedGroups = ref<Set<number>>(new Set())
+const toggleGroupExpand = (groupId: number) => {
+  const next = new Set(expandedGroups.value)
+  if (next.has(groupId)) next.delete(groupId)
+  else next.add(groupId)
+  expandedGroups.value = next
+}
+const selectGroup = (groupId: number) => {
+  filters.value.groupId = groupId
+  filters.value.subgroupId = undefined
+  if (!expandedGroups.value.has(groupId)) toggleGroupExpand(groupId)
+}
+const selectSubgroup = (groupId: number, subgroupId: number) => {
+  filters.value.groupId = groupId
+  filters.value.subgroupId = subgroupId
+}
+const clearGroupFilters = () => {
+  filters.value.groupId = undefined
+  filters.value.subgroupId = undefined
+}
+
+const filteredIndicators = computed(() => {
+  const name = filters.value.name.trim().toLowerCase()
+  const g = filters.value.groupId
+  const sg = filters.value.subgroupId
+  return indicators.value.filter((i) => {
+    const byName = name ? i.nombreindicador.toLowerCase().includes(name) : true
+    const byGroup = g ? i.idgrupo === g : true
+    const bySubgroup = sg ? i.idsubgrupo === sg : true
+    return byName && byGroup && bySubgroup
+  })
+})
+
+const isSelected = (id: string) => form.value.selectedItems.some((s) => s.value === id)
+
+const toggleSelection = (item: BOIndicadorDto) => {
+  const id = String(item.idindicador)
+  if (isSelected(id)) {
+    form.value.selectedItems = form.value.selectedItems.filter((s) => s.value !== id)
+  } else {
+    form.value.selectedItems = [
+      ...form.value.selectedItems,
+      { value: id, label: item.nombreindicador },
+    ]
+  }
+}
+
+const clearFilters = () => {
+  filters.value = { name: '', groupId: undefined, subgroupId: undefined }
+}
+
+// Paginación (front)
+const page = ref(1)
+const pageSize = ref(5)
+const totalPages = computed(() =>
+  Math.max(1, Math.ceil(filteredIndicators.value.length / pageSize.value)),
+)
+const paginatedIndicators = computed(() => {
+  const start = (page.value - 1) * pageSize.value
+  return filteredIndicators.value.slice(start, start + pageSize.value)
+})
+const prevPage = () => {
+  if (page.value > 1) page.value -= 1
+}
+const nextPage = () => {
+  if (page.value < totalPages.value) page.value += 1
+}
+
+// Resetear página cuando cambian los filtros o el tamaño de página
+watch(
+  () => [filters.value.name, filters.value.groupId, filters.value.subgroupId, pageSize.value],
+  () => {
+    page.value = 1
+  },
+)
 </script>
 
 <style>
