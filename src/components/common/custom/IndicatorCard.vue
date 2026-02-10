@@ -97,7 +97,7 @@
         <SelectInput
           v-model="selectedTerritoryType"
           :options="
-            territoryTypeStore.territoryTypes.map((pt) => ({
+            indicador.tiposterritorio.map((pt) => ({
               value: pt.idtipoterritorio,
               label: pt.nombretipoterritorio,
             }))
@@ -118,7 +118,7 @@
           <SelectInput
             v-model="selectedPeriodType"
             :options="
-              periodTypeStore.periodTypes.map((pt) => ({
+              indicador.tiposperiodo.map((pt) => ({
                 value: pt.idtipoperiodo,
                 label: pt.nombretipoperiodo,
               }))
@@ -130,7 +130,7 @@
           <SelectInput
             v-model="selectedPeriodTypeUntil"
             :options="
-              periodTypeStore.periodTypes.map((pt) => ({
+              indicador.tiposperiodo.map((pt) => ({
                 value: pt.idtipoperiodo,
                 label: pt.nombretipoperiodo,
               }))

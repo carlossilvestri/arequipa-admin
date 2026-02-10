@@ -286,6 +286,8 @@ export interface BOIndicadorDto extends BOIndicador {
   nombreunidadmedida: string
   simbolounidadmedida: string
   nombresubgrupo: string
+  tiposperiodo: BOTipoPeriodo[]
+  tiposterritorio: BOTipoTerritorio[]
 }
 
 export interface FilterBOIndicador {
