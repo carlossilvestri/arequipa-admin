@@ -94,51 +94,60 @@
       />
       <!-- Elegir tipo de territorio -->
       <div class="mt-3">
-        <SelectInput
-          v-model="selectedTerritoryType"
-          :options="
-            indicador.tiposterritorio.map((pt) => ({
-              value: pt.idtipoterritorio,
-              label: pt.nombretipoterritorio,
-            }))
-          "
-          label="Tipo de territorio"
-          id="IDTIPOTERREITORIO"
-          placeholder="Seleccione un tipo de territorio"
-        />
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-6">
+            <SelectInput
+              v-model="selectedTerritoryType"
+              :options="
+                indicador.tiposterritorio.map((pt) => ({
+                  value: pt.idtipoterritorio,
+                  label: pt.nombretipoterritorio,
+                }))
+              "
+              label="Tipo de territorio"
+              id="IDTIPOTERRITORIO"
+              placeholder="Seleccione un tipo de territorio"
+            />
+          </div>
+          <div class="col-span-6">
+            <SelectInput
+              v-model="selectedTerritoryType"
+              :options="[]"
+              label="Territorio"
+              id="IDTERRITORIO"
+              placeholder="Seleccione un territorio"
+            />
+          </div>
+        </div>
       </div>
       <!-- Elegir periodo -->
       <div class="mt-3">
-        <label
-          for="IDTIPOPERIODO"
-          class="block text-sm font-medium text-gray-700 dark:text-gray-400"
-          >Tipo de periodo</label
-        >
         <div class="flex items-center space-x-2">
-          <SelectInput
-            v-model="selectedPeriodType"
-            :options="
-              indicador.tiposperiodo.map((pt) => ({
-                value: pt.idtipoperiodo,
-                label: pt.nombretipoperiodo,
-              }))
-            "
-            label=""
-            id="IDTIPOPERIODO"
-            placeholder="Seleccione un tipo de período"
-          />
-          <SelectInput
-            v-model="selectedPeriodTypeUntil"
-            :options="
-              indicador.tiposperiodo.map((pt) => ({
-                value: pt.idtipoperiodo,
-                label: pt.nombretipoperiodo,
-              }))
-            "
-            id="IDTIPOPERIODO"
-            label=""
-            placeholder="Seleccione un tipo de período"
-          />
+          <div class="grid grid-cols-12 gap-4">
+            <div class="col-span-6">
+              <SelectInput
+                v-model="selectedPeriodType"
+                :options="
+                  indicador.tiposperiodo.map((pt) => ({
+                    value: pt.idtipoperiodo,
+                    label: pt.nombretipoperiodo,
+                  }))
+                "
+                label="Tipo de período"
+                id="Tipo de periodo"
+                placeholder="Seleccione un tipo de período"
+              />
+            </div>
+            <div class="col-span-6">
+              <SelectInput
+                v-model="selectedPeriodTypeUntil"
+                :options="[]"
+                id="IDTIPOPERIODO"
+                label="Período"
+                placeholder="Seleccione un tipo de período"
+              />
+            </div>
+          </div>
         </div>
       </div>
 

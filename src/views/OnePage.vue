@@ -373,7 +373,6 @@ import type { BOIndicadorDto } from '@/interfaces'
 import { getIndicators } from '@/services/indicator'
 import IndicatorCard from '@/components/common/custom/IndicatorCard.vue'
 import NumberBadge from '@/components/common/custom/NumberBadge.vue'
-import { getPeriodTypes } from '@/services/periodType'
 import SearchIcon from '@/icons/SearchIcon.vue'
 import InfoCircleIcon from '@/icons/InfoCircleIcon.vue'
 import ModalIndicatorDetail from '@/components/common/custom/ModalIndicatorDetail.vue'
@@ -397,7 +396,7 @@ onMounted(async () => {
   try {
     loadingIndicators.value = true
     indicators.value = await getIndicators({ ACTIVO: true })
-    await getPeriodTypes({})
+    //await getPeriodTypes({})
   } finally {
     loadingIndicators.value = false
   }
