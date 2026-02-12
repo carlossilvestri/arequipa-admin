@@ -149,10 +149,33 @@ export async function getTerritoryById(
   }
 }
 
+/**
+ * Get period by idTipo and idIndicador
+ * @Param idTipo: number.
+ * @Param idIndicador: number.
+ * @Return Promise<BOTerritorio[]>
+ */
+export async function getTerritoryByIdTipoAndIdIndicador(
+  idTipo: number,
+  idIndicador: number,
+): Promise<BOTerritorio[]> {
+  try {
+    const { data } = await axiosInstance.get<BOTerritorio[]>(
+      `/api/Territorio/LeerPorTipoYIndicador?idTipo=${idTipo}&idIndicador=${idIndicador}`,
+    )
+    return data
+  } catch (error) {
+    console.error(error)
+    handleShowError(error)
+    throw error
+  }
+}
+
 export default {
   getTerritiries,
   createTerritory,
   updateTerritory,
   deleteTerritory,
   getTerritoryById,
+  getTerritoryByIdTipoAndIdIndicador,
 }

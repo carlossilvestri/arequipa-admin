@@ -98,6 +98,7 @@
           <div class="col-span-6">
             <SelectInput
               v-model="selectedTerritoryType"
+              @change="handleOnTerritoryTypeChange(selectedTerritoryType)"
               :options="
                 indicador.tiposterritorio.map((pt) => ({
                   value: pt.idtipoterritorio,
@@ -111,8 +112,8 @@
           </div>
           <div class="col-span-6">
             <SelectInput
-              v-model="selectedTerritoryType"
-              :options="[]"
+              v-model="selectedTerritory"
+              :options="territoryOptions"
               label="Territorio"
               id="IDTERRITORIO"
               placeholder="Seleccione un territorio"
@@ -133,6 +134,7 @@
                     label: pt.nombretipoperiodo,
                   }))
                 "
+                @change="handleOnPeriodTypeChange(selectedPeriodType)"
                 label="Tipo de período"
                 id="Tipo de periodo"
                 placeholder="Seleccione un tipo de período"
@@ -140,8 +142,8 @@
             </div>
             <div class="col-span-6">
               <SelectInput
-                v-model="selectedPeriodTypeUntil"
-                :options="[]"
+                v-model="selectedPeriod"
+                :options="periodOptions"
                 id="IDTIPOPERIODO"
                 label="Período"
                 placeholder="Seleccione un tipo de período"
@@ -168,8 +170,16 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import type { BOIndicadorDto } from '@/interfaces/index'
+import type {
+  BOIndicadorDto,
+  BOPeriodo,
+  BOResultadoLogicaNegocio,
+  BOTerritorio,
+  OptionType,
+} from '@/interfaces/index'
 import { useTheme } from '@/composables/useTheme'
+import { getPeriodByIdTipoAndIdIndicador } from '@/services/period'
+import { getTerritoryByIdTipoAndIdIndicador } from '@/services/territories'
 import { truncateTextWithEllipsis } from '@/utilities'
 import SelectInput from '@/components/forms/FormElements/SelectInput.vue'
 import { usePeriodTypeStore } from '@/stores/periodType'
@@ -199,12 +209,14 @@ const emit = defineEmits<{
 const { isDark } = useTheme()
 
 // Tipo de gráfico seleccionado para este indicador
-const chartType = ref<'line' | 'bar' | 'area' | 'pie' | 'scatter' | 'radar'>('line')
-const selectedPeriodType = ref<string | number | null>(null)
-const selectedPeriodTypeUntil = ref<string | number | null>(null)
-const selectedTerritoryType = ref<string | number | null>(null)
+const selectedPeriodType = ref<number | null>(null)
+const selectedPeriod = ref<string | number | null>(null)
+const selectedTerritoryType = ref<number | null>(null)
+const selectedTerritory = ref<number | null>(null)
 const showDetails = ref(false)
 const checkboxValue = ref(false)
+const periodOptions = ref<OptionType[]>([])
+const territoryOptions = ref<OptionType[]>([])
 
 // Clases dinámicas según el tema
 const themeClasses = computed(() => ({
@@ -295,6 +307,31 @@ const themeClasses = computed(() => ({
     icon: isDark.value ? 'text-red-400' : 'text-red-500',
   },
 }))
+
+const handleOnTerritoryTypeChange = async (territoryType: number | null) => {
+  if (!territoryType) return
+  const territories = await getTerritoryByIdTipoAndIdIndicador(
+    territoryType,
+    props.indicador.idindicador,
+  )
+  console.log('territories ', territories)
+
+  territoryOptions.value = territories.map((territory) => ({
+    value: territory.idterritorio,
+    label: territory.nombreterritorio,
+  }))
+}
+
+const handleOnPeriodTypeChange = async (periodType: number | null) => {
+  if (!periodType) return
+  const periods = await getPeriodByIdTipoAndIdIndicador(periodType, props.indicador.idindicador)
+  console.log('periods ', periods)
+
+  periodOptions.value = periods.map((period) => ({
+    value: period.idperiodo,
+    label: period.etiquetalarga,
+  }))
+}
 
 // Métodos (no se requieren utilidades del modal aquí)
 </script>

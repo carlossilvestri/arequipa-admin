@@ -316,3 +316,8 @@ export interface CreateBOIndicadorRequest {
 export interface UpdateBOIndicadorRequest extends CreateBOIndicadorRequest {
   IDINDICADOR: number
 }
+
+export interface OptionType {
+  value: string | number
+  label: string
+}

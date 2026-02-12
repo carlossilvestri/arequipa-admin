@@ -407,13 +407,6 @@ const handleShowDetails = (indicator: BOIndicadorDto) => {
   indicatorDetail.value = indicator
 }
 
-const computedValues = computed(() => ({
-  indicatorOptions: indicators.value.map((i) => ({
-    value: String(i.idindicador),
-    label: i.nombreindicador,
-  })),
-}))
-
 const displayIndicators = computed(() => {
   const selectedItems: string[] = form.value.selectedItems.map((i) => String(i.value))
   const selectedSet = new Set(selectedItems)

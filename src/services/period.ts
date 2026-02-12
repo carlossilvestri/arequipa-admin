@@ -161,10 +161,33 @@ export async function getPeriodById(id: number): Promise<BOResultadoLogicaNegoci
   }
 }
 
+/**
+ * Get period by idTipo and idIndicador
+ * @Param idTipo: number.
+ * @Param idIndicador: number.
+ * @Return Promise<BOPeriodo[]>
+ */
+export async function getPeriodByIdTipoAndIdIndicador(
+  idTipo: number,
+  idIndicador: number,
+): Promise<BOPeriodo[]> {
+  try {
+    const { data } = await axiosInstance.get<BOPeriodo[]>(
+      `/api/Periodo/LeerPorPorTipoYIndicador?idTipo=${idTipo}&idIndicador=${idIndicador}`,
+    )
+    return data
+  } catch (error) {
+    console.error(error)
+    handleShowError(error)
+    throw error
+  }
+}
+
 export default {
   getPeriods,
   createPeriod,
   updatePeriod,
   deletePeriod,
   getPeriodById,
+  getPeriodByIdTipoAndIdIndicador,
 }
