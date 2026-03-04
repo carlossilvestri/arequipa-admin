@@ -1,11 +1,18 @@
 <template>
   <div class="space-y-6">
     <!-- Single Select Input -->
-    <div>
-      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400" :for="id">
+    <div
+      :class="labelPosition === 'left' ? 'flex flex-col sm:flex-row sm:items-center sm:gap-4' : ''"
+    >
+      <label
+        v-if="label"
+        class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+        :for="id"
+        :class="labelPosition === 'left' ? 'mb-2 sm:mb-0 flex-shrink-0 w-32' : ''"
+      >
         {{ label }}
       </label>
-      <div class="relative z-20 bg-transparent">
+      <div class="relative z-20 bg-transparent" :class="labelPosition === 'left' ? 'flex-1' : ''">
         <select
           v-model="internalValue"
           :disabled="disabled"
@@ -69,6 +76,11 @@ const props = defineProps({
   optionLabel: { type: String, default: 'label' },
   disabled: { type: Boolean, default: false },
   id: { type: String, default: '' },
+  labelPosition: {
+    type: String as PropType<'top' | 'left'>,
+    default: 'top',
+    validator: (value: string) => ['top', 'left'].includes(value),
+  },
 })
 
 const emit = defineEmits<{

@@ -94,19 +94,15 @@
             </div>
           </div>
         </div>
-        <!--
-        <div>
-          <DynamicChartExample />
-        </div>
-        <div>
-          <DynamicChartJS :response="jsonData" />
-        </div>
-                -->
       </div>
     </section>
 
     <!-- Modal de detalles -->
-    <ModalIndicatorDetail v-model:open="showModalDetails" :indicador="indicatorDetail" />
+    <ModalIndicatorDetail
+      v-if="indicatorDetail"
+      v-model:open="showModalDetails"
+      :indicador="indicatorDetail"
+    />
 
     <!-- Modal Buscar Indicadores -->
     <Modal v-if="isSearchModalOpen" :full-screen-backdrop="true" @close="isSearchModalOpen = false">
@@ -398,8 +394,6 @@ import InfoCircleIcon from '@/icons/InfoCircleIcon.vue'
 import ModalIndicatorDetail from '@/components/common/custom/ModalIndicatorDetail.vue'
 import { useNotificationStore } from '@/stores/notification'
 import NotificationContainer from '@/components/common/custom/NotificationContainer.vue'
-import DynamicChartExample from '@/components/charts/DynamicChartExample.vue'
-import DynamicChartJS from '@/components/charts/DynamicChartJS.vue'
 
 const notificationStore = useNotificationStore()
 const indicators = ref<BOIndicadorDto[]>([])

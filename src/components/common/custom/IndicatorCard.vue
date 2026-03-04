@@ -90,7 +90,8 @@
         ]"
         v-model="selectedChartType"
         label="Tipo de gráfico"
-        id="GRAFICO"
+        label-position="left"
+        :id="`GRAFICO${indicador.codigoindicador}`"
         placeholder="Seleccione un tipo de gráfico"
       />
       <!-- Elegir tipo de territorio -->
@@ -107,7 +108,7 @@
                 }))
               "
               label="Tipo de territorio"
-              id="IDTIPOTERRITORIO"
+              :id="`IDTIPOTERRITORIO${indicador.codigoindicador}`"
               placeholder="Seleccione un tipo de territorio"
             />
           </div>
@@ -116,7 +117,7 @@
               v-model="selectedTerritory"
               :options="territoryOptions"
               label="Territorio"
-              id="IDTERRITORIO"
+              :id="`IDTERRITORIO${indicador.codigoindicador}`"
               placeholder="Seleccione un territorio"
             />
           </div>
@@ -138,7 +139,8 @@
                 "
                 @change="handleOnPeriodTypeChange(selectedPeriodType)"
                 label="Tipo de período"
-                id="Tipo de periodo"
+                label-position="left"
+                :id="`Tipo de periodo${indicador.codigoindicador}`"
                 placeholder="Seleccione un tipo de período"
               />
             </div>
@@ -146,7 +148,7 @@
               <SelectInput
                 v-model="selectedPeriodFrom"
                 :options="periodOptions"
-                id="idperiododesde"
+                :id="`idperiododesde${indicador.codigoindicador}`"
                 label="Desde"
                 placeholder="Seleccione un tipo de período"
               />
@@ -155,7 +157,7 @@
               <SelectInput
                 v-model="selectedPeriodSince"
                 :options="periodOptions"
-                id="idperiodohasta"
+                :id="`idperiodohasta${indicador.codigoindicador}`"
                 label="Hasta"
                 placeholder="Seleccione un tipo de período"
               />
