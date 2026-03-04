@@ -29,12 +29,14 @@
     >
       &copy; {{ currentYear }} - TailAdmin
     </p>
+    <NotificationContainer />
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import CommonGridShape from '../../components/common/CommonGridShape.vue'
+import NotificationContainer from '@/components/common/custom/NotificationContainer.vue'
 
 const currentYear = ref(new Date().getFullYear())
 </script>

@@ -6,6 +6,8 @@ import type {
   CreateBOIndicadorRequest,
   DeleteByIdRequest,
   FilterBOIndicador,
+  GenerateIndicatorRequest,
+  GenerateIndicatorResponse,
   UpdateBOIndicadorRequest,
 } from '@/interfaces'
 import { useNotificationStore } from '@/stores/notification'
@@ -148,10 +150,32 @@ export async function getIndicatorById(id: number): Promise<BOResultadoLogicaNeg
   }
 }
 
+/*
+ * Generate graphic.
+ * @Param param: GenerateIndicatorRequest.
+ * @Return Promise<GenerateIndicatorResponse>
+ */
+export async function generateGraphic(
+  param: GenerateIndicatorRequest,
+): Promise<GenerateIndicatorResponse> {
+  try {
+    const { data } = await axiosInstance.post<GenerateIndicatorResponse>(
+      `/api/Indicador/ValidarGenerarGrafica`,
+      param,
+    )
+    return data
+  } catch (error) {
+    console.error(error)
+    handleShowError(error)
+    throw error
+  }
+}
+
 export default {
   getIndicators,
   createIndicator,
   updateIndicator,
   deleteIndicator,
   getIndicatorById,
+  generateGraphic,
 }

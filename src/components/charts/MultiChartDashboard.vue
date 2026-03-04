@@ -1,59 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50 p-4 md:p-6">
-    <!-- Vista principal condicional -->
-    <div v-if="currentChartType === 'pie'" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-      <!-- Gráfico de Pie principal -->
-      <div class="bg-white rounded-xl shadow-sm p-4">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-semibold text-gray-800">Distribución por Categoría</h2>
-          <div class="text-sm text-gray-500">Total: ${{ totalPieValue.toLocaleString() }}</div>
-        </div>
-        <VueApexCharts
-          :key="'pie-main'"
-          :options="mainPieOptions"
-          :series="mainPieSeries"
-          type="pie"
-          height="400"
-        />
-      </div>
-
-      <!-- Detalles del Pie Chart -->
-      <div class="bg-white rounded-xl shadow-sm p-4">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Detalles por Categoría</h3>
-        <div class="space-y-3">
-          <div
-            v-for="(item, index) in pieCategories"
-            :key="item.name"
-            class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
-            :style="{ borderLeft: `4px solid ${pieColors[index]}` }"
-          >
-            <div class="flex items-center space-x-3">
-              <div
-                class="w-8 h-8 rounded-full flex items-center justify-center"
-                :style="{ backgroundColor: `${pieColors[index]}20` }"
-              >
-                <span class="text-sm font-medium" :style="{ color: pieColors[index] }">
-                  {{ item.percentage }}%
-                </span>
-              </div>
-              <div>
-                <p class="font-medium text-gray-800">{{ item.name }}</p>
-                <p class="text-sm text-gray-500">{{ item.description }}</p>
-              </div>
-            </div>
-            <div class="text-right">
-              <p class="font-bold text-gray-900">${{ item.value.toLocaleString() }}</p>
-              <p class="text-sm" :class="item.trend >= 0 ? 'text-green-600' : 'text-red-600'">
-                {{ item.trend >= 0 ? '+' : '' }}{{ item.trend }}%
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
+  <div class="bg-gray-50 p-4 md:p-6">
     <!-- Gráfico principal (para otros tipos) -->
-    <div v-else class="bg-white rounded-xl shadow-sm p-4 mb-6">
+    <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold text-gray-800">Resultados del análisis</h2>
         <div class="flex items-center space-x-4">
@@ -70,66 +18,41 @@
         :key="chartKey"
         :options="chartOptions"
         :series="filteredSeries"
-        :type="currentChartType"
+        :type="currentChartType === 'pie' ? 'pie' : 'line'"
         height="400"
         ref="mainChart"
       />
-
-      <!-- Controles de exportación -->
-      <div class="flex flex-col space-y-2">
-        <span class="text-sm font-medium text-gray-700">Exportar Datos:</span>
-        <div class="flex items-center space-x-3">
-          <button
-            @click="exportToCSV"
-            class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center space-x-2 text-xl"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            <span>CSV</span>
-          </button>
-
-          <button
-            @click="exportToPNG"
-            class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center space-x-2 text-xl"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            <span>PNG</span>
-          </button>
-        </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import VueApexCharts from 'vue3-apexcharts'
 import { useTheme } from '@/composables/useTheme'
 
+// Props para recibir datos del componente padre
+const props = defineProps({
+  chartData: {
+    type: Object,
+    default: null,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  chartType: {
+    type: String,
+    default: 'line',
+  },
+})
+
 // Configuración inicial
-const currentChartType = ref('line')
+const currentChartType = computed(() => props.chartType || 'line')
 const visibleSeries = ref([true, true, true])
 const lastUpdate = ref(new Date().toLocaleString())
 const chartKey = ref(0)
-const dateRange = ref({
-  start: '2024-01-01',
-  end: '2024-12-31',
-})
 const showLegend = ref(true)
-const highlightedMetric = ref(null)
 const { isDark, toggleTheme, enableDarkMode, enableLightMode } = useTheme()
 
 // Tipos de gráficos disponibles (incluyendo pie)
@@ -142,139 +65,53 @@ const chartTypes = [
   { label: 'Radar', value: 'radar', icon: '🔄' },
 ]
 
+// Categorías del eje X computadas desde los datos reales de TODAS las series
+const xaxisCategories = computed(() => {
+  if (props.chartData && props.chartData.series && props.chartData.series.length > 0) {
+    // Recolectar todos los nombres de períodos de TODAS las series
+    const allPeriodNames = props.chartData.series.flatMap((serie) =>
+      serie.valores.map((valor) => valor.nombreperiodo),
+    )
+
+    // Obtener valores únicos y ordenarlos
+    const uniquePeriods = [
+      ...new Set(allPeriodNames.filter((name) => name !== null && name !== undefined)),
+    ]
+    return uniquePeriods.sort((a, b) => a.localeCompare(b))
+  }
+  // Categorías por defecto
+  return []
+  //return ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+})
+
 // Etiqueta del gráfico actual
 const currentChartTypeLabel = computed(() => {
   const type = chartTypes.find((t) => t.value === currentChartType.value)
   return type ? type.label : 'Gráfico'
 })
 
-// Datos de ejemplo
-const series = ref([
-  {
-    name: 'Ventas',
-    data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 110, 95, 120],
-  },
-  {
-    name: 'Gastos',
-    data: [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75],
-  },
-  {
-    name: 'Beneficios',
-    data: [10, 15, 5, 15, 9, 15, 20, 36, 65, 45, 25, 45],
-  },
-])
+// Series computadas que usan datos reales si están disponibles
+const series = computed(() => {
+  if (props.chartData && props.chartData.series) {
+    // Obtener unidades de medida únicas
+    const uniqueUnits = [...new Set(props.chartData.series.map((serie) => serie.unidadmedida))]
 
-// Datos para gráfico de pie principal
-const mainPieSeries = ref([44, 55, 13, 43, 22])
-const pieColors = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6']
-const pieCategories = ref([
-  {
-    name: 'Marketing',
-    value: 44000,
-    percentage: 25,
-    description: 'Campañas publicitarias',
-    trend: 12,
-  },
-  {
-    name: 'Desarrollo',
-    value: 55000,
-    percentage: 31,
-    description: 'Producto y tecnología',
-    trend: 8,
-  },
-  {
-    name: 'Ventas',
-    value: 13000,
-    percentage: 7,
-    description: 'Equipo comercial',
-    trend: 15,
-  },
-  {
-    name: 'Soporte',
-    value: 43000,
-    percentage: 24,
-    description: 'Atención al cliente',
-    trend: 5,
-  },
-  {
-    name: 'Administración',
-    value: 22000,
-    percentage: 13,
-    description: 'Gestión y operaciones',
-    trend: -3,
-  },
-])
+    // Transformar los datos de la API al formato esperado por ApexCharts
+    return props.chartData.series.map((serie) => {
+      // Encontrar el índice del eje Y para esta unidad de medida
+      const yAxisIndex = uniqueUnits.indexOf(serie.unidadmedida)
 
-const totalPieValue = computed(() => {
-  return mainPieSeries.value.reduce((a, b) => a + b, 0) * 1000
+      return {
+        name: serie.nombreindicador,
+        type: serie.tipografica, // Usar el tipo de gráfico específico de cada serie
+        data: serie.valores.map((valor) => valor.valor),
+        // Asignar al eje Y correspondiente a su unidad de medida
+        yAxisIndex: yAxisIndex,
+      }
+    })
+  }
+  return []
 })
-
-// Opciones del gráfico de pie principal
-const mainPieOptions = computed(() => ({
-  chart: {
-    type: 'pie',
-    height: 400,
-    animations: {
-      enabled: true,
-      speed: 800,
-    },
-  },
-  labels: pieCategories.value.map((cat) => cat.name),
-  colors: pieColors,
-  legend: {
-    position: 'bottom',
-    horizontalAlign: 'center',
-    fontSize: '14px',
-    fontFamily: 'inherit',
-    labels: {
-      colors: isDark.value ? '#E5E7EB' : '#374151',
-    },
-  },
-  dataLabels: {
-    enabled: true,
-    style: {
-      fontSize: '12px',
-      fontWeight: 'bold',
-      colors: ['#fff'],
-    },
-    dropShadow: {
-      enabled: true,
-    },
-  },
-  plotOptions: {
-    pie: {
-      donut: {
-        size: '45%',
-      },
-      customScale: 0.9,
-      expandOnClick: true,
-      dataLabels: {
-        offset: 30,
-        minAngleToShowLabel: 10,
-      },
-    },
-  },
-  tooltip: {
-    y: {
-      formatter: function (value) {
-        return `$${(value * 1000).toLocaleString()} (${((value / totalPieValue.value) * 100000).toFixed(1)}%)`
-      },
-    },
-  },
-  responsive: [
-    {
-      breakpoint: 768,
-      options: {
-        chart: {
-          height: 300,
-        },
-        legend: {
-          position: 'bottom',
-        },
-      },
-    },
-  ],
-}))
 
 // Series filtradas según visibilidad
 const filteredSeries = computed(() => {
@@ -287,15 +124,10 @@ const seriesColor = (index) => {
   return colors[index % colors.length]
 }
 
-// Función para calcular total de una serie
-const seriesTotal = (data) => {
-  return data.reduce((a, b) => a + b, 0) * 1000
-}
-
 // Opciones del gráfico principal (no pie)
 const chartOptions = computed(() => ({
   chart: {
-    type: currentChartType.value,
+    type: 'line', // Usar 'line' como base para permitir tipos mixtos
     height: 400,
     zoom: {
       enabled: currentChartType.value !== 'radar',
@@ -331,7 +163,7 @@ const chartOptions = computed(() => ({
     dashArray: currentChartType.value === 'radar' ? [0, 0] : undefined,
   },
   title: {
-    text: `Análisis de Datos 2024 - ${currentChartTypeLabel.value}`,
+    text: `Análisis de Datos - ${currentChartTypeLabel.value}`,
     align: 'left',
     style: {
       fontSize: '16px',
@@ -340,34 +172,60 @@ const chartOptions = computed(() => ({
     },
   },
   xaxis: {
-    categories: [
-      'Ene',
-      'Feb',
-      'Mar',
-      'Abr',
-      'May',
-      'Jun',
-      'Jul',
-      'Ago',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dic',
-    ],
+    categories: xaxisCategories.value,
     labels: {
       style: {
         colors: isDark.value ? '#9CA3AF' : '#6B7280',
       },
     },
   },
-  yaxis: {
-    labels: {
-      formatter: (value) => `$${value}K`,
-      style: {
-        colors: isDark.value ? '#9CA3AF' : '#6B7280',
+  yaxis: (() => {
+    if (props.chartData && props.chartData.series) {
+      // Obtener unidades de medida únicas
+      const uniqueUnits = [...new Set(props.chartData.series.map((serie) => serie.unidadmedida))]
+
+      // Crear un eje Y para cada unidad de medida única
+      return uniqueUnits.map((unidad, index) => ({
+        seriesName: unidad,
+        opposite: index % 2 === 1,
+        axisTicks: {
+          show: true,
+        },
+        axisBorder: {
+          show: true,
+          color: seriesColor(index),
+        },
+        labels: {
+          style: {
+            colors: seriesColor(index),
+            fontWeight: 600,
+          },
+          formatter: (value) => {
+            if (unidad.includes('Porcentaje') || unidad.includes('%')) {
+              return `${value}%`
+            } else if (unidad.includes('Soles') || unidad.includes('S/.')) {
+              return `S/ ${value.toLocaleString('es-PE')}`
+            }
+            return value.toString()
+          },
+        },
+        title: {
+          text: unidad,
+          style: {
+            color: seriesColor(index),
+            fontWeight: 'bold',
+          },
+        },
+      }))
+    }
+    return {
+      labels: {
+        style: {
+          colors: isDark.value ? '#9CA3AF' : '#6B7280',
+        },
       },
-    },
-  },
+    }
+  })(),
   grid: {
     borderColor: isDark.value ? '#374151' : '#E5E7EB',
     row: {
@@ -385,7 +243,17 @@ const chartOptions = computed(() => ({
   tooltip: {
     theme: isDark.value ? 'dark' : 'light',
     y: {
-      formatter: (value) => `$${value}K`,
+      formatter: (value, { seriesIndex }) => {
+        if (props.chartData && props.chartData.series && props.chartData.series[seriesIndex]) {
+          const unidad = props.chartData.series[seriesIndex].unidadmedida
+          if (unidad.includes('Porcentaje') || unidad.includes('%')) {
+            return `${value}%`
+          } else if (unidad.includes('Soles') || unidad.includes('S/.')) {
+            return `S/ ${Number(value).toLocaleString('es-PE')}`
+          }
+        }
+        return value.toString()
+      },
     },
   },
   markers: {
@@ -413,83 +281,31 @@ const chartOptions = computed(() => ({
   },
 }))
 
-// Funciones
-const changeChartType = (type) => {
-  currentChartType.value = type
-  if (type === 'bar') {
-    series.value = [
-      {
-        name: 'Ventas',
-        data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 110, 95, 120],
-      },
-      {
-        name: 'Gastos',
-        type: 'line',
-        data: [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75],
-      },
-      {
-        name: 'Beneficios',
-        type: 'area',
-        data: [10, 15, 5, 15, 9, 15, 20, 36, 65, 45, 25, 45],
-      },
-    ]
-  } else {
-    series.value = [
-      {
-        name: 'Ventas',
-        data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 110, 95, 120],
-      },
-      {
-        name: 'Gastos',
-        data: [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75],
-      },
-      {
-        name: 'Beneficios',
-        data: [10, 15, 5, 15, 9, 15, 20, 36, 65, 45, 25, 45],
-      },
-    ]
-  }
-  chartKey.value++ // Forzar re-render
-}
-
 const exportToCSV = () => {
+  if (!props.chartData || !props.chartData.series || props.chartData.series.length === 0) {
+    alert('No hay datos disponibles para exportar')
+    return
+  }
+
   let csvContent = ''
 
-  if (currentChartType.value === 'pie') {
-    csvContent = 'Categoría,Valor,Porcentaje,Tendencia\n'
-    pieCategories.value.forEach((cat, index) => {
-      csvContent += `${cat.name},$${cat.value},${cat.percentage}%,${cat.trend}%\n`
-    })
-  } else {
-    const headers = ['Mes', ...series.value.map((s) => s.name)]
-    const months = [
-      'Enero',
-      'Febrero',
-      'Marzo',
-      'Abril',
-      'Mayo',
-      'Junio',
-      'Julio',
-      'Agosto',
-      'Septiembre',
-      'Octubre',
-      'Noviembre',
-      'Diciembre',
-    ]
+  // Usar las categorías reales del eje X
+  const categories = xaxisCategories.value
+  const headers = ['Período', ...series.value.map((s) => s.name)]
 
-    csvContent = headers.join(',') + '\n'
+  csvContent = headers.join(',') + '\n'
 
-    for (let i = 0; i < 12; i++) {
-      const row = [months[i], ...series.value.map((s) => s.data[i])]
-      csvContent += row.join(',') + '\n'
-    }
+  // Iterar sobre cada período/ categoría
+  for (let i = 0; i < categories.length; i++) {
+    const row = [categories[i], ...series.value.map((s) => s.data[i] || '')]
+    csvContent += row.join(',') + '\n'
   }
 
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
-  const fileName = currentChartType.value === 'pie' ? 'datos_pie' : 'datos_series'
-  link.download = `${fileName}_${new Date().toISOString().split('T')[0]}.csv`
+  const fileName = `datos_${currentChartType.value}_${new Date().toISOString().split('T')[0]}.csv`
+  link.download = fileName
   link.click()
 
   alert('Archivo CSV generado con éxito')
@@ -500,41 +316,32 @@ const exportToPNG = () => {
   // Implementación con html2canvas
 }
 
-const applyDateFilter = () => {
-  alert(`Filtro aplicado del ${dateRange.value.start} al ${dateRange.value.end}`)
-  lastUpdate.value = new Date().toLocaleString()
-}
-
-const resetFilters = () => {
-  visibleSeries.value = [true, true, true]
-  currentChartType.value = 'line'
-  dateRange.value = {
-    start: '2024-01-01',
-    end: '2024-12-31',
-  }
-  showLegend.value = true
-  highlightedMetric.value = null
-  lastUpdate.value = new Date().toLocaleString()
-  chartKey.value++
-}
-
 const toggleLegend = () => {
   showLegend.value = !showLegend.value
 }
 
-const toggleDarkMode = () => {
-  isDark.value = !isDark.value
-  if (isDark.value) {
-    document.documentElement.classList.add('dark')
-  } else {
-    document.documentElement.classList.remove('dark')
-  }
-}
+// Watch para actualizar el gráfico cuando lleguen nuevos datos
+watch(
+  () => props.chartData,
+  (newData) => {
+    if (newData) {
+      lastUpdate.value = new Date().toLocaleString()
+      chartKey.value++ // Forzar re-render del gráfico
+    }
+  },
+  { deep: true },
+)
 
-// Inicialización
-onMounted(() => {
-  console.log('Dashboard de gráficos cargado con soporte para Pie Chart')
-})
+// Watch para mostrar loading
+watch(
+  () => props.loading,
+  (isLoading) => {
+    if (isLoading) {
+      // Opcional: mostrar indicador de carga
+      console.log('Cargando datos del gráfico...')
+    }
+  },
+)
 </script>
 
 <style scoped>

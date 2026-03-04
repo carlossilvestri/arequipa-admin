@@ -321,3 +321,45 @@ export interface OptionType {
   value: string | number
   label: string
 }
+
+export interface GenerateIndicatorRequest {
+  indicadores: IndicatorRequest[]
+}
+
+export interface IndicatorRequest {
+  idindicador: number
+  tipografica: string
+  idtipoterritorio: number
+  idterritorio: number
+  idtipoperiodo: number
+  idperiododesde: number
+  idperiodohasta: number
+}
+
+export interface Serie {
+  idindicador: number
+  nombreindicador: string
+  unidadmedida: string
+  simbolounidadmedida: string
+  tipografica: string
+  valores: Valor[]
+}
+
+export interface Valor {
+  idperiodo: number
+  nombreperiodo: string
+  valor: number
+}
+
+export interface GenerateIndicatorResponse {
+  objeto: {
+    idtipoperiodo: number
+    idtipoterritorio: number
+    series: Serie[]
+  }
+  exito: boolean
+  listaErrores: string[]
+  errores: string
+  listaMensajes: string[]
+  mensajes: string
+}

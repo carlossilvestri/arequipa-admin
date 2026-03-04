@@ -84,10 +84,11 @@
         :options="[
           { value: 'line', label: 'Línea' },
           { value: 'bar', label: 'Barras' },
-          { value: 'pie', label: 'Pie' },
+          /*{ value: 'pie', label: 'Pie' },*/
           { value: 'scatter', label: 'Dispersión' },
-          { value: 'radar', label: 'Radar' },
+          { value: 'area', label: 'Área' },
         ]"
+        v-model="selectedChartType"
         label="Tipo de gráfico"
         id="GRAFICO"
         placeholder="Seleccione un tipo de gráfico"
@@ -121,11 +122,12 @@
           </div>
         </div>
       </div>
+      <hr class="border-gray-300 mt-6" />
       <!-- Elegir periodo -->
       <div class="mt-3">
         <div class="flex items-center space-x-2">
           <div class="grid grid-cols-12 gap-4">
-            <div class="col-span-6">
+            <div class="col-span-12">
               <SelectInput
                 v-model="selectedPeriodType"
                 :options="
@@ -140,24 +142,39 @@
                 placeholder="Seleccione un tipo de período"
               />
             </div>
-            <div class="col-span-6">
+            <div class="col-span-6 pl-2">
               <SelectInput
-                v-model="selectedPeriod"
+                v-model="selectedPeriodFrom"
                 :options="periodOptions"
-                id="IDTIPOPERIODO"
-                label="Período"
+                id="idperiododesde"
+                label="Desde"
+                placeholder="Seleccione un tipo de período"
+              />
+            </div>
+            <div class="col-span-6 pr-2">
+              <SelectInput
+                v-model="selectedPeriodSince"
+                :options="periodOptions"
+                id="idperiodohasta"
+                label="Hasta"
                 placeholder="Seleccione un tipo de período"
               />
             </div>
           </div>
         </div>
       </div>
+      <hr class="border-gray-300 my-5" />
 
       <div class="mt-3">
         <Checkbox
           :name="`ENLAGRAFICA-${props.indicador.idindicador}`"
           :modelValue="checkboxValue"
-          @update:modelValue="checkboxValue = $event"
+          @update:modelValue="
+            (val: boolean) => {
+              checkboxValue = val
+              emit('update:checkbox', props.indicador.idindicador, val)
+            }
+          "
           label="Incluir este indicador en la gráfica"
         />
       </div>
@@ -169,7 +186,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type {
   BOIndicadorDto,
   BOPeriodo,
@@ -182,8 +199,6 @@ import { getPeriodByIdTipoAndIdIndicador } from '@/services/period'
 import { getTerritoryByIdTipoAndIdIndicador } from '@/services/territories'
 import { truncateTextWithEllipsis } from '@/utilities'
 import SelectInput from '@/components/forms/FormElements/SelectInput.vue'
-import { usePeriodTypeStore } from '@/stores/periodType'
-import { useTerritoryTypeStore } from '@/stores/territoryType'
 import TrashIcon from '@/icons/TrashIcon.vue'
 import Checkbox from '@/components/common/custom/Checkbox.vue'
 import ModalIndicatorDetail from '@/components/common/custom/ModalIndicatorDetail.vue'
@@ -194,14 +209,24 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const periodTypeStore = usePeriodTypeStore()
-const territoryTypeStore = useTerritoryTypeStore()
 // Emits
 const emit = defineEmits<{
   editar: [indicator: BOIndicadorDto]
   'toggle-activo': [indicator: BOIndicadorDto]
   'ver-detalle': [indicator: BOIndicadorDto]
   deseleccionar: [indicator: BOIndicadorDto]
+  'update:checkbox': [id: number, checked: boolean]
+  'update:config': [
+    id: number,
+    config: {
+      tipografica: string
+      idtipoterritorio: number | null
+      idterritorio: number | null
+      idtipoperiodo: number | null
+      idperiododesde: number | null
+      idperiodohasta: number | null
+    },
+  ]
 }>()
 
 // Tema actual (puede venir de un store, prop o composable)
@@ -209,14 +234,39 @@ const emit = defineEmits<{
 const { isDark } = useTheme()
 
 // Tipo de gráfico seleccionado para este indicador
+const selectedChartType = ref<string | null>(null)
 const selectedPeriodType = ref<number | null>(null)
-const selectedPeriod = ref<string | number | null>(null)
+const selectedPeriodFrom = ref<string | number | null>(null)
+const selectedPeriodSince = ref<string | number | null>(null)
 const selectedTerritoryType = ref<number | null>(null)
 const selectedTerritory = ref<number | null>(null)
 const showDetails = ref(false)
 const checkboxValue = ref(false)
 const periodOptions = ref<OptionType[]>([])
 const territoryOptions = ref<OptionType[]>([])
+
+// Watcher para emitir cambios en la configuración
+watch(
+  [
+    selectedChartType,
+    selectedPeriodType,
+    selectedPeriodFrom,
+    selectedPeriodSince,
+    selectedTerritoryType,
+    selectedTerritory,
+  ],
+  () => {
+    emit('update:config', props.indicador.idindicador, {
+      tipografica: selectedChartType.value || 'line',
+      idtipoterritorio: selectedTerritoryType.value,
+      idterritorio: selectedTerritory.value,
+      idtipoperiodo: selectedPeriodType.value,
+      idperiododesde: selectedPeriodFrom.value ? Number(selectedPeriodFrom.value) : null,
+      idperiodohasta: selectedPeriodSince.value ? Number(selectedPeriodSince.value) : null,
+    })
+  },
+  { deep: true },
+)
 
 // Clases dinámicas según el tema
 const themeClasses = computed(() => ({
@@ -314,7 +364,6 @@ const handleOnTerritoryTypeChange = async (territoryType: number | null) => {
     territoryType,
     props.indicador.idindicador,
   )
-  console.log('territories ', territories)
 
   territoryOptions.value = territories.map((territory) => ({
     value: territory.idterritorio,
@@ -325,7 +374,6 @@ const handleOnTerritoryTypeChange = async (territoryType: number | null) => {
 const handleOnPeriodTypeChange = async (periodType: number | null) => {
   if (!periodType) return
   const periods = await getPeriodByIdTipoAndIdIndicador(periodType, props.indicador.idindicador)
-  console.log('periods ', periods)
 
   periodOptions.value = periods.map((period) => ({
     value: period.idperiodo,

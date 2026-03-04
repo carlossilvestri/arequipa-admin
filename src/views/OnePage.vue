@@ -49,12 +49,19 @@
                 @toggle-activo="handleToggleActivo"
                 @ver-detalle="handleVerDetalle"
                 @deseleccionar="handleDeseleccionar"
+                @update:checkbox="handleCheckboxChange"
+                @update:config="handleConfigChange"
               />
             </div>
           </div>
         </div>
         <div class="flex items-center justify-center my-5">
-          <Button size="md" class="inline-flex items-center">
+          <Button
+            size="md"
+            class="inline-flex items-center"
+            @click="handleClickGenerateGraphic"
+            :loading="loadingGenerateGraphics"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -72,17 +79,29 @@
             GENERAR GRÁFICO
           </Button>
         </div>
-        <div v-if="form.selectedItems.length > 0">
+        <div v-if="chartData">
           <div class="border border-gray-300 rounded-md p-4 m-3 text-3xl">
             <div class="flex mt-2 mb-4">
               <NumberBadge :number="3" />
               <p class="pl-2 font-bold">Resultados del análisis</p>
             </div>
             <div class="grid">
-              <MultiChartDashboard />
+              <MultiChartDashboard
+                :chart-data="chartData"
+                :loading="loadingGenerateGraphics"
+                :chart-type="selectedChartType"
+              />
             </div>
           </div>
         </div>
+        <!--
+        <div>
+          <DynamicChartExample />
+        </div>
+        <div>
+          <DynamicChartJS :response="jsonData" />
+        </div>
+                -->
       </div>
     </section>
 
@@ -358,6 +377,7 @@
     >
       © {{ year }} IPE Arequipa
     </footer>
+    <NotificationContainer />
   </div>
 </template>
 
@@ -369,23 +389,34 @@ import Button from '@/components/ui/Button.vue'
 import Modal from '@/components/ui/Modal.vue'
 import HeaderOnePage from '@/components/common/custom/HeaderOnePage.vue'
 import { classicFormatDate } from '@/utilities'
-import type { BOIndicadorDto } from '@/interfaces'
-import { getIndicators } from '@/services/indicator'
+import type { BOIndicadorDto, GenerateIndicatorRequest, IndicatorRequest } from '@/interfaces'
+import { generateGraphic, getIndicators } from '@/services/indicator'
 import IndicatorCard from '@/components/common/custom/IndicatorCard.vue'
 import NumberBadge from '@/components/common/custom/NumberBadge.vue'
 import SearchIcon from '@/icons/SearchIcon.vue'
 import InfoCircleIcon from '@/icons/InfoCircleIcon.vue'
 import ModalIndicatorDetail from '@/components/common/custom/ModalIndicatorDetail.vue'
+import { useNotificationStore } from '@/stores/notification'
+import NotificationContainer from '@/components/common/custom/NotificationContainer.vue'
+import DynamicChartExample from '@/components/charts/DynamicChartExample.vue'
+import DynamicChartJS from '@/components/charts/DynamicChartJS.vue'
 
+const notificationStore = useNotificationStore()
 const indicators = ref<BOIndicadorDto[]>([])
 const loadingIndicators = ref(false)
+const loadingGenerateGraphics = ref(false)
 const isSearchModalOpen = ref(false)
 const showModalDetails = ref(false)
 const indicatorDetail = ref<BOIndicadorDto | null>(null)
+const chartData = ref<any>(null) // Almacenará los datos del gráfico
+const selectedChartType = ref('line') // Tipo de gráfico seleccionado
 
 const form = ref<{ selectedItems: { value: string; label: string }[] }>({
   selectedItems: [],
 })
+
+// Estado para almacenar configuración y checkbox por indicador
+const indicatorsConfig = ref<Map<number, { checked: boolean; config: IndicatorRequest }>>(new Map())
 
 // Selección temporal dentro del modal; solo se aplica al confirmar
 const modalSelectedItems = ref<{ value: string; label: string }[]>([])
@@ -393,6 +424,10 @@ const modalSelectedItems = ref<{ value: string; label: string }[]>([])
 const year = ref(classicFormatDate(new Date(), 'YYYY'))
 
 onMounted(async () => {
+  await loadIndicators()
+})
+
+const loadIndicators = async () => {
   try {
     loadingIndicators.value = true
     indicators.value = await getIndicators({ ACTIVO: true })
@@ -400,7 +435,51 @@ onMounted(async () => {
   } finally {
     loadingIndicators.value = false
   }
-})
+}
+
+const handleClickGenerateGraphic = async () => {
+  try {
+    loadingGenerateGraphics.value = true
+    // Filtrar solo los indicadores marcados y construir el payload
+    const checkedIndicators = Array.from(indicatorsConfig.value.entries())
+      .filter(([, { checked }]) => checked)
+      .map(([, { config }]) => config)
+
+    // Validar que todos los idperiododesde sean iguales
+    if (checkedIndicators.length > 1) {
+      const periodFromValues = checkedIndicators.map((config) => config.idperiododesde)
+      const uniquePeriodFromValues = [...new Set(periodFromValues)]
+
+      if (uniquePeriodFromValues.length > 1) {
+        notificationStore.error(
+          'Todos los indicadores deben tener el mismo período "Desde" seleccionado',
+        )
+        chartData.value = null
+        return
+      }
+    }
+
+    const params: GenerateIndicatorRequest = {
+      indicadores: checkedIndicators,
+    }
+    const response = await generateGraphic(params)
+
+    if (!response.exito) {
+      const errorMsg = response.errores.replace('grfica', 'gráfica')
+      notificationStore.error(errorMsg)
+      chartData.value = null
+    }
+
+    // Aquí puedes manejar la respuesta, por ejemplo mostrar un gráfico o mensaje
+    if (response.exito) {
+      // Guardar los datos del gráfico si la respuesta es exitosa
+      chartData.value = JSON.parse(JSON.stringify(response.objeto))
+      notificationStore.success('Gráfico generado exitosamente')
+    }
+  } finally {
+    loadingGenerateGraphics.value = false // si usas loading
+  }
+}
 
 const handleShowDetails = (indicator: BOIndicadorDto) => {
   showModalDetails.value = true
@@ -433,6 +512,49 @@ const handleDeseleccionar = (indicador: BOIndicadorDto) => {
   const id: string = String(indicador.idindicador)
 
   form.value.selectedItems = form.value.selectedItems.filter((item) => item.value !== id)
+  indicatorsConfig.value.delete(Number(id))
+
+  //chartData.value = form.value.selectedItems.filter((item) => item.value !== id)
+}
+
+// Handlers para checkbox y configuración
+const handleCheckboxChange = (id: number, checked: boolean) => {
+  const current = indicatorsConfig.value.get(id) || {
+    checked: false,
+    config: {} as IndicatorRequest,
+  }
+  indicatorsConfig.value.set(id, { ...current, checked })
+}
+
+const handleConfigChange = (
+  id: number,
+  config: {
+    tipografica: string
+    idtipoterritorio: number | null
+    idterritorio: number | null
+    idtipoperiodo: number | null
+    idperiododesde: number | null
+    idperiodohasta: number | null
+  },
+) => {
+  const current = indicatorsConfig.value.get(id) || {
+    checked: false,
+    config: {} as IndicatorRequest,
+  }
+
+  // Actualizar el tipo de gráfico seleccionado si este indicador está seleccionado
+  /*
+  const isSelected = form.value.selectedItems.some((item) => item.value === String(id))
+
+  if (isSelected && config.tipografica) {
+    selectedChartType.value = config.tipografica
+  }
+    */
+
+  indicatorsConfig.value.set(id, {
+    ...current,
+    config: { ...config, idindicador: id } as IndicatorRequest,
+  })
 }
 
 // Filtros modal
