@@ -15,9 +15,19 @@
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <custom-input
+                v-model="form.IDSUBGRUPO"
+                placeholder="ID"
+                label="ID"
+                name="IDSUBGRUPO"
+                type="text"
+                disabled
+              />
+            </div>
+            <div>
+              <custom-input
                 v-model="form.NOMBRESUBGRUPO"
                 placeholder="Nombre"
-                label="Nombre"
+                label="Nombre*"
                 name="NOMBRESUBGRUPO"
                 type="text"
               />
@@ -29,7 +39,7 @@
                     :model-value="value"
                     @update:model-value="onInput"
                     :options="computedValues.groups"
-                    label="Grupo"
+                    label="Grupo*"
                     placeholder="Seleccione un grupo"
                     id="IDGRUPO"
                   />
@@ -85,7 +95,7 @@ const schema = object().shape({
 })
 
 const form = ref({
-  IDSUBGRUPO: '',
+  IDSUBGRUPO: '0',
   IDGRUPO: '',
   NOMBRESUBGRUPO: '',
 })
@@ -135,7 +145,14 @@ const save = async () => {
     EstadoPersistencia: EstadoPersistenciaEnum.NEW,
   }
   if (status.value === 'new') {
-    await handleCreate(objectData)
+    const response = await handleCreate(objectData)
+    router.push(
+      routes.admin.subgroups.edit.path.replace(':id', response.objeto?.idsubgrupo.toString() || ''),
+    )
+    // Reload page to show the new indicator
+    setTimeout(async () => {
+      await handleOnMount()
+    }, 500)
   } else {
     // TODO: Handle update logic
     const updateUserData: UpdateBOSubGrupoRequest = {
@@ -145,17 +162,19 @@ const save = async () => {
     }
     await handleUpdate(updateUserData)
   }
-  router.push(routes.admin.subgroups.path)
+  //router.push(routes.admin.subgroups.path)
   loading.value = false
 }
 
 const handleCreate = async (values: CreateBOSubGrupoRequest) => {
   // TODO: Call your API to save the user here
-  await createSubGroup(values)
+  const response = await createSubGroup(values)
+  return response
 }
 
 const handleUpdate = async (values: UpdateBOSubGrupoRequest) => {
-  await updateSubGroup(values)
+  const response = await updateSubGroup(values)
+  return response
 }
 
 function cancel() {

@@ -15,8 +15,18 @@
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <custom-input
+                v-model="form.IDPERIODO"
+                placeholder="ID"
+                label="ID"
+                name="IDPERIODO"
+                type="text"
+                disabled
+              />
+            </div>
+            <div>
+              <custom-input
                 v-model="form.ANIO"
-                placeholder="Año"
+                placeholder="Año*"
                 label="Año"
                 name="ANIO"
                 type="number"
@@ -26,7 +36,7 @@
               <custom-input
                 v-model="form.NUMEROPERIODO"
                 placeholder="Número de período"
-                label="Número de período"
+                label="Número de período*"
                 name="NUMEROPERIODO"
                 type="number"
               />
@@ -35,7 +45,7 @@
               <custom-input
                 v-model="form.ETIQUETACORTA"
                 placeholder="Etiqueta corta"
-                label="Etiqueta corta"
+                label="Etiqueta corta*"
                 name="ETIQUETACORTA"
                 type="text"
               />
@@ -44,7 +54,7 @@
               <custom-input
                 v-model="form.ETIQUETALARGA"
                 placeholder="Etiqueta larga"
-                label="Etiqueta larga"
+                label="Etiqueta larga*"
                 name="ETIQUETALARGA"
                 type="text"
               />
@@ -56,7 +66,7 @@
                     :model-value="value"
                     @update:model-value="onInput"
                     :options="computedValues.periodTypes"
-                    label="Tipo de período"
+                    label="Tipo de período*"
                     id="IDTIPOPERIODO"
                     placeholder="Seleccione un tipo de período"
                   />
@@ -67,7 +77,7 @@
               <custom-input name="FECHAINICIO" v-model="form.FECHAINICIO">
                 <template #input="{ value, onInput, onBlur }">
                   <DatePicker
-                    :label="'Fecha inicio'"
+                    :label="'Fecha inicio*'"
                     :model-value="value"
                     :format="'yyyy-MM-dd'"
                     :model-type="'string'"
@@ -81,7 +91,7 @@
               <custom-input name="FECHAFIN" v-model="form.FECHAFIN">
                 <template #input="{ value, onInput, onBlur }">
                   <DatePicker
-                    :label="'Fecha fin'"
+                    :label="'Fecha fin*'"
                     :model-value="value"
                     :format="'yyyy-MM-dd'"
                     :model-type="'string'"
@@ -163,7 +173,7 @@ const schema = object().shape({
 })
 
 const form = ref({
-  IDPERIODO: '',
+  IDPERIODO: '0',
   IDTIPOPERIODO: '',
   ANIO: '',
   NUMEROPERIODO: '',
@@ -227,7 +237,14 @@ const save = async () => {
     EstadoPersistencia: EstadoPersistenciaEnum.NEW,
   }
   if (status.value === 'new') {
-    await handleCreate(objectData)
+    const response = await handleCreate(objectData)
+    router.push(
+      routes.admin.periods.edit.path.replace(':id', response.objeto?.idperiodo.toString() || ''),
+    )
+    // Reload page to show the new indicator
+    setTimeout(async () => {
+      await handleOnMount()
+    }, 500)
   } else {
     // TODO: Handle update logic
     const updateData: UpdateBOPeriodoRequest = {
@@ -237,17 +254,19 @@ const save = async () => {
     }
     await handleUpdate(updateData)
   }
-  router.push(routes.admin.periods.path)
+  //router.push(routes.admin.periods.path)
   loading.value = false
 }
 
 const handleCreate = async (values: CreateBOPeriodoRequest) => {
   // TODO: Call your API to save the user here
-  await createPeriod(values)
+  const response = await createPeriod(values)
+  return response
 }
 
 const handleUpdate = async (values: UpdateBOPeriodoRequest) => {
-  await updatePeriod(values)
+  const response = await updatePeriod(values)
+  return response
 }
 
 function cancel() {

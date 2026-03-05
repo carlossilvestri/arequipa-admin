@@ -92,8 +92,8 @@ const mockInfoTable = ref({
     },
     { key: 'nombresubgrupo', label: 'Nombre', thClass: 'px-5 py-3 text-left w-2/11 sm:px-6' },
     {
-      key: 'idgrupo',
-      label: 'Id grupo',
+      key: 'nombregrupo',
+      label: 'Grupo',
       thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
     },
     {

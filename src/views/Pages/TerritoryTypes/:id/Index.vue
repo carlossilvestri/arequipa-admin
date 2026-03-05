@@ -15,9 +15,19 @@
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <custom-input
+                v-model="form.IDTIPOTERRITORIO"
+                placeholder="ID"
+                label="ID"
+                name="IDTIPOTERRITORIO"
+                type="text"
+                disabled
+              />
+            </div>
+            <div>
+              <custom-input
                 v-model="form.NOMBRETIPOTERRITORIO"
                 placeholder="Nombre"
-                label="Nombre"
+                label="Nombre*"
                 name="NOMBRETIPOTERRITORIO"
                 type="text"
               />
@@ -26,7 +36,7 @@
               <custom-input
                 v-model="form.ORDENJERARQUICO"
                 placeholder="Orden jerárquico"
-                label="Orden jerárquico"
+                label="Orden jerárquico*"
                 name="ORDENJERARQUICO"
                 type="number"
               />
@@ -84,7 +94,7 @@ const schema = object().shape({
 })
 
 const form = ref({
-  IDTIPOTERRITORIO: '',
+  IDTIPOTERRITORIO: '0',
   NOMBRETIPOTERRITORIO: '',
   ORDENJERARQUICO: '0',
 })
@@ -124,7 +134,17 @@ const save = async () => {
     EstadoPersistencia: EstadoPersistenciaEnum.NEW,
   }
   if (status.value === 'new') {
-    await handleCreate(objectData)
+    const response = await handleCreate(objectData)
+    router.push(
+      routes.admin.territoryTypes.edit.path.replace(
+        ':id',
+        response.objeto?.idtipoterritorio.toString() || '',
+      ),
+    )
+    // Reload page to show the new indicator
+    setTimeout(async () => {
+      await handleOnMount()
+    }, 500)
   } else {
     // TODO: Handle update logic
     const updateData: UpdateBOTipoTerritorioRequest = {
@@ -134,17 +154,19 @@ const save = async () => {
     }
     await handleUpdate(updateData)
   }
-  router.push(routes.admin.territoryTypes.path)
+  //router.push(routes.admin.territoryTypes.path)
   loading.value = false
 }
 
 const handleCreate = async (values: CreateBOTipoTerritorioRequest) => {
   // TODO: Call your API to save the user here
-  await createTerritoryType(values)
+  const response = await createTerritoryType(values)
+  return response
 }
 
 const handleUpdate = async (values: UpdateBOTipoTerritorioRequest) => {
-  await updateTerritoryType(values)
+  const response = await updateTerritoryType(values)
+  return response
 }
 
 function cancel() {

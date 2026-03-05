@@ -107,8 +107,8 @@ const mockInfoTable = ref({
       thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
     },
     {
-      key: 'idtipoperiodo',
-      label: 'ID Tipo Período',
+      key: 'nombretipoperiodo',
+      label: 'Tipo periodo',
       thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
     },
     {

@@ -15,9 +15,19 @@
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <custom-input
+                v-model="form.IDGRUPO"
+                placeholder="ID"
+                label="ID"
+                name="IDGRUPO"
+                type="text"
+                disabled
+              />
+            </div>
+            <div>
+              <custom-input
                 v-model="form.NOMBREGRUPO"
                 placeholder="Nombre"
-                label="Nombre"
+                label="Nombre*"
                 name="NOMBREGRUPO"
                 type="text"
               />
@@ -65,7 +75,7 @@ const schema = object().shape({
 })
 
 const form = ref({
-  IDGRUPO: '',
+  IDGRUPO: '0',
   NOMBREGRUPO: '',
 })
 
@@ -102,7 +112,13 @@ const save = async () => {
     EstadoPersistencia: EstadoPersistenciaEnum.NEW,
   }
   if (status.value === 'new') {
-    await handleCreate(createUserData)
+    const response = await handleCreate(createUserData)
+    router.push(
+      routes.admin.groups.edit.path.replace(':id', response.objeto?.idgrupo.toString() || ''),
+    )
+    setTimeout(async () => {
+      await handleOnMount()
+    }, 500)
   } else {
     // TODO: Handle update logic
     const updateUserData: UpdateBOGrupoRequest = {
@@ -112,17 +128,19 @@ const save = async () => {
     }
     await handleUpdate(updateUserData)
   }
-  router.push(`${routes.admin.groups.path}`)
+  //router.push(`${routes.admin.groups.path}`)
   loading.value = false
 }
 
 const handleCreate = async (values: CreateBOGrupoRequest) => {
   // TODO: Call your API to save the user here
-  await createGroup(values)
+  const response = await createGroup(values)
+  return response
 }
 
 const handleUpdate = async (values: UpdateBOGrupoRequest) => {
-  await updateGroup(values)
+  const response = await updateGroup(values)
+  return response
 }
 
 function cancel() {

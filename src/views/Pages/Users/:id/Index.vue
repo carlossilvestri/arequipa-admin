@@ -15,9 +15,19 @@
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <custom-input
+                v-model="form.IDUSUARIO"
+                placeholder="ID"
+                label="ID"
+                name="IDUSUARIO"
+                type="text"
+                disabled
+              />
+            </div>
+            <div>
+              <custom-input
                 v-model="form.NOMBRE"
                 placeholder="Nombre"
-                label="Nombre"
+                label="Nombre*"
                 name="NOMBRE"
                 type="text"
               />
@@ -29,7 +39,7 @@
                   { value: 'ACTIVO', label: 'ACTIVO' },
                   { value: 'INACTIVO', label: 'INACTIVO' },
                 ]"
-                label="Estado"
+                label="Estado*"
                 placeholder="Seleccione un estado"
               />
             </div>
@@ -37,7 +47,7 @@
               <custom-input
                 v-model="form.NICK"
                 placeholder="Nick"
-                label="Nick"
+                label="Nick*"
                 name="NICK"
                 type="text"
               />
@@ -99,7 +109,7 @@ const schema = object().shape({
 })
 
 const form = ref({
-  IDUSUARIO: '',
+  IDUSUARIO: '0',
   NOMBRE: '',
   NICK: '',
   CLAVE: '',
@@ -145,7 +155,14 @@ const save = async () => {
     EstadoPersistencia: EstadoPersistenciaEnum.NEW,
   }
   if (status.value === 'new') {
-    await handleCreate(createUserData)
+    const response = await handleCreate(createUserData)
+    router.push(
+      routes.admin.users.edit.path.replace(':id', response.objeto?.idusuario.toString() || ''),
+    )
+    // Reload page to show the new indicator
+    setTimeout(async () => {
+      await handleOnMount()
+    }, 1000)
   } else {
     // TODO: Handle update logic
     const updateUserData: UpdateUserRequest = {
@@ -154,17 +171,19 @@ const save = async () => {
     }
     await handleUpdate(updateUserData)
   }
-  router.push(`/${routes.admin.users.path}`)
+  //router.push(`${routes.admin.users.path}`)
   loading.value = false
 }
 
 const handleCreate = async (values: CreateUserRequest) => {
   // TODO: Call your API to save the user here
-  await createUser(values)
+  const response = await createUser(values)
+  return response
 }
 
 const handleUpdate = async (values: UpdateUserRequest) => {
-  await updateUser(values)
+  const response = await updateUser(values)
+  return response
 }
 
 function cancel() {

@@ -93,22 +93,12 @@ const props = defineProps({
 
 // Configuración inicial
 const currentChartType = computed(() => props.chartType || 'line')
-const visibleSeries = ref([true, true, true])
+const visibleSeries = ref(props.chartData?.series?.map(() => true) || [])
 const lastUpdate = ref(new Date().toLocaleString())
 const chartKey = ref(0)
 const showLegend = ref(true)
 const { isDark, toggleTheme, enableDarkMode, enableLightMode } = useTheme()
 const mainChart = ref(null)
-
-// Tipos de gráficos disponibles (incluyendo pie)
-const chartTypes = [
-  { label: 'Línea', value: 'line', icon: '📈' },
-  { label: 'Barras', value: 'bar', icon: '📊' },
-  { label: 'Área', value: 'area', icon: '🔽' },
-  { label: 'Pie', value: 'pie', icon: '🥧' },
-  { label: 'Dispersión', value: 'scatter', icon: '⚫' },
-  { label: 'Radar', value: 'radar', icon: '🔄' },
-]
 
 // Categorías del eje X computadas desde los datos reales de TODAS las series
 const xaxisCategories = computed(() => {
@@ -129,29 +119,33 @@ const xaxisCategories = computed(() => {
   //return ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 })
 
-// Etiqueta del gráfico actual
-const currentChartTypeLabel = computed(() => {
-  const type = chartTypes.find((t) => t.value === currentChartType.value)
-  return type ? type.label : 'Gráfico'
-})
-
 // Series computadas que usan datos reales si están disponibles
 const series = computed(() => {
   if (props.chartData && props.chartData.series) {
-    // Obtener unidades de medida únicas
-    const uniqueUnits = [...new Set(props.chartData.series.map((serie) => serie.unidadmedida))]
+    // Obtener unidades de medida únicas manteniendo el orden de aparición
+    const uniqueUnits = []
+    const unitOrder = new Map()
+
+    props.chartData.series.forEach((serie, index) => {
+      if (!unitOrder.has(serie.unidadmedida)) {
+        unitOrder.set(serie.unidadmedida, unitOrder.size)
+        uniqueUnits.push(serie.unidadmedida)
+      }
+    })
 
     // Transformar los datos de la API al formato esperado por ApexCharts
     return props.chartData.series.map((serie) => {
       // Encontrar el índice del eje Y para esta unidad de medida
-      const yAxisIndex = uniqueUnits.indexOf(serie.unidadmedida)
+      const yAxisIndex = unitOrder.get(serie.unidadmedida)
 
       return {
         name: serie.nombreindicador,
         type: serie.tipografica, // Usar el tipo de gráfico específico de cada serie
         data: serie.valores.map((valor) => valor.valor),
         // Asignar al eje Y correspondiente a su unidad de medida
-        yAxisIndex: yAxisIndex,
+        //yAxisIndex: yAxisIndex,
+        //group: `apexcharts-axis-$`,
+        //xaxis: serie.valores.map((valor) => valor.nombreperiodo),
       }
     })
   }
@@ -217,36 +211,37 @@ const chartOptions = computed(() => ({
   },
   yaxis: (() => {
     if (props.chartData && props.chartData.series) {
-      // Obtener unidades de medida únicas
-      const uniqueUnits = [...new Set(props.chartData.series.map((serie) => serie.unidadmedida))]
+      // Obtener unidades de medida únicas manteniendo el orden de aparición
+      const uniqueUnits = []
+      const unitOrder = new Map()
+
+      props.chartData.series.forEach((serie, index) => {
+        if (!unitOrder.has(serie.unidadmedida)) {
+          unitOrder.set(serie.unidadmedida, serie.nombreindicador)
+          uniqueUnits.push(serie)
+        }
+      })
 
       // Crear un eje Y para cada unidad de medida única
-      return uniqueUnits.map((unidad, index) => ({
-        seriesName: unidad,
-        opposite: index % 2 === 1,
-        axisTicks: {
-          show: true,
-        },
-        axisBorder: {
-          show: true,
-          color: seriesColor(index),
-        },
+      return props.chartData.series.map((serie, index) => ({
+        seriesName: unitOrder.get(serie.unidadmedida),
+        opposite: uniqueUnits.findIndex((u) => u.unidadmedida === serie.unidadmedida) % 2 === 1,
         labels: {
           style: {
             colors: seriesColor(index),
             fontWeight: 600,
           },
           formatter: (value) => {
-            if (unidad.includes('Porcentaje') || unidad.includes('%')) {
+            if (serie.unidadmedida.includes('Porcentaje') || serie.unidadmedida.includes('%')) {
               return `${value}%`
-            } else if (unidad.includes('Soles') || unidad.includes('S/.')) {
+            } else if (serie.unidadmedida.includes('Soles') || serie.unidadmedida.includes('S/.')) {
               return `S/ ${value.toLocaleString('es-PE')}`
             }
             return value.toString()
           },
         },
         title: {
-          text: unidad,
+          text: serie.unidadmedida,
           style: {
             color: seriesColor(index),
             fontWeight: 'bold',
@@ -262,6 +257,7 @@ const chartOptions = computed(() => ({
       },
     }
   })(),
+
   grid: {
     borderColor: isDark.value ? '#374151' : '#E5E7EB',
     row: {
@@ -279,24 +275,92 @@ const chartOptions = computed(() => ({
   },
   tooltip: {
     theme: isDark.value ? 'dark' : 'light',
-    y: {
-      formatter: (value, { seriesIndex }) => {
-        if (props.chartData && props.chartData.series && props.chartData.series[seriesIndex]) {
-          const unidad = props.chartData.series[seriesIndex].unidadmedida
-          if (unidad.includes('Porcentaje') || unidad.includes('%')) {
-            return `${value}%`
-          } else if (unidad.includes('Soles') || unidad.includes('S/.')) {
-            return `S/ ${Number(value).toLocaleString('es-PE')}`
+    custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+      // Obtener el nombre del período desde los datos originales
+      let categoryName = ''
+      if (
+        props.chartData &&
+        props.chartData.series &&
+        props.chartData.series[0] &&
+        props.chartData.series[0].valores[dataPointIndex]
+      ) {
+        categoryName =
+          props.chartData.series[0].valores[dataPointIndex].nombreperiodo ||
+          w.globals.labels[dataPointIndex]
+      } else {
+        categoryName = w.globals.labels[dataPointIndex]
+      }
+
+      // Construir el tooltip con todas las series para este punto de datos
+      let tooltipContent =
+        '<div class="custom-tooltip p-3 rounded-lg shadow-lg border min-w-[200px] ' +
+        (isDark.value
+          ? 'bg-gray-800 text-gray-200 border-gray-600'
+          : 'bg-white text-gray-700 border-gray-200') +
+        '">' +
+        '<div class="font-bold text-sm text-center mb-3 pb-2 border-b ' +
+        (isDark.value ? 'border-gray-600' : 'border-gray-200') +
+        '">' +
+        categoryName +
+        '</div>'
+
+      // Iterar sobre todas las series para mostrar sus valores en este punto
+      series.forEach((serieData, index) => {
+        if (
+          w.globals.seriesNames[index] &&
+          serieData[dataPointIndex] !== null &&
+          serieData[dataPointIndex] !== undefined
+        ) {
+          const seriesName = w.globals.seriesNames[index]
+          const value = serieData[dataPointIndex]
+          const originalSeries = props.chartData.series[index]
+          const unidadMedida = originalSeries?.unidadmedida || ''
+          const nombrePeriodo =
+            originalSeries?.valores[dataPointIndex]?.nombreperiodo || categoryName
+          const color = w.globals.colors[index]
+
+          // Formatear el valor según la unidad de medida
+          let formattedValue = value
+          if (unidadMedida.includes('Porcentaje') || unidadMedida.includes('%')) {
+            formattedValue = `${value}%`
+          } else if (unidadMedida.includes('Soles') || unidadMedida.includes('S/.')) {
+            formattedValue = `S/ ${value.toLocaleString('es-PE')}`
           }
+
+          tooltipContent +=
+            '<div class="mb-2 flex items-center justify-between">' +
+            '<div class="flex items-center">' +
+            '<div class="w-3 h-3 rounded-sm mr-2" style="background: ' +
+            color +
+            '"></div>' +
+            '<div>' +
+            '<div class="text-xs font-medium">' +
+            seriesName +
+            '</div>' +
+            '<div class="text-[10px] ' +
+            (isDark.value ? 'text-gray-400' : 'text-gray-500') +
+            '">' +
+            unidadMedida +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="pl-5 text-sm font-bold" style="color: ' +
+            color +
+            ';">' +
+            formattedValue +
+            '</div>' +
+            '</div>'
         }
-        return value.toString()
-      },
+      })
+
+      tooltipContent += '</div>'
+      return tooltipContent
     },
   },
   markers: {
     size: currentChartType.value === 'scatter' ? 6 : 4,
     hover: {
-      sizeOffset: 2,
+      sizeOffset: 1,
     },
   },
   fill: {
@@ -330,15 +394,24 @@ const exportToCSV = () => {
   const categories = xaxisCategories.value
   const headers = ['Período', ...series.value.map((s) => s.name)]
 
-  csvContent = headers.join(',') + '\n'
+  csvContent = headers.map((h) => `"${h}"`).join(';') + '\n'
 
   // Iterar sobre cada período/ categoría
   for (let i = 0; i < categories.length; i++) {
-    const row = [categories[i], ...series.value.map((s) => s.data[i] || '')]
-    csvContent += row.join(',') + '\n'
+    const row = [
+      `"${categories[i]}"`,
+      ...series.value.map((s) => {
+        const value = s.data[i]
+        if (value !== null && value !== undefined && value !== '') {
+          return `"${value}"`
+        }
+        return `""`
+      }),
+    ]
+    csvContent += row.join(';') + '\n'
   }
 
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
   const fileName = `datos_${currentChartType.value}_${new Date().toISOString().split('T')[0]}.csv`

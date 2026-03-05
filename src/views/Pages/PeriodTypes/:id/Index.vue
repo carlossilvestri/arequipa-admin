@@ -15,9 +15,19 @@
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <custom-input
+                v-model="form.IDTIPOPERIODO"
+                placeholder="ID"
+                label="ID"
+                name="IDTIPOPERIODO"
+                type="text"
+                disabled
+              />
+            </div>
+            <div>
+              <custom-input
                 v-model="form.NOMBRETIPOPERIODO"
                 placeholder="Nombre"
-                label="Nombre"
+                label="Nombre*"
                 name="NOMBRETIPOPERIODO"
                 type="text"
               />
@@ -26,7 +36,7 @@
               <custom-input
                 v-model="form.CANTIDADMESES"
                 placeholder="Cantidad de meses"
-                label="Cantidad de meses"
+                label="Cantidad de meses*"
                 name="CANTIDADMESES"
                 type="number"
               />
@@ -80,7 +90,7 @@ const schema = object().shape({
 })
 
 const form = ref({
-  IDTIPOPERIODO: '',
+  IDTIPOPERIODO: '0',
   NOMBRETIPOPERIODO: '',
   CANTIDADMESES: '0',
 })
@@ -120,7 +130,17 @@ const save = async () => {
     EstadoPersistencia: EstadoPersistenciaEnum.NEW,
   }
   if (status.value === 'new') {
-    await handleCreate(objectData)
+    const response = await handleCreate(objectData)
+    router.push(
+      routes.admin.periodTypes.edit.path.replace(
+        ':id',
+        response.objeto?.idtipoperiodo.toString() || '',
+      ),
+    )
+    // Reload page to show the new indicator
+    setTimeout(async () => {
+      await handleOnMount()
+    }, 500)
   } else {
     // TODO: Handle update logic
     const updateData: UpdateBOTipoPeriodoRequest = {
@@ -130,17 +150,19 @@ const save = async () => {
     }
     await handleUpdate(updateData)
   }
-  router.push(routes.admin.periodTypes.path)
+  //router.push(routes.admin.periodTypes.path)
   loading.value = false
 }
 
 const handleCreate = async (values: CreateBOTipoPeriodoRequest) => {
   // TODO: Call your API to save the user here
-  await createPeriodType(values)
+  const response = await createPeriodType(values)
+  return response
 }
 
 const handleUpdate = async (values: UpdateBOTipoPeriodoRequest) => {
-  await updatePeriodType(values)
+  const response = await updatePeriodType(values)
+  return response
 }
 
 function cancel() {

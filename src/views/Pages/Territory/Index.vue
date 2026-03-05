@@ -92,8 +92,8 @@ const mockInfoTable = ref({
     },
     { key: 'nombreterritorio', label: 'Nombre', thClass: 'px-5 py-3 text-left w-2/11 sm:px-6' },
     {
-      key: 'idtipoterritorio',
-      label: 'ID Tipo territorio',
+      key: 'nombretipoterritorio',
+      label: 'Tipo territorio',
       thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
     },
     {

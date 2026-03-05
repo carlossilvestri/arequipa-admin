@@ -15,9 +15,19 @@
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <custom-input
+                v-model="form.IDUNIDADMEDIDA"
+                placeholder="ID"
+                label="ID"
+                name="IDUNIDADMEDIDA"
+                type="text"
+                disabled
+              />
+            </div>
+            <div>
+              <custom-input
                 v-model="form.NOMBREUNIDADMEDIDA"
                 placeholder="Nombre"
-                label="Nombre"
+                label="Nombre*"
                 name="NOMBREUNIDADMEDIDA"
                 type="text"
               />
@@ -26,7 +36,7 @@
               <custom-input
                 v-model="form.SIMBOLOUNIDADMEDIDA"
                 placeholder="Símbolo"
-                label="Símbolo"
+                label="Símbolo*"
                 name="SIMBOLOUNIDADMEDIDA"
                 type="text"
               />
@@ -80,13 +90,13 @@ const route = useRoute()
 const router = useRouter()
 const defaultErrorMsg = 'Valor requerido'
 const schema = object().shape({
-  NOMBREUNIDADMEDIDA: string().required(defaultErrorMsg).min(1).max(100),
-  SIMBOLOUNIDADMEDIDA: string().required(defaultErrorMsg).min(1).max(10, 'Máximo 10 caracteres'),
-  DESCRIPCIONUNIDADMEDIDA: string().required(defaultErrorMsg).min(1).max(1000),
+  NOMBREUNIDADMEDIDA: string().required(defaultErrorMsg).max(100),
+  SIMBOLOUNIDADMEDIDA: string().required(defaultErrorMsg).max(100, 'Máximo 100 caracteres'),
+  DESCRIPCIONUNIDADMEDIDA: string().max(1000),
 })
 
 const form = ref({
-  IDUNIDADMEDIDA: '',
+  IDUNIDADMEDIDA: '0',
   NOMBREUNIDADMEDIDA: '',
   SIMBOLOUNIDADMEDIDA: '',
   DESCRIPCIONUNIDADMEDIDA: '',
@@ -129,7 +139,16 @@ const save = async () => {
     EstadoPersistencia: EstadoPersistenciaEnum.NEW,
   }
   if (status.value === 'new') {
-    await handleCreate(createUserData)
+    const response = await handleCreate(createUserData)
+    router.push(
+      routes.admin.unitsOfMeasure.edit.path.replace(
+        ':id',
+        response.objeto?.idunidadmedida.toString() || '',
+      ),
+    )
+    setTimeout(() => {
+      handleOnMount()
+    }, 500)
   } else {
     // TODO: Handle update logic
     const updateUserData: UpdateBOUnidadMedidaRequest = {
@@ -139,17 +158,19 @@ const save = async () => {
     }
     await handleUpdate(updateUserData)
   }
-  router.push(routes.admin.unitsOfMeasure.path)
+  //router.push(routes.admin.unitsOfMeasure.path)
   loading.value = false
 }
 
 const handleCreate = async (values: CreateBOUnidadMedidaRequest) => {
   // TODO: Call your API to save the user here
-  await createUnitMeasure(values)
+  const response = await createUnitMeasure(values)
+  return response
 }
 
 const handleUpdate = async (values: UpdateBOUnidadMedidaRequest) => {
-  await updateUnitMeasure(values)
+  const response = await updateUnitMeasure(values)
+  return response
 }
 
 function cancel() {
