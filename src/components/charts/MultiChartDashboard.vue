@@ -277,16 +277,29 @@ const chartOptions = computed(() => ({
     theme: isDark.value ? 'dark' : 'light',
     custom: function ({ series, seriesIndex, dataPointIndex, w }) {
       // Obtener el nombre del período desde los datos originales
+      // Si la primera serie no tiene valores, buscar en las siguientes series
       let categoryName = ''
-      if (
-        props.chartData &&
-        props.chartData.series &&
-        props.chartData.series[0] &&
-        props.chartData.series[0].valores[dataPointIndex]
-      ) {
-        categoryName =
-          props.chartData.series[0].valores[dataPointIndex].nombreperiodo ||
-          w.globals.labels[dataPointIndex]
+      if (props.chartData && props.chartData.series && props.chartData.series.length > 0) {
+        // Buscar en todas las series hasta encontrar una con valores en este punto
+        let foundCategory = false
+        for (let seriesIndex = 0; seriesIndex < props.chartData.series.length; seriesIndex++) {
+          const currentSeries = props.chartData.series[seriesIndex]
+          if (
+            currentSeries &&
+            currentSeries.valores &&
+            currentSeries.valores[dataPointIndex] &&
+            currentSeries.valores[dataPointIndex].nombreperiodo
+          ) {
+            categoryName = currentSeries.valores[dataPointIndex].nombreperiodo
+            foundCategory = true
+            break
+          }
+        }
+
+        // Si ninguna serie tiene el nombre del período, usar el label del gráfico
+        if (!foundCategory) {
+          categoryName = w.globals.labels[dataPointIndex]
+        }
       } else {
         categoryName = w.globals.labels[dataPointIndex]
       }
