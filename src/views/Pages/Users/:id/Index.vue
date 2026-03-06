@@ -187,6 +187,6 @@ const handleUpdate = async (values: UpdateUserRequest) => {
 }
 
 function cancel() {
-  router.back()
+  router.push(routes.admin.users.path)
 }
 </script>

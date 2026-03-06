@@ -178,6 +178,6 @@ const handleUpdate = async (values: UpdateBOSubGrupoRequest) => {
 }
 
 function cancel() {
-  router.back()
+  router.push(routes.admin.subgroups.path)
 }
 </script>

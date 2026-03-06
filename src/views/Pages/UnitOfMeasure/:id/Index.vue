@@ -174,6 +174,6 @@ const handleUpdate = async (values: UpdateBOUnidadMedidaRequest) => {
 }
 
 function cancel() {
-  router.back()
+  router.push(routes.admin.unitsOfMeasure.path)
 }
 </script>

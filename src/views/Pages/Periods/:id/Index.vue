@@ -270,6 +270,6 @@ const handleUpdate = async (values: UpdateBOPeriodoRequest) => {
 }
 
 function cancel() {
-  router.back()
+  router.push(routes.admin.periods.path)
 }
 </script>

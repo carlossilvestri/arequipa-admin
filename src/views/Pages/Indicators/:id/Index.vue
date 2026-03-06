@@ -396,7 +396,7 @@ const handleUpdate = async (values: UpdateBOIndicadorRequest) => {
 }
 
 const cancel = () => {
-  router.back()
+  router.push(routes.admin.indicators.path)
 }
 
 // Función para seleccionar un tab

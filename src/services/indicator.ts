@@ -52,10 +52,7 @@ export async function createIndicator(
   try {
     const { data } = await axiosInstance.post<BOResultadoLogicaNegocio<BOIndicador>>(
       '/api/Indicador/Grabar',
-      null,
-      {
-        params: groupData,
-      },
+      groupData,
     )
     if (data?.exito) {
       notifications.success(`${name} fue creado con éxito.`)
@@ -82,10 +79,7 @@ export async function updateIndicator(
   try {
     const { data } = await axiosInstance.post<BOResultadoLogicaNegocio<BOIndicador>>(
       '/api/Indicador/Editar',
-      null,
-      {
-        params: groupData,
-      },
+      groupData,
     )
     if (data?.exito) {
       notifications.success(`${name} fue actualizado con éxito.`)

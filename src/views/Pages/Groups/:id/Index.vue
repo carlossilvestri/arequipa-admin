@@ -144,6 +144,6 @@ const handleUpdate = async (values: UpdateBOGrupoRequest) => {
 }
 
 function cancel() {
-  router.back()
+  router.push(routes.admin.groups.path)
 }
 </script>

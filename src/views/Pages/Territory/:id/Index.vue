@@ -212,6 +212,6 @@ const handleUpdate = async (values: UpdateBOTerritorioRequest) => {
 }
 
 function cancel() {
-  router.back()
+  router.push(routes.admin.territories.path)
 }
 </script>

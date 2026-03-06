@@ -170,6 +170,6 @@ const handleUpdate = async (values: UpdateBOTipoTerritorioRequest) => {
 }
 
 function cancel() {
-  router.back()
+  router.push(routes.admin.territoryTypes.path)
 }
 </script>
