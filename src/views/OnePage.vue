@@ -40,7 +40,7 @@
               <NumberBadge :number="2" />
               <p class="pl-2 font-bold">Configura los indicadores seleccionados</p>
             </div>
-            <div class="pt-3 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div class="pt-3 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 items-start">
               <IndicatorCard
                 v-for="indicator in displayIndicators"
                 :key="indicator.idindicador"
@@ -385,7 +385,12 @@ import Button from '@/components/ui/Button.vue'
 import Modal from '@/components/ui/Modal.vue'
 import HeaderOnePage from '@/components/common/custom/HeaderOnePage.vue'
 import { classicFormatDate } from '@/utilities'
-import type { BOIndicadorDto, GenerateIndicatorRequest, IndicatorRequest } from '@/interfaces'
+import type {
+  BOIndicadorDto,
+  GenerateIndicatorRequest,
+  IndicatorRequest,
+  Serie,
+} from '@/interfaces'
 import { generateGraphic, getIndicators } from '@/services/indicator'
 import IndicatorCard from '@/components/common/custom/IndicatorCard.vue'
 import NumberBadge from '@/components/common/custom/NumberBadge.vue'
@@ -410,7 +415,7 @@ const form = ref<{ selectedItems: { value: string; label: string }[] }>({
 })
 
 // Estado para almacenar configuración y checkbox por indicador
-const indicatorsConfig = ref<Map<number, { checked: boolean; config: IndicatorRequest }>>(new Map())
+const indicatorsConfig = ref<Map<number, { checked: boolean; config: any }>>(new Map())
 
 // Selección temporal dentro del modal; solo se aplica al confirmar
 const modalSelectedItems = ref<{ value: string; label: string }[]>([])
@@ -433,15 +438,67 @@ const loadIndicators = async () => {
 
 const handleClickGenerateGraphic = async () => {
   try {
-    loadingGenerateGraphics.value = true
     // Filtrar solo los indicadores marcados y construir el payload
     const checkedIndicators = Array.from(indicatorsConfig.value.entries())
       .filter(([, { checked }]) => checked)
       .map(([, { config }]) => config)
 
+    if (checkedIndicators.length === 0) {
+      notificationStore.error('Debe seleccionar al menos un indicador')
+      return
+    }
+
+    // Validar que todos los indicadores tengan al menos un territorio seleccionado
+    const indicatorsWithoutTerritory = checkedIndicators.filter((config) => !config.idterritorio)
+
+    if (indicatorsWithoutTerritory.length > 0) {
+      notificationStore.error(
+        'Todos los indicadores seleccionados deben tener al menos un territorio configurado',
+      )
+      chartData.value = null
+      return
+    }
+    loadingGenerateGraphics.value = true
+    // Transformar los indicadores para manejar múltiples territorios
+    const transformedIndicators: IndicatorRequest[] = []
+
+    for (const config of checkedIndicators) {
+      if (Array.isArray(config.idtipoterritorio) && typeof config.idterritorio === 'object') {
+        // Si hay múltiples tipos de territorio, crear una entrada por cada territorio seleccionado
+        for (const territoryTypeId of config.idtipoterritorio) {
+          const territoryId = config.idterritorio[territoryTypeId]
+          if (territoryId) {
+            transformedIndicators.push({
+              idindicador: config.idindicador,
+              tipografica: config.tipografica,
+              idtipoterritorio: territoryTypeId,
+              idterritorio: territoryId,
+              idtipoperiodo: config.idtipoperiodo!,
+              idperiododesde: config.idperiododesde!,
+              idperiodohasta: config.idperiodohasta!,
+            })
+          }
+        }
+      } else if (
+        typeof config.idtipoterritorio === 'number' &&
+        typeof config.idterritorio === 'number'
+      ) {
+        // Si es un solo territorio, agregar directamente
+        transformedIndicators.push({
+          idindicador: config.idindicador,
+          tipografica: config.tipografica,
+          idtipoterritorio: config.idtipoterritorio,
+          idterritorio: config.idterritorio,
+          idtipoperiodo: config.idtipoperiodo!,
+          idperiododesde: config.idperiododesde!,
+          idperiodohasta: config.idperiodohasta!,
+        })
+      }
+    }
+
     // Validar que todos los idperiododesde sean iguales
-    if (checkedIndicators.length > 1) {
-      const periodFromValues = checkedIndicators.map((config) => config.idperiododesde)
+    if (transformedIndicators.length > 1) {
+      const periodFromValues = transformedIndicators.map((config) => config.idperiododesde)
       const uniquePeriodFromValues = [...new Set(periodFromValues)]
 
       if (uniquePeriodFromValues.length > 1) {
@@ -454,20 +511,27 @@ const handleClickGenerateGraphic = async () => {
     }
 
     const params: GenerateIndicatorRequest = {
-      indicadores: checkedIndicators,
+      indicadores: transformedIndicators,
     }
     const response = await generateGraphic(params)
+    const responseTransformed = JSON.parse(JSON.stringify(response))
+    responseTransformed.objeto.series = responseTransformed.objeto.series.map((serie: Serie) => {
+      return {
+        ...serie,
+        nombreindicador: `${serie.nombreindicador} - ${serie.nombretipoterritorio} - ${serie.nombreterritorio}`,
+      }
+    })
 
-    if (!response.exito) {
-      const errorMsg = response.errores.replace('grfica', 'gráfica')
+    if (!responseTransformed.exito) {
+      const errorMsg = responseTransformed.errores.replace('grfica', 'gráfica')
       notificationStore.error(errorMsg)
       chartData.value = null
     }
 
     // Aquí puedes manejar la respuesta, por ejemplo mostrar un gráfico o mensaje
-    if (response.exito) {
+    if (responseTransformed.exito) {
       // Guardar los datos del gráfico si la respuesta es exitosa
-      chartData.value = JSON.parse(JSON.stringify(response.objeto))
+      chartData.value = JSON.parse(JSON.stringify(responseTransformed.objeto))
       notificationStore.success('Gráfico generado exitosamente')
     }
   } finally {
@@ -515,7 +579,7 @@ const handleDeseleccionar = (indicador: BOIndicadorDto) => {
 const handleCheckboxChange = (id: number, checked: boolean) => {
   const current = indicatorsConfig.value.get(id) || {
     checked: false,
-    config: {} as IndicatorRequest,
+    config: {},
   }
   indicatorsConfig.value.set(id, { ...current, checked })
 }
@@ -524,8 +588,8 @@ const handleConfigChange = (
   id: number,
   config: {
     tipografica: string
-    idtipoterritorio: number | null
-    idterritorio: number | null
+    idtipoterritorio: number[] | null
+    idterritorio: { [key: number]: number } | null
     idtipoperiodo: number | null
     idperiododesde: number | null
     idperiodohasta: number | null
@@ -533,7 +597,7 @@ const handleConfigChange = (
 ) => {
   const current = indicatorsConfig.value.get(id) || {
     checked: false,
-    config: {} as IndicatorRequest,
+    config: {},
   }
 
   // Actualizar el tipo de gráfico seleccionado si este indicador está seleccionado
@@ -547,7 +611,7 @@ const handleConfigChange = (
 
   indicatorsConfig.value.set(id, {
     ...current,
-    config: { ...config, idindicador: id } as IndicatorRequest,
+    config: { ...config, idindicador: id },
   })
 }
 

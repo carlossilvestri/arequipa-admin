@@ -16,7 +16,7 @@
       <VueApexCharts
         :key="chartKey"
         :options="chartOptions"
-        :series="filteredSeries"
+        :series="series"
         :type="currentChartType === 'pie' ? 'pie' : 'line'"
         height="400"
         ref="mainChart"
@@ -93,7 +93,7 @@ const props = defineProps({
 
 // Configuración inicial
 const currentChartType = computed(() => props.chartType || 'line')
-const visibleSeries = ref(props.chartData?.series?.map(() => true) || [])
+//const visibleSeries = ref(props.chartData?.series?.map(() => true) || [])
 const lastUpdate = ref(new Date().toLocaleString())
 const chartKey = ref(0)
 const showLegend = ref(true)
@@ -116,7 +116,6 @@ const xaxisCategories = computed(() => {
   }
   // Categorías por defecto
   return []
-  //return ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 })
 
 // Series computadas que usan datos reales si están disponibles
@@ -136,30 +135,21 @@ const series = computed(() => {
     // Transformar los datos de la API al formato esperado por ApexCharts
     return props.chartData.series.map((serie) => {
       // Encontrar el índice del eje Y para esta unidad de medida
-      const yAxisIndex = unitOrder.get(serie.unidadmedida)
+      //const yAxisIndex = unitOrder.get(serie.unidadmedida)
 
       return {
         name: serie.nombreindicador,
         type: serie.tipografica, // Usar el tipo de gráfico específico de cada serie
         data: serie.valores.map((valor) => valor.valor),
-        // Asignar al eje Y correspondiente a su unidad de medida
-        //yAxisIndex: yAxisIndex,
-        //group: `apexcharts-axis-$`,
-        //xaxis: serie.valores.map((valor) => valor.nombreperiodo),
       }
     })
   }
   return []
 })
 
-// Series filtradas según visibilidad
-const filteredSeries = computed(() => {
-  return series.value.filter((_, index) => visibleSeries.value[index])
-})
-
 // Colores para las series
 const seriesColor = (index) => {
-  const colors = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6']
+  const colors = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#000000', '#10ff00', '#00ffed']
   return colors[index % colors.length]
 }
 
@@ -328,8 +318,6 @@ const chartOptions = computed(() => ({
           const value = serieData[dataPointIndex]
           const originalSeries = props.chartData.series[index]
           const unidadMedida = originalSeries?.unidadmedida || ''
-          const nombrePeriodo =
-            originalSeries?.valores[dataPointIndex]?.nombreperiodo || categoryName
           const color = w.globals.colors[index]
 
           // Formatear el valor según la unidad de medida
@@ -474,17 +462,6 @@ watch(
     }
   },
   { deep: true },
-)
-
-// Watch para mostrar loading
-watch(
-  () => props.loading,
-  (isLoading) => {
-    if (isLoading) {
-      // Opcional: mostrar indicador de carga
-      console.log('Cargando datos del gráfico...')
-    }
-  },
 )
 </script>
 

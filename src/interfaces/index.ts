@@ -339,6 +339,8 @@ export interface IndicatorRequest {
 export interface Serie {
   idindicador: number
   nombreindicador: string
+  nombretipoterritorio: string
+  nombreterritorio: string
   unidadmedida: string
   simbolounidadmedida: string
   tipografica: string

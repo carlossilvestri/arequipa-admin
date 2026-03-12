@@ -41,7 +41,7 @@
 
       <!-- Jerarquía grupo/subgrupo -->
       <div
-        class="flex items-center text-sm transition-colors min-h-[40px]"
+        class="flex items-center justify-between text-sm transition-colors min-h-[40px]"
         :class="themeClasses.text.secondary"
       >
         <div class="flex items-center space-x-2">
@@ -63,22 +63,21 @@
             truncateTextWithEllipsis(indicador.nombreunidadmedida, 80)
           }}</span>
         </div>
-      </div>
-
-      <!-- Botón para abrir detalles -->
-      <div class="mt-1">
-        <button
-          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
-          :class="themeClasses.button.primary"
-          @click="showDetails = true"
-        >
-          Ver más detalles
-        </button>
+        <!-- Botón para abrir detalles -->
+        <div class="mt-1">
+          <button
+            class="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+            :class="themeClasses.button.primary"
+            @click="showDetails = true"
+          >
+            Ver más detalles
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- Contenido principal -->
-    <div class="p-6">
+    <div class="px-6 pt-3 pb-6">
       <!-- Elegir tipo de gráfica -->
       <SelectInput
         :options="[
@@ -96,34 +95,53 @@
       />
       <!-- Elegir tipo de territorio -->
       <div class="mt-3">
-        <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-6">
-            <SelectInput
-              v-model="selectedTerritoryType"
-              @change="handleOnTerritoryTypeChange(selectedTerritoryType)"
+        <div class="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2 sm:mb-0 flex-shrink-0 w-32"
+            for="GRAFICOEP001"
+            >Tipo de territorio</label
+          >
+          <div class="relative z-50 flex-1">
+            <MultipleSelect
               :options="
-                indicador.tiposterritorio.map((pt) => ({
-                  value: pt.idtipoterritorio,
-                  label: pt.nombretipoterritorio,
+                indicador.tiposterritorio.map((tt) => ({
+                  value: tt.idtipoterritorio,
+                  label: tt.nombretipoterritorio,
                 }))
               "
-              label="Tipo de territorio"
-              :id="`IDTIPOTERRITORIO${indicador.codigoindicador}`"
-              placeholder="Seleccione un tipo de territorio"
-            />
-          </div>
-          <div class="col-span-6">
-            <SelectInput
-              v-model="selectedTerritory"
-              :options="territoryOptions"
-              label="Territorio"
-              :id="`IDTERRITORIO${indicador.codigoindicador}`"
-              placeholder="Seleccione un territorio"
+              v-model="selectedTerritoryTypesFormatted"
+              @update:modelValue="handleTerritoryTypesChange"
+              placeholder=""
             />
           </div>
         </div>
+        <!-- Selección de territorios para cada tipo seleccionado -->
+        <div
+          v-for="territoryTypeId in selectedTerritoryTypes"
+          :key="territoryTypeId"
+          class="mt-4 p-3 border rounded-lg"
+          :class="themeClasses.border"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-sm font-medium" :class="themeClasses.text.label">
+              Territorio - {{ getTerritoryTypeName(territoryTypeId) }}
+            </label>
+            <button
+              @click="removeTerritoryType(territoryTypeId)"
+              class="text-red-500 hover:text-red-700 text-sm"
+            >
+              Eliminar
+            </button>
+          </div>
+          <SelectInput
+            v-model="selectedTerritories[territoryTypeId]"
+            :options="territoryOptions[territoryTypeId] || []"
+            :id="`TERRITORIO_${territoryTypeId}_${indicador.codigoindicador}`"
+            placeholder="Seleccione un territorio"
+          />
+        </div>
       </div>
-      <hr class="border-gray-300 mt-6" />
+      <hr class="border-gray-300 mt-3" />
       <!-- Elegir periodo -->
       <div class="mt-3">
         <div class="flex items-center space-x-2">
@@ -165,7 +183,7 @@
           </div>
         </div>
       </div>
-      <hr class="border-gray-300 my-5" />
+      <hr class="border-gray-300 mt-3 mb-5" />
 
       <div class="mt-3">
         <Checkbox
@@ -201,6 +219,7 @@ import { getPeriodByIdTipoAndIdIndicador } from '@/services/period'
 import { getTerritoryByIdTipoAndIdIndicador } from '@/services/territories'
 import { truncateTextWithEllipsis } from '@/utilities'
 import SelectInput from '@/components/forms/FormElements/SelectInput.vue'
+import MultipleSelect from '@/components/forms/FormElements/MultipleSelect.vue'
 import TrashIcon from '@/icons/TrashIcon.vue'
 import Checkbox from '@/components/common/custom/Checkbox.vue'
 import ModalIndicatorDetail from '@/components/common/custom/ModalIndicatorDetail.vue'
@@ -222,8 +241,8 @@ const emit = defineEmits<{
     id: number,
     config: {
       tipografica: string
-      idtipoterritorio: number | null
-      idterritorio: number | null
+      idtipoterritorio: number[] | null
+      idterritorio: { [key: number]: number } | null
       idtipoperiodo: number | null
       idperiododesde: number | null
       idperiodohasta: number | null
@@ -240,12 +259,13 @@ const selectedChartType = ref<string | null>(null)
 const selectedPeriodType = ref<number | null>(null)
 const selectedPeriodFrom = ref<string | number | null>(null)
 const selectedPeriodSince = ref<string | number | null>(null)
-const selectedTerritoryType = ref<number | null>(null)
-const selectedTerritory = ref<number | null>(null)
+const selectedTerritoryTypes = ref<number[]>([])
+const selectedTerritoryTypesFormatted = ref<{ value: number; label: string }[]>([])
+const selectedTerritories = ref<{ [key: number]: number }>({})
 const showDetails = ref(false)
 const checkboxValue = ref(false)
 const periodOptions = ref<OptionType[]>([])
-const territoryOptions = ref<OptionType[]>([])
+const territoryOptions = ref<{ [key: number]: OptionType[] }>({})
 
 // Watcher para emitir cambios en la configuración
 watch(
@@ -254,14 +274,16 @@ watch(
     selectedPeriodType,
     selectedPeriodFrom,
     selectedPeriodSince,
-    selectedTerritoryType,
-    selectedTerritory,
+    selectedTerritoryTypes,
+    selectedTerritories,
   ],
   () => {
     emit('update:config', props.indicador.idindicador, {
       tipografica: selectedChartType.value || 'line',
-      idtipoterritorio: selectedTerritoryType.value,
-      idterritorio: selectedTerritory.value,
+      idtipoterritorio:
+        selectedTerritoryTypes.value.length > 0 ? selectedTerritoryTypes.value : null,
+      idterritorio:
+        Object.keys(selectedTerritories.value).length > 0 ? selectedTerritories.value : null,
       idtipoperiodo: selectedPeriodType.value,
       idperiododesde: selectedPeriodFrom.value ? Number(selectedPeriodFrom.value) : null,
       idperiodohasta: selectedPeriodSince.value ? Number(selectedPeriodSince.value) : null,
@@ -360,17 +382,74 @@ const themeClasses = computed(() => ({
   },
 }))
 
-const handleOnTerritoryTypeChange = async (territoryType: number | null) => {
-  if (!territoryType) return
-  const territories = await getTerritoryByIdTipoAndIdIndicador(
-    territoryType,
-    props.indicador.idindicador,
-  )
+const handleTerritoryTypesChange = async (selectedOptions: { value: number; label: string }[]) => {
+  selectedTerritoryTypesFormatted.value = selectedOptions
+  selectedTerritoryTypes.value = selectedOptions.map((option) => option.value)
 
-  territoryOptions.value = territories.map((territory) => ({
-    value: territory.idterritorio,
-    label: territory.nombreterritorio,
-  }))
+  // Load territories for newly selected types
+  for (const option of selectedOptions) {
+    if (!territoryOptions.value[option.value]) {
+      const territories = await getTerritoryByIdTipoAndIdIndicador(
+        option.value,
+        props.indicador.idindicador,
+      )
+      territoryOptions.value[option.value] = territories.map((territory) => ({
+        value: territory.idterritorio,
+        label: territory.nombreterritorio,
+      }))
+    }
+  }
+
+  // Clean up territory options for deselected types
+  const selectedTypeIds = selectedOptions.map((option) => option.value)
+  Object.keys(territoryOptions.value).forEach((typeId) => {
+    const typeIdNum = Number(typeId)
+    if (!selectedTypeIds.includes(typeIdNum)) {
+      delete territoryOptions.value[typeIdNum]
+      delete selectedTerritories.value[typeIdNum]
+    }
+  })
+}
+
+const handleTerritoryTypeToggle = async (territoryTypeId: number) => {
+  if (selectedTerritoryTypes.value.includes(territoryTypeId)) {
+    // Si se selecciona el tipo, cargar sus territorios
+    const territories = await getTerritoryByIdTipoAndIdIndicador(
+      territoryTypeId,
+      props.indicador.idindicador,
+    )
+    territoryOptions.value[territoryTypeId] = territories.map((territory) => ({
+      value: territory.idterritorio,
+      label: territory.nombreterritorio,
+    }))
+  } else {
+    // Si se deselecciona, limpiar datos
+    delete territoryOptions.value[territoryTypeId]
+    delete selectedTerritories.value[territoryTypeId]
+  }
+}
+
+const getTerritoryTypeName = (territoryTypeId: number) => {
+  const territoryType = props.indicador.tiposterritorio.find(
+    (tt) => tt.idtipoterritorio === territoryTypeId,
+  )
+  return territoryType?.nombretipoterritorio || ''
+}
+
+const removeTerritoryType = (territoryTypeId: number) => {
+  const index = selectedTerritoryTypes.value.indexOf(territoryTypeId)
+  if (index > -1) {
+    selectedTerritoryTypes.value.splice(index, 1)
+    // Also remove from formatted array
+    const formattedIndex = selectedTerritoryTypesFormatted.value.findIndex(
+      (item) => item.value === territoryTypeId,
+    )
+    if (formattedIndex > -1) {
+      selectedTerritoryTypesFormatted.value.splice(formattedIndex, 1)
+    }
+    delete territoryOptions.value[territoryTypeId]
+    delete selectedTerritories.value[territoryTypeId]
+  }
 }
 
 const handleOnPeriodTypeChange = async (periodType: number | null) => {
