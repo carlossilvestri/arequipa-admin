@@ -175,7 +175,7 @@
               >
                 <div class="col-span-12 sm:col-span-4 flex items-center">
                   <Checkbox
-                    :name="`check-${elemento.tipoterritorio.value}-${elemento.territorio.value}`"
+                    :name="`check-${elemento.tipoterritorio.value}-${elemento.territorio.value}-${props.indicador.idindicador}`"
                     :modelValue="elemento.checked"
                     @update:modelValue="
                       (val: boolean) => {
