@@ -241,6 +241,11 @@
                 </div>
               </li>
             </ul>
+            <div class="flex justify-end pr-2">
+              <p class="text-gray-300 font-light text-sm">
+                Total: {{ indicatorCard.elementos.length }}
+              </p>
+            </div>
           </div>
         </div>
       </div>
