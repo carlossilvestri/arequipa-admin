@@ -2,7 +2,13 @@
   <div class="fixed top-25 right-6 z-2 space-y-3">
     <transition-group name="fade" tag="div">
       <div v-for="n in notifications" :key="n.id">
-        <Alert :variant="n.variant" :title="n.title" :message="n.message" :showLink="false" />
+        <Alert
+          :class="{ 'mt-2': notifications.indexOf(n) > 0 }"
+          :variant="n.variant"
+          :title="n.title!"
+          :message="n.message"
+          :showLink="false"
+        />
       </div>
     </transition-group>
   </div>

@@ -1,8 +1,19 @@
 <template>
-  <div class="bg-gray-50 p-4 md:p-6">
+  <div class="bg-gray-50 p-0 md:p-6">
     <!-- Gráfico principal (para otros tipos) -->
-    <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
-      <div class="flex justify-between items-center mb-4">
+    <div class="bg-white rounded-xl shadow-sm pb-4 pr-2 md:p-4 mb-6 flex flex-col">
+      <div class="flex-1 w-full" style="min-height: 400px">
+        <VueApexCharts
+          :key="chartKey"
+          :options="chartOptions"
+          :series="series"
+          :type="currentChartType === 'pie' ? 'pie' : 'line'"
+          height="100%"
+          width="100%"
+          ref="mainChart"
+        />
+      </div>
+      <div class="flex justify-between items-center mt-4">
         <span></span>
         <div class="flex items-center space-x-4">
           <button
@@ -13,14 +24,6 @@
           </button>
         </div>
       </div>
-      <VueApexCharts
-        :key="chartKey"
-        :options="chartOptions"
-        :series="series"
-        :type="currentChartType === 'pie' ? 'pie' : 'line'"
-        height="400"
-        ref="mainChart"
-      />
     </div>
 
     <!-- Botones de exportación -->
@@ -71,7 +74,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import VueApexCharts from 'vue3-apexcharts'
 import { useTheme } from '@/composables/useTheme'
 
@@ -99,6 +102,23 @@ const chartKey = ref(0)
 const showLegend = ref(true)
 const { isDark, toggleTheme, enableDarkMode, enableLightMode } = useTheme()
 const mainChart = ref(null)
+
+// Window width reactive
+const windowWidth = ref(window.innerWidth)
+
+// Handle window resize
+const handleResize = () => {
+  windowWidth.value = window.innerWidth
+  chartKey.value++ // Force chart re-render
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 
 // Categorías del eje X computadas desde los datos reales de TODAS las series
 const xaxisCategories = computed(() => {
@@ -157,7 +177,8 @@ const seriesColor = (index) => {
 const chartOptions = computed(() => ({
   chart: {
     type: 'line', // Usar 'line' como base para permitir tipos mixtos
-    height: 400,
+    height: '100%',
+    width: '100%',
     zoom: {
       enabled: currentChartType.value !== 'radar',
     },
@@ -220,6 +241,7 @@ const chartOptions = computed(() => ({
           style: {
             colors: seriesColor(index),
             fontWeight: 600,
+            fontSize: '10px',
           },
           formatter: (value) => {
             if (serie.unidadmedida.includes('Porcentaje') || serie.unidadmedida.includes('%')) {
@@ -235,6 +257,7 @@ const chartOptions = computed(() => ({
           style: {
             color: seriesColor(index),
             fontWeight: 'bold',
+            fontSize: '11px',
           },
         },
       }))
@@ -257,7 +280,7 @@ const chartOptions = computed(() => ({
   legend: {
     show: showLegend.value,
     showForSingleSeries: true,
-    position: 'top',
+    position: windowWidth.value < 768 ? 'bottom' : 'top',
     horizontalAlign: 'center',
     labels: {
       colors: isDark.value ? '#E5E7EB' : '#374151',
@@ -295,13 +318,23 @@ const chartOptions = computed(() => ({
       }
 
       // Construir el tooltip con todas las series para este punto de datos
+      const tooltipMinWidth = windowWidth.value < 768 ? '150px' : '200px'
+      const titleFontSize = windowWidth.value < 768 ? 'text-[11px]' : 'text-sm'
+      const seriesNameFontSize = windowWidth.value < 768 ? 'text-[9px]' : 'text-xs'
+      const valueFontSize = windowWidth.value < 768 ? 'text-[10px]' : 'text-sm'
+      const unitFontSize = windowWidth.value < 768 ? 'text-[8px]' : 'text-[10px]'
+
       let tooltipContent =
-        '<div class="custom-tooltip p-3 rounded-lg shadow-lg border min-w-[200px] ' +
+        '<div class="custom-tooltip p-2 md:p-3 rounded-lg shadow-lg border" style="min-width: ' +
+        tooltipMinWidth +
+        '" ' +
         (isDark.value
           ? 'bg-gray-800 text-gray-200 border-gray-600'
           : 'bg-white text-gray-700 border-gray-200') +
         '">' +
-        '<div class="font-bold text-sm text-center mb-3 pb-2 border-b ' +
+        '<div class="font-bold text-center mb-2 md:mb-3 pb-1 md:pb-2 border-b ' +
+        titleFontSize +
+        ' ' +
         (isDark.value ? 'border-gray-600' : 'border-gray-200') +
         '">' +
         categoryName +
@@ -329,23 +362,29 @@ const chartOptions = computed(() => ({
           }
 
           tooltipContent +=
-            '<div class="mb-2 flex items-center justify-between">' +
+            '<div class="mb-1 md:mb-2 flex items-center justify-between">' +
             '<div class="flex items-center">' +
-            '<div class="w-3 h-3 rounded-sm mr-2" style="background: ' +
+            '<div class="w-2 md:w-3 h-2 md:h-3 rounded-sm mr-1 md:mr-2" style="background: ' +
             color +
             '"></div>' +
             '<div>' +
-            '<div class="text-xs font-medium">' +
+            '<div class="font-medium ' +
+            seriesNameFontSize +
+            '">' +
             seriesName +
             '</div>' +
-            '<div class="text-[10px] ' +
+            '<div class="' +
+            unitFontSize +
+            ' ' +
             (isDark.value ? 'text-gray-400' : 'text-gray-500') +
             '">' +
             unidadMedida +
             '</div>' +
             '</div>' +
             '</div>' +
-            '<div class="pl-5 text-sm font-bold" style="color: ' +
+            '<div class="pl-2 md:pl-5 font-bold ' +
+            valueFontSize +
+            '" style="color: ' +
             color +
             ';">' +
             formattedValue +

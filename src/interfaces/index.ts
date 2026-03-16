@@ -290,6 +290,23 @@ export interface BOIndicadorDto extends BOIndicador {
   tiposterritorio: BOTipoTerritorio[]
 }
 
+export interface BOIndicadorElemento {
+  tipoterritorio: OptionType
+  territorio: OptionType
+  chartseleccionado: string
+  checked: boolean
+}
+
+export interface BOCardIndicadorDto {
+  idindicador: number
+  tipoterritorio: number | null
+  territorio: number | null
+  tipoperiodo: number | null
+  elementos: BOIndicadorElemento[]
+  desde: string
+  hasta: string
+}
+
 export interface FilterBOIndicador {
   CODIGO?: string
   IDGRUPO?: number

@@ -37,3 +37,11 @@ export const truncateText = ({
 export const truncateTextWithEllipsis = (text: string, maxLength: number): string => {
   return truncateText({ text, maxLength, symbol: '...' })
 }
+
+// Handle scroll to section
+export const handleScrollToSection = (value: string) => {
+  const element = document.querySelector(value)
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth' })
+  }
+}

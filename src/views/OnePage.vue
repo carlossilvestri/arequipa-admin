@@ -4,94 +4,213 @@
     <HeaderOnePage />
 
     <!-- Sección Opción 1 (con gráfico) -->
-    <section
-      id="opcion-1"
-      class="scroll-mt-24 mx-auto max-w-(--breakpoint-2xl) px-4 md:px-6 py-12 md:py-16"
-    >
-      <h3 class="text-3xl font-semibold mb-6 pl-6">Indicadores</h3>
-      <div class="m-3">
-        <div class="gap-6 border border-gray-300 rounded-md p-4 m-3">
-          <div>
-            <div class="flex text-3xl">
-              <NumberBadge :number="1" />
-              <p class="pl-2 font-bold">Selecciona uno o más indicadores</p>
-            </div>
-            <div class="mt-3 ml-2">
-              <p class="text-gray-900/50 text-[14px] italic my-5 ml-2 dark:text-gray-100/50">
-                Haz clic en el botón para buscar indicadores por grupo, subgrupo o nombre
-              </p>
-              <hr class="border-gray-300" />
-              <Button
-                type="submit"
-                variant="primary"
-                class="flex items-center justify-center mt-3 ml-2 px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600"
-                @click="isSearchModalOpen = true"
-              >
-                <SearchIcon />
-                BUSCAR INDICADORES
-              </Button>
+    <section class="pt-20 bg-gradient-to-b from-blue-50 to-white">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-4xl font-bold text-blue-900 mb-4">Explorador de indicadores</h2>
+          <p class="text-xl text-gray-600">
+            Busca, selecciona y compara indicadores de la gestión pública regional.
+          </p>
+        </div>
+      </div>
+      <div id="opcion-1" class="scroll-mt-24 mx-auto max-w-(--breakpoint-2xl) px-4 md:px-6">
+        <div class="md:m-3">
+          <div class="gap-6 border border-gray-300 rounded-md p-4 m-3">
+            <div>
+              <div class="flex text-3xl">
+                <NumberBadge :number="1" />
+                <p class="pl-2 font-bold">Selecciona uno o más indicadores</p>
+              </div>
+              <div class="mt-3 ml-2">
+                <p class="text-gray-900/50 text-[14px] italic my-5 ml-2 dark:text-gray-100/50">
+                  Haz clic en el botón para buscar indicadores por grupo, subgrupo o nombre
+                </p>
+                <hr class="border-gray-300" />
+                <Button
+                  type="submit"
+                  variant="primary"
+                  class="flex items-center justify-center mt-3 ml-2 px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600"
+                  @click="isSearchModalOpen = true"
+                >
+                  <SearchIcon />
+                  BUSCAR INDICADORES
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div>
-          <div class="border border-gray-300 rounded-md p-4 m-3">
-            <div class="flex mb-3 text-3xl">
-              <NumberBadge :number="2" />
-              <p class="pl-2 font-bold">Configura los indicadores seleccionados</p>
+          <div>
+            <div class="border border-gray-300 rounded-md p-4 m-3">
+              <div class="flex mb-3 text-3xl">
+                <NumberBadge :number="2" />
+                <p class="pl-2 font-bold">Configura los indicadores seleccionados</p>
+              </div>
+              <div class="pt-3 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 items-start">
+                <IndicatorCard
+                  v-for="indicator in displayIndicators"
+                  :key="indicator.idindicador"
+                  :indicador="indicator"
+                  @deseleccionar="handleDeseleccionar"
+                  @update:config="handleConfigChange"
+                />
+              </div>
             </div>
-            <div class="pt-3 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 items-start">
-              <IndicatorCard
-                v-for="indicator in displayIndicators"
-                :key="indicator.idindicador"
-                :indicador="indicator"
-                @editar="handleEditar"
-                @toggle-activo="handleToggleActivo"
-                @ver-detalle="handleVerDetalle"
-                @deseleccionar="handleDeseleccionar"
-                @update:checkbox="handleCheckboxChange"
-                @update:config="handleConfigChange"
-              />
+          </div>
+          <div class="flex items-center justify-center my-5">
+            <Button
+              size="md"
+              class="inline-flex items-center"
+              @click="handleClickGenerateGraphic"
+              :loading="loadingGenerateGraphics"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.8"
+                stroke="currentColor"
+                class="w-4 h-4 mr-2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 3v18h18M6 15l4-4 4 4 6-6"
+                />
+              </svg>
+              GENERAR GRÁFICO
+            </Button>
+          </div>
+          <div v-if="chartData">
+            <div class="border border-gray-300 rounded-md p-4 m-3 text-3xl">
+              <div class="flex mt-2 mb-4">
+                <NumberBadge :number="3" />
+                <p class="pl-2 font-bold">Resultados del análisis</p>
+              </div>
+              <div class="grid">
+                <MultiChartDashboard
+                  :chart-data="chartData"
+                  :loading="loadingGenerateGraphics"
+                  :chart-type="selectedChartType"
+                />
+              </div>
             </div>
           </div>
         </div>
-        <div class="flex items-center justify-center my-5">
-          <Button
-            size="md"
-            class="inline-flex items-center"
-            @click="handleClickGenerateGraphic"
-            :loading="loadingGenerateGraphics"
+      </div>
+      <button
+        class="fixed bottom-8 right-8 z-50 inline-flex items-center justify-center w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 hover:scale-110 transition-all duration-200"
+        aria-label="Consejos de uso"
+        @click="openTips = true"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-lightbulb w-6 h-6"
+        >
+          <path
+            d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"
+          ></path>
+          <path d="M9 18h6"></path>
+          <path d="M10 22h4"></path>
+        </svg>
+      </button>
+      <div
+        class="fixed inset-0 bg-black/20 z-50 transition-opacity"
+        :class="{ hidden: !openTips }"
+      ></div>
+      <div
+        :class="{ hidden: !openTips }"
+        class="fixed bottom-8 right-8 z-50 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-2xl border-2 border-blue-200 animate-in slide-in-from-bottom-4"
+      >
+        <div class="bg-blue-50 border-b-2 border-blue-200 p-6 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-600 rounded-lg">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-lightbulb w-6 h-6 text-white"
+              >
+                <path
+                  d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"
+                ></path>
+                <path d="M9 18h6"></path>
+                <path d="M10 22h4"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-blue-900">Consejos de uso</h3>
+          </div>
+          <button
+            @click="openTips = false"
+            data-slot="button"
+            class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 rounded-md gap-1.5 has-[&gt;svg]:px-2.5 h-8 w-8 p-0"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              fill="none"
+              width="24"
+              height="24"
               viewBox="0 0 24 24"
-              stroke-width="1.8"
+              fill="none"
               stroke="currentColor"
-              class="w-4 h-4 mr-2"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-x w-5 h-5"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3 3v18h18M6 15l4-4 4 4 6-6"
-              />
+              <path d="M18 6 6 18"></path>
+              <path d="m6 6 12 12"></path>
             </svg>
-            GENERAR GRÁFICO
-          </Button>
+          </button>
         </div>
-        <div v-if="chartData">
-          <div class="border border-gray-300 rounded-md p-4 m-3 text-3xl">
-            <div class="flex mt-2 mb-4">
-              <NumberBadge :number="3" />
-              <p class="pl-2 font-bold">Resultados del análisis</p>
-            </div>
-            <div class="grid">
-              <MultiChartDashboard
-                :chart-data="chartData"
-                :loading="loadingGenerateGraphics"
-                :chart-type="selectedChartType"
-              />
-            </div>
+        <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+          <div class="flex gap-3">
+            <div class="flex-shrink-0 w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
+            <p class="text-sm text-gray-700 leading-relaxed">
+              Puedes seleccionar varios indicadores para compararlos.
+            </p>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex-shrink-0 w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
+            <p class="text-sm text-gray-700 leading-relaxed">
+              Agrega múltiples territorios a cada indicador.
+            </p>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex-shrink-0 w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
+            <p class="text-sm text-gray-700 leading-relaxed">
+              Cada indicador puede tener su propio rango de fechas.
+            </p>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex-shrink-0 w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
+            <p class="text-sm text-gray-700 leading-relaxed">
+              Utiliza diferentes tipos de gráfico para visualizar mejor los datos.
+            </p>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex-shrink-0 w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
+            <p class="text-sm text-gray-700 leading-relaxed">
+              Ordena los territorios usando las flechas para controlar el orden en la gráfica.
+            </p>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex-shrink-0 w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
+            <p class="text-sm text-gray-700 leading-relaxed">
+              Usa el checkbox para incluir o excluir territorios sin eliminarlos.
+            </p>
           </div>
         </div>
       </div>
@@ -368,11 +487,7 @@
     </Modal>
 
     <!-- Footer simple -->
-    <footer
-      class="border-t border-gray-200 dark:border-gray-800 py-6 text-center text-sm dark:text-gray-400 bg-[#29307feb] text-white"
-    >
-      © {{ year }} IPE Arequipa
-    </footer>
+    <FooterOnePage />
     <NotificationContainer />
   </div>
 </template>
@@ -386,6 +501,7 @@ import Modal from '@/components/ui/Modal.vue'
 import HeaderOnePage from '@/components/common/custom/HeaderOnePage.vue'
 import { classicFormatDate } from '@/utilities'
 import type {
+  BOCardIndicadorDto,
   BOIndicadorDto,
   GenerateIndicatorRequest,
   IndicatorRequest,
@@ -399,6 +515,7 @@ import InfoCircleIcon from '@/icons/InfoCircleIcon.vue'
 import ModalIndicatorDetail from '@/components/common/custom/ModalIndicatorDetail.vue'
 import { useNotificationStore } from '@/stores/notification'
 import NotificationContainer from '@/components/common/custom/NotificationContainer.vue'
+import FooterOnePage from '@/components/common/custom/FooterOnePage.vue'
 
 const notificationStore = useNotificationStore()
 const indicators = ref<BOIndicadorDto[]>([])
@@ -409,13 +526,14 @@ const showModalDetails = ref(false)
 const indicatorDetail = ref<BOIndicadorDto | null>(null)
 const chartData = ref<any>(null) // Almacenará los datos del gráfico
 const selectedChartType = ref('line') // Tipo de gráfico seleccionado
-
+const indicatorCards = ref<BOCardIndicadorDto[]>([])
+const openTips = ref<boolean>(false)
 const form = ref<{ selectedItems: { value: string; label: string }[] }>({
   selectedItems: [],
 })
 
 // Estado para almacenar configuración y checkbox por indicador
-const indicatorsConfig = ref<Map<number, { checked: boolean; config: any }>>(new Map())
+const indicatorsConfig = ref<Map<number, BOCardIndicadorDto>>(new Map())
 
 // Selección temporal dentro del modal; solo se aplica al confirmar
 const modalSelectedItems = ref<{ value: string; label: string }[]>([])
@@ -438,6 +556,75 @@ const loadIndicators = async () => {
 
 const handleClickGenerateGraphic = async () => {
   try {
+    const transformedIndicators: IndicatorRequest[] = []
+    let error = false
+    if (indicatorsConfig.value.size === 0) {
+      notificationStore.error('Debe seleccionar al menos un indicador')
+      return
+    }
+    indicatorsConfig.value.forEach((indicator) => {
+      // Validaciones:
+      const thereAreElements = indicator.elementos.filter((e) => e.checked).length > 0
+      error = !indicator.desde || !indicator.hasta || !thereAreElements || !indicator.tipoperiodo
+      if (!thereAreElements) {
+        notificationStore.error('Debe seleccionar al menos un territorio')
+      }
+      if (!indicator.tipoperiodo) {
+        notificationStore.error('Debe seleccionar un tipo de periodo')
+      }
+      if (!indicator.desde) {
+        notificationStore.error('Debe completar desde')
+      }
+      if (!indicator.hasta) {
+        notificationStore.error('Debe completar hasta')
+      }
+      if (error) {
+        error = true
+        return
+      }
+      const checkedElements = indicator.elementos.filter((element) => element.checked)
+      checkedElements.forEach((element) => {
+        transformedIndicators.push({
+          idindicador: indicator.idindicador,
+          tipografica: element.chartseleccionado,
+          idtipoterritorio: +element.tipoterritorio.value,
+          idterritorio: +element.territorio.value,
+          idtipoperiodo: indicator.tipoperiodo!,
+          idperiododesde: +indicator.desde,
+          idperiodohasta: +indicator.hasta,
+        })
+      })
+    })
+
+    if (error) {
+      return
+    }
+
+    const params: GenerateIndicatorRequest = {
+      indicadores: transformedIndicators,
+    }
+    const response = await generateGraphic(params)
+    const responseTransformed = JSON.parse(JSON.stringify(response))
+    if (!responseTransformed.exito) {
+      const errorMsg = responseTransformed.errores.replace('grfica', 'gráfica')
+      notificationStore.error(errorMsg)
+      chartData.value = null
+      return
+    }
+    responseTransformed.objeto.series = responseTransformed.objeto.series.map((serie: Serie) => {
+      return {
+        ...serie,
+        nombreindicador: `${serie.nombreindicador} - ${serie.nombretipoterritorio} - ${serie.nombreterritorio}`,
+      }
+    })
+
+    // Aquí puedes manejar la respuesta, por ejemplo mostrar un gráfico o mensaje
+    if (responseTransformed.exito) {
+      // Guardar los datos del gráfico si la respuesta es exitosa
+      chartData.value = JSON.parse(JSON.stringify(responseTransformed.objeto))
+      notificationStore.success('Gráfico generado exitosamente')
+    }
+    /*
     // Filtrar solo los indicadores marcados y construir el payload
     const checkedIndicators = Array.from(indicatorsConfig.value.entries())
       .filter(([, { checked }]) => checked)
@@ -534,6 +721,7 @@ const handleClickGenerateGraphic = async () => {
       chartData.value = JSON.parse(JSON.stringify(responseTransformed.objeto))
       notificationStore.success('Gráfico generado exitosamente')
     }
+    */
   } finally {
     loadingGenerateGraphics.value = false // si usas loading
   }
@@ -547,24 +735,9 @@ const handleShowDetails = (indicator: BOIndicadorDto) => {
 const displayIndicators = computed(() => {
   const selectedItems: string[] = form.value.selectedItems.map((i) => String(i.value))
   const selectedSet = new Set(selectedItems)
-  return indicators.value.filter((i) => selectedSet.has(String(i.idindicador)))
+  const result = indicators.value.filter((i) => selectedSet.has(String(i.idindicador)))
+  return result
 })
-
-// Handlers
-const handleEditar = (indicador: BOIndicadorDto) => {
-  console.log('Editar indicador:', indicador)
-  // Lógica de edición
-}
-
-const handleToggleActivo = (indicador: BOIndicadorDto) => {
-  console.log('Cambiar estado del indicador:', indicador)
-  indicador.activo = !indicador.activo
-}
-
-const handleVerDetalle = (indicador: BOIndicadorDto) => {
-  console.log('Ver detalle del indicador:', indicador)
-  // Navegación o modal de detalle
-}
 
 const handleDeseleccionar = (indicador: BOIndicadorDto) => {
   const id: string = String(indicador.idindicador)
@@ -575,44 +748,10 @@ const handleDeseleccionar = (indicador: BOIndicadorDto) => {
   //chartData.value = form.value.selectedItems.filter((item) => item.value !== id)
 }
 
-// Handlers para checkbox y configuración
-const handleCheckboxChange = (id: number, checked: boolean) => {
-  const current = indicatorsConfig.value.get(id) || {
-    checked: false,
-    config: {},
-  }
-  indicatorsConfig.value.set(id, { ...current, checked })
-}
-
-const handleConfigChange = (
-  id: number,
-  config: {
-    tipografica: string
-    idtipoterritorio: number[] | null
-    idterritorio: { [key: number]: number } | null
-    idtipoperiodo: number | null
-    idperiododesde: number | null
-    idperiodohasta: number | null
-  },
-) => {
-  const current = indicatorsConfig.value.get(id) || {
-    checked: false,
-    config: {},
-  }
-
-  // Actualizar el tipo de gráfico seleccionado si este indicador está seleccionado
-  /*
-  const isSelected = form.value.selectedItems.some((item) => item.value === String(id))
-
-  if (isSelected && config.tipografica) {
-    selectedChartType.value = config.tipografica
-  }
-    */
-
-  indicatorsConfig.value.set(id, {
-    ...current,
-    config: { ...config, idindicador: id },
-  })
+const handleConfigChange = (indicatorCard: BOCardIndicadorDto) => {
+  const id = indicatorCard.idindicador
+  const indicatorCardCopy = JSON.parse(JSON.stringify(indicatorCard))
+  indicatorsConfig.value.set(id, indicatorCardCopy)
 }
 
 // Filtros modal
@@ -727,6 +866,14 @@ watch(
     }
   },
 )
+
+// Handle scroll to section
+const handleScrollToSection = (sectionId: string) => {
+  const element = document.getElementById(sectionId)
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth' })
+  }
+}
 </script>
 
 <style>
