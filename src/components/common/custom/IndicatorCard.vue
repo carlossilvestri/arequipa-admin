@@ -173,7 +173,7 @@
                   'hover:bg-gray-100 dark:hover:bg-gray-600': elemento.checked,
                 }"
               >
-                <div class="col-span-12 sm:col-span-4 flex items-center">
+                <div class="col-span-12 sm:col-span-6 flex items-center">
                   <Checkbox
                     :name="`check-${elemento.tipoterritorio.value}-${elemento.territorio.value}-${props.indicador.idindicador}`"
                     :modelValue="elemento.checked"
@@ -185,7 +185,7 @@
                     :label="elemento.tipoterritorio.label + ' - ' + elemento.territorio.label"
                   />
                 </div>
-                <div class="col-span-12 sm:col-span-5 mt-2 sm:mt-0">
+                <div class="col-span-12 sm:col-span-4 mt-2 sm:mt-0 pr-2">
                   <div>
                     <SelectInput
                       :options="[
@@ -201,7 +201,7 @@
                   </div>
                 </div>
                 <div
-                  class="col-span-12 sm:col-span-3 flex items-center justify-center mt-2 sm:mt-0"
+                  class="col-span-12 sm:col-span-2 flex items-center justify-center mt-2 sm:mt-0"
                 >
                   <button
                     @click="moveElementUp(index)"
@@ -236,7 +236,21 @@
                     class="rounded-md transition-colors text-gray-500 hover:text-gray-800 hover:bg-gray-100"
                     title="Eliminar"
                   >
-                    <TrashIcon />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="text-red-500 hover:text-red-700"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
                   </button>
                 </div>
               </li>
@@ -309,11 +323,10 @@ import { getPeriodByIdTipoAndIdIndicador } from '@/services/period'
 import { getTerritoryByIdTipoAndIdIndicador } from '@/services/territories'
 import { truncateTextWithEllipsis } from '@/utilities'
 import SelectInput from '@/components/forms/FormElements/SelectInput.vue'
-import TrashIcon from '@/icons/TrashIcon.vue'
 import Checkbox from '@/components/common/custom/Checkbox.vue'
 import ModalIndicatorDetail from '@/components/common/custom/ModalIndicatorDetail.vue'
 import { useNotificationStore } from '@/stores/notification'
-
+import TrashIcon from '@/icons/TrashIcon.vue'
 // Props
 interface Props {
   indicador: BOIndicadorDto

@@ -132,7 +132,7 @@ const xaxisCategories = computed(() => {
     const uniquePeriods = [
       ...new Set(allPeriodNames.filter((name) => name !== null && name !== undefined)),
     ]
-    return uniquePeriods.sort((a, b) => a.localeCompare(b))
+    return uniquePeriods
   }
   // Categorías por defecto
   return []
@@ -141,22 +141,8 @@ const xaxisCategories = computed(() => {
 // Series computadas que usan datos reales si están disponibles
 const series = computed(() => {
   if (props.chartData && props.chartData.series) {
-    // Obtener unidades de medida únicas manteniendo el orden de aparición
-    const uniqueUnits = []
-    const unitOrder = new Map()
-
-    props.chartData.series.forEach((serie, index) => {
-      if (!unitOrder.has(serie.unidadmedida)) {
-        unitOrder.set(serie.unidadmedida, unitOrder.size)
-        uniqueUnits.push(serie.unidadmedida)
-      }
-    })
-
     // Transformar los datos de la API al formato esperado por ApexCharts
     return props.chartData.series.map((serie) => {
-      // Encontrar el índice del eje Y para esta unidad de medida
-      //const yAxisIndex = unitOrder.get(serie.unidadmedida)
-
       return {
         name: serie.nombreindicador,
         type: serie.tipografica, // Usar el tipo de gráfico específico de cada serie
@@ -281,7 +267,8 @@ const chartOptions = computed(() => ({
     show: showLegend.value,
     showForSingleSeries: true,
     position: windowWidth.value < 768 ? 'bottom' : 'top',
-    horizontalAlign: 'center',
+    horizontalAlign: 'left',
+    orientation: 'vertical',
     labels: {
       colors: isDark.value ? '#E5E7EB' : '#374151',
     },

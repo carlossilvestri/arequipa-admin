@@ -28,11 +28,20 @@
       <div
         class="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-5xl my-2 md:my-0"
       >
-        <div class="mb-8">
-          <div class="inline-block bg-white/95 px-8 py-4 rounded-xl shadow-lg">
-            <h2 class="text-2xl font-bold text-blue-900">IPE Arequipa</h2>
-            <p class="text-sm text-blue-700">Instituto de Economía de Arequipa</p>
-          </div>
+        <div id="brxe-fgeduv" class="flex justify-center my-3">
+          <a
+            id="brxe-htskvk"
+            class="brxe-image logo-header tag"
+            href="https://ipearequipa.org/"
+            aria-current="page"
+            ><img
+              src="@/assets/img/logos/logo-ipe-arequipa.png"
+              class="css-filter img-logo-custom"
+              alt=""
+              decoding="async"
+              fetchpriority="high"
+              data-type="string"
+          /></a>
         </div>
         <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
           Explora y compara los indicadores de la gestión pública en Arequipa
@@ -275,7 +284,7 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 import { handleScrollToSection } from '@/utilities'
-
+import HeaderLogo from '@/components/layout/header/HeaderLogo.vue'
 let ticking = false
 
 // Mobile menu state
@@ -316,3 +325,13 @@ onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll)
 })
 </script>
+
+<style>
+.img-logo-custom {
+  filter: brightness(0) invert(1);
+  width: 350px;
+  @media (max-width: 768px) {
+    width: 250px;
+  }
+}
+</style>

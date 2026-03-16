@@ -21,20 +21,39 @@
                 <NumberBadge :number="1" />
                 <p class="pl-2 font-bold">Selecciona uno o más indicadores</p>
               </div>
-              <div class="mt-3 ml-2">
+              <div class="mt-3 ml-2 flex flex-col md:flex-row md:justify-between">
                 <p class="text-gray-900/50 text-[14px] italic my-5 ml-2 dark:text-gray-100/50">
-                  Haz clic en el botón para buscar indicadores por grupo, subgrupo o nombre
+                  Haz clic en "Buscar indicadores" para encontrarlos por sector, grupo o nombre.
                 </p>
                 <hr class="border-gray-300" />
-                <Button
-                  type="submit"
-                  variant="primary"
-                  class="flex items-center justify-center mt-3 ml-2 px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600"
+                <button
+                  data-slot="button"
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-white rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive text-primary-foreground h-9 px-4 py-2 has-[&gt;svg]:px-3 bg-blue-600 hover:bg-blue-700 flex-shrink-0"
+                  data-fg-brcf16="1.18:9.14074:/src/app/components/IndicatorExplorer.tsx:72:15:2467:175:e:Button:et::::s:BNeg:1"
+                  data-fgid-brcf16=":r2u:"
+                  data-fg-csem0="0.17:0.2106:/src/app/components/ui/button.tsx:50:5:1941:121:e:Comp::1"
+                  data-fgid-csem0=":r2v:"
+                  data-fg-callsite-brcf16=""
                   @click="isSearchModalOpen = true"
                 >
-                  <SearchIcon />
-                  BUSCAR INDICADORES
-                </Button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-search w-4 h-4 mr-2"
+                    data-fg-brcf17="1.18:9.14074:/src/app/components/IndicatorExplorer.tsx:73:17:2548:35:e:Search::::::B9rK"
+                    data-fgid-brcf17=":r30:"
+                  >
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.3-4.3"></path></svg
+                  >Buscar indicadores
+                </button>
               </div>
             </div>
           </div>
@@ -69,7 +88,7 @@
                 viewBox="0 0 24 24"
                 stroke-width="1.8"
                 stroke="currentColor"
-                class="w-4 h-4 mr-2"
+                class="w-3 h-3 mr-2"
               >
                 <path
                   stroke-linecap="round"
@@ -77,11 +96,11 @@
                   d="M3 3v18h18M6 15l4-4 4 4 6-6"
                 />
               </svg>
-              GENERAR GRÁFICO
+              Generar gráfico
             </Button>
           </div>
           <div v-if="chartData">
-            <div class="border border-gray-300 rounded-md p-4 m-3 text-3xl">
+            <div id="step-3" class="border border-gray-300 rounded-md p-4 m-3 text-3xl">
               <div class="flex mt-2 mb-4">
                 <NumberBadge :number="3" />
                 <p class="pl-2 font-bold">Resultados del análisis</p>
@@ -209,7 +228,8 @@
           <div class="flex gap-3">
             <div class="flex-shrink-0 w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
             <p class="text-sm text-gray-700 leading-relaxed">
-              Usa el checkbox para incluir o excluir territorios sin eliminarlos.
+              Usa el checkbox para incluir o excluir territorios en la gráfica sin tener que
+              eliminar el indicador.
             </p>
           </div>
         </div>
@@ -495,11 +515,10 @@
 <script setup lang="ts">
 // Reutilizamos el componente existente
 import MultiChartDashboard from '@/components/charts/MultiChartDashboard.vue'
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, nextTick } from 'vue'
 import Button from '@/components/ui/Button.vue'
 import Modal from '@/components/ui/Modal.vue'
 import HeaderOnePage from '@/components/common/custom/HeaderOnePage.vue'
-import { classicFormatDate } from '@/utilities'
 import type {
   BOCardIndicadorDto,
   BOIndicadorDto,
@@ -538,8 +557,6 @@ const indicatorsConfig = ref<Map<number, BOCardIndicadorDto>>(new Map())
 // Selección temporal dentro del modal; solo se aplica al confirmar
 const modalSelectedItems = ref<{ value: string; label: string }[]>([])
 
-const year = ref(classicFormatDate(new Date(), 'YYYY'))
-
 onMounted(async () => {
   await loadIndicators()
 })
@@ -568,15 +585,19 @@ const handleClickGenerateGraphic = async () => {
       error = !indicator.desde || !indicator.hasta || !thereAreElements || !indicator.tipoperiodo
       if (!thereAreElements) {
         notificationStore.error('Debe seleccionar al menos un territorio')
+        error = true
       }
       if (!indicator.tipoperiodo) {
         notificationStore.error('Debe seleccionar un tipo de periodo')
+        error = true
       }
       if (!indicator.desde) {
         notificationStore.error('Debe completar desde')
+        error = true
       }
       if (!indicator.hasta) {
         notificationStore.error('Debe completar hasta')
+        error = true
       }
       if (error) {
         error = true
@@ -623,105 +644,11 @@ const handleClickGenerateGraphic = async () => {
       // Guardar los datos del gráfico si la respuesta es exitosa
       chartData.value = JSON.parse(JSON.stringify(responseTransformed.objeto))
       notificationStore.success('Gráfico generado exitosamente')
+      // Esperar a que el DOM se actualice y luego hacer scroll al div con id step-3
+      nextTick(() => {
+        document.getElementById('step-3')?.scrollIntoView({ behavior: 'smooth' })
+      })
     }
-    /*
-    // Filtrar solo los indicadores marcados y construir el payload
-    const checkedIndicators = Array.from(indicatorsConfig.value.entries())
-      .filter(([, { checked }]) => checked)
-      .map(([, { config }]) => config)
-
-    if (checkedIndicators.length === 0) {
-      notificationStore.error('Debe seleccionar al menos un indicador')
-      return
-    }
-
-    // Validar que todos los indicadores tengan al menos un territorio seleccionado
-    const indicatorsWithoutTerritory = checkedIndicators.filter((config) => !config.idterritorio)
-
-    if (indicatorsWithoutTerritory.length > 0) {
-      notificationStore.error(
-        'Todos los indicadores seleccionados deben tener al menos un territorio configurado',
-      )
-      chartData.value = null
-      return
-    }
-    loadingGenerateGraphics.value = true
-    // Transformar los indicadores para manejar múltiples territorios
-    const transformedIndicators: IndicatorRequest[] = []
-
-    for (const config of checkedIndicators) {
-      if (Array.isArray(config.idtipoterritorio) && typeof config.idterritorio === 'object') {
-        // Si hay múltiples tipos de territorio, crear una entrada por cada territorio seleccionado
-        for (const territoryTypeId of config.idtipoterritorio) {
-          const territoryId = config.idterritorio[territoryTypeId]
-          if (territoryId) {
-            transformedIndicators.push({
-              idindicador: config.idindicador,
-              tipografica: config.tipografica,
-              idtipoterritorio: territoryTypeId,
-              idterritorio: territoryId,
-              idtipoperiodo: config.idtipoperiodo!,
-              idperiododesde: config.idperiododesde!,
-              idperiodohasta: config.idperiodohasta!,
-            })
-          }
-        }
-      } else if (
-        typeof config.idtipoterritorio === 'number' &&
-        typeof config.idterritorio === 'number'
-      ) {
-        // Si es un solo territorio, agregar directamente
-        transformedIndicators.push({
-          idindicador: config.idindicador,
-          tipografica: config.tipografica,
-          idtipoterritorio: config.idtipoterritorio,
-          idterritorio: config.idterritorio,
-          idtipoperiodo: config.idtipoperiodo!,
-          idperiododesde: config.idperiododesde!,
-          idperiodohasta: config.idperiodohasta!,
-        })
-      }
-    }
-
-    // Validar que todos los idperiododesde sean iguales
-    if (transformedIndicators.length > 1) {
-      const periodFromValues = transformedIndicators.map((config) => config.idperiododesde)
-      const uniquePeriodFromValues = [...new Set(periodFromValues)]
-
-      if (uniquePeriodFromValues.length > 1) {
-        notificationStore.error(
-          'Todos los indicadores deben tener el mismo período "Desde" seleccionado',
-        )
-        chartData.value = null
-        return
-      }
-    }
-
-    const params: GenerateIndicatorRequest = {
-      indicadores: transformedIndicators,
-    }
-    const response = await generateGraphic(params)
-    const responseTransformed = JSON.parse(JSON.stringify(response))
-    responseTransformed.objeto.series = responseTransformed.objeto.series.map((serie: Serie) => {
-      return {
-        ...serie,
-        nombreindicador: `${serie.nombreindicador} - ${serie.nombretipoterritorio} - ${serie.nombreterritorio}`,
-      }
-    })
-
-    if (!responseTransformed.exito) {
-      const errorMsg = responseTransformed.errores.replace('grfica', 'gráfica')
-      notificationStore.error(errorMsg)
-      chartData.value = null
-    }
-
-    // Aquí puedes manejar la respuesta, por ejemplo mostrar un gráfico o mensaje
-    if (responseTransformed.exito) {
-      // Guardar los datos del gráfico si la respuesta es exitosa
-      chartData.value = JSON.parse(JSON.stringify(responseTransformed.objeto))
-      notificationStore.success('Gráfico generado exitosamente')
-    }
-    */
   } finally {
     loadingGenerateGraphics.value = false // si usas loading
   }
