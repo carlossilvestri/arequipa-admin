@@ -3,6 +3,10 @@ defineProps({
   name: { type: String, required: true },
   label: { type: String, required: true },
   modelValue: { type: Boolean, required: true },
+  labelClass: {
+    type: String,
+    default: '',
+  },
 })
 </script>
 
@@ -10,7 +14,8 @@ defineProps({
   <div>
     <label
       :for="name"
-      class="flex items-center text-[13px] font-medium text-gray-700 cursor-pointer select-none dark:text-gray-400"
+      class="flex items-center text-sm font-medium text-gray-700 cursor-pointer select-none dark:text-gray-400"
+      :class="[labelClass]"
     >
       <div class="relative">
         <input

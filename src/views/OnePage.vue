@@ -529,7 +529,6 @@ import type {
 import { generateGraphic, getIndicators } from '@/services/indicator'
 import IndicatorCard from '@/components/common/custom/IndicatorCard.vue'
 import NumberBadge from '@/components/common/custom/NumberBadge.vue'
-import SearchIcon from '@/icons/SearchIcon.vue'
 import InfoCircleIcon from '@/icons/InfoCircleIcon.vue'
 import ModalIndicatorDetail from '@/components/common/custom/ModalIndicatorDetail.vue'
 import { useNotificationStore } from '@/stores/notification'
@@ -579,12 +578,12 @@ const handleClickGenerateGraphic = async () => {
       notificationStore.error('Debe seleccionar al menos un indicador')
       return
     }
-    indicatorsConfig.value.forEach((indicator) => {
+    for (const [, indicator] of indicatorsConfig.value) {
       // Validaciones:
       const thereAreElements = indicator.elementos.filter((e) => e.checked).length > 0
       error = !indicator.desde || !indicator.hasta || !thereAreElements || !indicator.tipoperiodo
       if (!thereAreElements) {
-        notificationStore.error('Debe seleccionar al menos un territorio')
+        notificationStore.error(`Debe seleccionar al menos un territorio`)
         error = true
       }
       if (!indicator.tipoperiodo) {
@@ -600,7 +599,6 @@ const handleClickGenerateGraphic = async () => {
         error = true
       }
       if (error) {
-        error = true
         return
       }
       const checkedElements = indicator.elementos.filter((element) => element.checked)
@@ -615,7 +613,7 @@ const handleClickGenerateGraphic = async () => {
           idperiodohasta: +indicator.hasta,
         })
       })
-    })
+    }
 
     if (error) {
       return
@@ -642,11 +640,29 @@ const handleClickGenerateGraphic = async () => {
     // Aquí puedes manejar la respuesta, por ejemplo mostrar un gráfico o mensaje
     if (responseTransformed.exito) {
       // Guardar los datos del gráfico si la respuesta es exitosa
-      chartData.value = JSON.parse(JSON.stringify(responseTransformed.objeto))
-      notificationStore.success('Gráfico generado exitosamente')
+      const copyResponseObject = JSON.parse(JSON.stringify(responseTransformed.objeto))
+      chartData.value = copyResponseObject
+      const hasAtLeastOneWithNoValues = copyResponseObject.series.some(
+        (serie: Serie) => serie.valores.length === 0,
+      )
+      if (hasAtLeastOneWithNoValues) {
+        const indicatorsWithNoValues = copyResponseObject.series.filter(
+          (serie: Serie) => serie.valores.length === 0,
+        )
+        notificationStore.error(
+          `Los siguientes indicadores no tienen datos para el tipo de período y territorio seleccionado: ${indicatorsWithNoValues.map((serie: Serie) => serie.nombreindicador).join(', ')}`,
+        )
+      } else {
+        notificationStore.success('Gráfico generado exitosamente')
+      }
       // Esperar a que el DOM se actualice y luego hacer scroll al div con id step-3
       nextTick(() => {
         document.getElementById('step-3')?.scrollIntoView({ behavior: 'smooth' })
+        /*
+        setTimeout(() => {
+          document.querySelector('.apexcharts-legend')?.classList.add('block!')
+        }, 500)
+        */
       })
     }
   } finally {
@@ -793,14 +809,6 @@ watch(
     }
   },
 )
-
-// Handle scroll to section
-const handleScrollToSection = (sectionId: string) => {
-  const element = document.getElementById(sectionId)
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth' })
-  }
-}
 </script>
 
 <style>

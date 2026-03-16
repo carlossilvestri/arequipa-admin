@@ -182,6 +182,7 @@
                         elemento.checked = val
                       }
                     "
+                    label-class="text-[12px]"
                     :label="elemento.tipoterritorio.label + ' - ' + elemento.territorio.label"
                   />
                 </div>
@@ -197,6 +198,7 @@
                       v-model="elemento.chartseleccionado"
                       placeholder="Tipo"
                       label=""
+                      select-class="text-[12px]"
                     />
                   </div>
                 </div>
@@ -512,6 +514,7 @@ const handleAdd = () => {
     tipoterritorio: selectedTerritoryType,
     territorio: selectedTerritory,
     chartseleccionado: 'bar',
+    fontSize: 'sm',
     checked: true,
   })
 

@@ -329,7 +329,7 @@ onBeforeUnmount(() => {
 <style>
 .img-logo-custom {
   filter: brightness(0) invert(1);
-  width: 350px;
+  width: 250px;
   @media (max-width: 768px) {
     width: 250px;
   }

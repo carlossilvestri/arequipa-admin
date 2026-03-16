@@ -294,6 +294,7 @@ export interface BOIndicadorElemento {
   tipoterritorio: OptionType
   territorio: OptionType
   chartseleccionado: string
+  fontSize: string
   checked: boolean
 }
 
