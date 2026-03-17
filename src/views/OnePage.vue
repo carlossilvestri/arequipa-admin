@@ -578,31 +578,35 @@ const handleClickGenerateGraphic = async () => {
       notificationStore.error('Debe seleccionar al menos un indicador')
       return
     }
+
+    const thereAreCheckedElements = Array.from(indicatorsConfig.value.values()).some((indicator) =>
+      indicator.elementos.some((element) => element.checked),
+    )
+    if (!thereAreCheckedElements) {
+      notificationStore.error(`Debe seleccionar al menos un territorio`)
+      error = true
+    }
     for (const [, indicator] of indicatorsConfig.value) {
       // Validaciones:
-      const thereAreElements = indicator.elementos.filter((e) => e.checked).length > 0
-      error = !indicator.desde || !indicator.hasta || !thereAreElements || !indicator.tipoperiodo
-      if (!thereAreElements) {
-        notificationStore.error(`Debe seleccionar al menos un territorio`)
-        error = true
-      }
-      if (!indicator.tipoperiodo) {
-        notificationStore.error('Debe seleccionar un tipo de periodo')
-        error = true
-      }
-      if (!indicator.desde) {
-        notificationStore.error('Debe completar desde')
-        error = true
-      }
-      if (!indicator.hasta) {
-        notificationStore.error('Debe completar hasta')
-        error = true
-      }
-      if (error) {
-        return
-      }
       const checkedElements = indicator.elementos.filter((element) => element.checked)
-      checkedElements.forEach((element) => {
+
+      for (const element of checkedElements) {
+        if (!indicator.tipoperiodo) {
+          notificationStore.error('Debe seleccionar un tipo de periodo')
+          error = true
+        }
+        if (!indicator.desde) {
+          notificationStore.error('Debe completar desde')
+          error = true
+        }
+        if (!indicator.hasta) {
+          notificationStore.error('Debe completar hasta')
+          error = true
+        }
+        if (error) {
+          return
+        }
+
         transformedIndicators.push({
           idindicador: indicator.idindicador,
           tipografica: element.chartseleccionado,
@@ -612,7 +616,7 @@ const handleClickGenerateGraphic = async () => {
           idperiododesde: +indicator.desde,
           idperiodohasta: +indicator.hasta,
         })
-      })
+      }
     }
 
     if (error) {

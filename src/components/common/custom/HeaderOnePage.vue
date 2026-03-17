@@ -43,7 +43,9 @@
               data-type="string"
           /></a>
         </div>
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+        <h1
+          class="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold text-white mb-6 leading-tight mt-4"
+        >
           Explora y compara los indicadores de la gestión pública en Arequipa
         </h1>
         <p class="text-lg sm:text-xl text-blue-50 mb-10 max-w-3xl mx-auto leading-relaxed">
