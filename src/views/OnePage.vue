@@ -629,7 +629,9 @@ const handleClickGenerateGraphic = async () => {
     const response = await generateGraphic(params)
     const responseTransformed = JSON.parse(JSON.stringify(response))
     if (!responseTransformed.exito) {
-      const errorMsg = responseTransformed.errores.replace('grfica', 'gráfica')
+      const errorMsg = responseTransformed.errores
+        .replace('gr�fica', 'gráfica')
+        .replace('per�odo', 'período')
       notificationStore.error(errorMsg)
       chartData.value = null
       return

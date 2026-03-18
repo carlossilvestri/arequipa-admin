@@ -22,6 +22,17 @@
           >
             {{ showLegend ? 'Ocultar Leyenda' : 'Mostrar Leyenda' }}
           </button>
+          <button
+            @click="toggleDataLabels"
+            class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+          >
+            {{ showDataLabels ? 'Ocultar Valores' : 'Mostrar Valores' }}
+          </button>
+          <div class="flex items-center space-x-2">
+            <label class="text-sm text-gray-600">Tamaño:</label>
+            <input v-model="dataLabelsSize" type="range" min="8" max="20" class="w-20" />
+            <span class="text-sm text-gray-600 w-8">{{ dataLabelsSize }}px</span>
+          </div>
         </div>
       </div>
     </div>
@@ -100,12 +111,14 @@ const currentChartType = computed(() => props.chartType || 'line')
 const lastUpdate = ref(new Date().toLocaleString())
 const chartKey = ref(0)
 const showLegend = ref(true)
-const { isDark, toggleTheme, enableDarkMode, enableLightMode } = useTheme()
+const showDataLabels = ref(true)
+const dataLabelsSize = ref(10)
+const { isDark } = useTheme()
 const mainChart = ref(null)
 
 // Window width reactive
 const windowWidth = ref(window.innerWidth)
-
+const percentage = 'Porcentaje'
 // Handle window resize
 const handleResize = () => {
   windowWidth.value = window.innerWidth
@@ -191,7 +204,23 @@ const chartOptions = computed(() => ({
   },
   colors: series.value.map((_, index) => seriesColor(index)),
   dataLabels: {
-    enabled: currentChartType.value === 'radar',
+    enabled: showDataLabels.value,
+    style: {
+      fontSize: `${dataLabelsSize.value}px`,
+      colors: series.value.map((_, index) => seriesColor(index)),
+    },
+    formatter: function (value, opts) {
+      const seriesIndex = opts.seriesIndex
+      if (props.chartData && props.chartData.series && props.chartData.series[seriesIndex]) {
+        const serie = props.chartData.series[seriesIndex]
+        if (serie.unidadmedida.includes(percentage) || serie.unidadmedida.includes('%')) {
+          return `${value}%`
+        } else if (serie.unidadmedida.includes('Soles') || serie.unidadmedida.includes('S/.')) {
+          return `S/ ${value.toLocaleString('es-PE')}`
+        }
+      }
+      return value.toString()
+    },
   },
   stroke: {
     curve: currentChartType.value === 'line' ? 'smooth' : 'straight',
@@ -223,6 +252,8 @@ const chartOptions = computed(() => ({
       return props.chartData.series.map((serie, index) => ({
         seriesName: unitOrder.get(serie.unidadmedida),
         opposite: uniqueUnits.findIndex((u) => u.unidadmedida === serie.unidadmedida) % 2 === 1,
+        min: serie.unidadmedida.includes(percentage) ? 0 : undefined,
+        max: serie.unidadmedida.includes(percentage) ? 100 : undefined,
         labels: {
           style: {
             colors: seriesColor(index),
@@ -230,7 +261,7 @@ const chartOptions = computed(() => ({
             fontSize: '10px',
           },
           formatter: (value) => {
-            if (serie.unidadmedida.includes('Porcentaje') || serie.unidadmedida.includes('%')) {
+            if (serie.unidadmedida.includes(percentage) || serie.unidadmedida.includes('%')) {
               return `${value}%`
             } else if (serie.unidadmedida.includes('Soles') || serie.unidadmedida.includes('S/.')) {
               return `S/ ${value.toLocaleString('es-PE')}`
@@ -342,7 +373,7 @@ const chartOptions = computed(() => ({
 
           // Formatear el valor según la unidad de medida
           let formattedValue = value
-          if (unidadMedida.includes('Porcentaje') || unidadMedida.includes('%')) {
+          if (unidadMedida.includes(percentage) || unidadMedida.includes('%')) {
             formattedValue = `${value}%`
           } else if (unidadMedida.includes('Soles') || unidadMedida.includes('S/.')) {
             formattedValue = `S/ ${value.toLocaleString('es-PE')}`
@@ -476,6 +507,10 @@ const exportToPNG = () => {
 
 const toggleLegend = () => {
   showLegend.value = !showLegend.value
+}
+
+const toggleDataLabels = () => {
+  showDataLabels.value = !showDataLabels.value
 }
 
 // Watch para actualizar el gráfico cuando lleguen nuevos datos
