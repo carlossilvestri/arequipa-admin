@@ -52,31 +52,27 @@
       <!-- Descripción -->
       <div>
         <template v-if="hasLongDescription && !showFullDescription">
-          <QuillEditor
-            :content="truncatedHtml || ''"
-            content-type="html"
-            :read-only="true"
-            theme="bubble"
-            class="prose prose-sm max-w-none transition-colors"
+          <div
+            class="prose prose-xs max-w-none transition-colors relative p-3 text-sm"
             :class="themeClasses.text.paragraph"
-          />
-          <button
-            class="mt-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ml-2"
-            :class="themeClasses.button.ghost"
-            @click="showFullDescription = true"
           >
-            Mostrar más
-          </button>
+            <div v-html="truncatedHtml" class="inline"></div>
+            <button
+              class="inline px-2 py-0.5 text-xs font-medium rounded transition-colors align-baseline"
+              :class="themeClasses.button.ghost"
+              @click="showFullDescription = true"
+            >
+              Mostrar más
+            </button>
+          </div>
         </template>
         <template v-else>
-          <QuillEditor
-            :content="indicador.descripcionindicador || ''"
-            content-type="html"
-            :read-only="true"
-            theme="bubble"
-            class="prose prose-sm max-w-none transition-colors"
+          <div
+            class="prose prose-xs max-w-none transition-colors p-3 text-sm"
             :class="themeClasses.text.paragraph"
-          />
+          >
+            <div v-html="indicador.descripcionindicador || ''"></div>
+          </div>
           <button
             v-if="hasLongDescription"
             class="mt-2 px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
