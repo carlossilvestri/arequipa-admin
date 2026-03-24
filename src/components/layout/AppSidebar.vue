@@ -207,7 +207,7 @@ const menuGroups = [
       {
         icon: GridIcon,
         name: 'Dashboard',
-        subItems: [{ name: 'Ecommerce', path: '/', pro: false }],
+        subItems: [{ name: 'Dashboard', path: '/', pro: false }],
       },
       {
         icon: CalenderIcon,
@@ -250,12 +250,12 @@ const menuGroups = [
         path: routes.admin.unitsOfMeasure.path,
       },
       {
-        name: 'Grupos',
+        name: 'Sectores',
         icon: ListIcon,
         path: routes.admin.groups.path,
       },
       {
-        name: 'Subgrupos',
+        name: 'Subsectores',
         icon: ListIcon,
         path: routes.admin.subgroups.path,
       },

@@ -1,29 +1,8 @@
 <template>
   <div class="min-h-screen bg-white">
     <div class="relative min-h-[600px] flex items-center justify-center overflow-hidden">
-      <div
-        class="absolute inset-0 bg-cover bg-center"
-        style="
-          background-image: url('https://images.unsplash.com/photo-1648959855742-9184cee7b427?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxQZXJ1JTIwY2l0eSUyMG1vdW50YWluJTIwbGFuZHNjYXBlfGVufDF8fHx8MTc3MzQ0NTExNXww&amp;ixlib=rb-4.1.0&amp;q=80&amp;w=1080&amp;utm_source=figma&amp;utm_medium=referral');
-        "
-      >
+      <div class="absolute inset-0 bg-cover bg-center custom-hero">
         <div class="absolute inset-0 bg-gradient-to-r from-blue-900/85 to-blue-800/75"></div>
-        <div class="absolute inset-0 opacity-10">
-          <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="0.5"></path>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)"></rect>
-            <polyline
-              points="0,300 100,280 200,320 300,260 400,290 500,240 600,270 700,220 800,250 900,200 1000,230 1100,180 1200,210"
-              fill="none"
-              stroke="white"
-              stroke-width="2"
-            ></polyline>
-          </svg>
-        </div>
       </div>
       <div
         class="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-5xl my-2 md:my-0"
@@ -219,7 +198,7 @@
               </div>
               <h3 class="text-xl font-semibold text-blue-900 mb-3">Busca indicadores</h3>
               <p class="text-gray-600 leading-relaxed">
-                Haz clic en "Buscar indicadores" para encontrarlos por sector, grupo o nombre.
+                Haz clic en "Buscar indicadores" para encontrarlos por sector, sector o nombre.
               </p>
             </div>
           </div>
@@ -335,5 +314,8 @@ onBeforeUnmount(() => {
   @media (max-width: 768px) {
     width: 250px;
   }
+}
+.custom-hero {
+  background-image: url('@/assets/img/hero.jpg');
 }
 </style>

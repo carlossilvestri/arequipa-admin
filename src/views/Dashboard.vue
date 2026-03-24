@@ -44,6 +44,6 @@ export default {
     StatisticsChart,
     RecentOrders,
   },
-  name: 'Ecommerce',
+  name: 'Dashboard',
 }
 </script>

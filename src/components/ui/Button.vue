@@ -28,7 +28,7 @@
 //import { toRefs } from 'vue'
 
 interface ButtonProps {
-  size?: 'sm' | 'md'
+  size?: 'sm' | 'md' | 'lg'
   variant?: 'primary' | 'outline'
   startIcon?: object
   endIcon?: object
@@ -47,8 +47,9 @@ const props = withDefaults(defineProps<ButtonProps>(), {
 })
 
 const sizeClasses = {
-  sm: 'px-4 py-3 text-sm',
+  sm: 'px-4 py-2 text-sm',
   md: 'px-5 py-3.5 text-sm',
+  lg: 'px-9 py-3.5 text-lg',
 }
 
 const variantClasses = {

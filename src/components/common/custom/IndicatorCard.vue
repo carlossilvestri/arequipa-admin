@@ -39,7 +39,7 @@
         </button>
       </div>
 
-      <!-- Jerarquía grupo/subgrupo -->
+      <!-- Jerarquía sector/subsector -->
       <div
         class="flex items-center justify-between text-sm transition-colors min-h-[40px]"
         :class="themeClasses.text.secondary"
@@ -63,37 +63,15 @@
             truncateTextWithEllipsis(indicador.nombreunidadmedida, 80)
           }}</span>
         </div>
-        <!-- Botón para abrir detalles -->
-        <div class="mt-1">
+        <!-- Botones de acción -->
+        <div class="flex items-center space-x-2">
+          <!-- Botón para abrir detalles -->
           <button
             class="px-4 py-2 text-sm font-medium rounded-lg transition-colors hidden sm:flex"
             :class="themeClasses.button.primary"
             @click="showDetails = true"
           >
             Ver detalles
-          </button>
-          <!-- Icono de ojo para mobile -->
-          <button
-            class="p-2 rounded-lg transition-colors sm:hidden"
-            :class="themeClasses.button.primary"
-            @click="showDetails = true"
-            aria-label="Ver detalles"
-            title="Ver detalles"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
           </button>
         </div>
       </div>
@@ -107,7 +85,7 @@
           <div class="md:grid grid-cols-12 gap-2 flex">
             <div class="col-span-5">
               <SelectInput
-                v-model="indicatorCard.tipoterritorio"
+                :modelValue="props.config.tipoterritorio"
                 :options="territoryTypeOptions"
                 @update:modelValue="handleTerritoryTypeChange"
                 label="Tipo de territorio"
@@ -117,8 +95,9 @@
             </div>
             <div class="col-span-5">
               <SelectInput
-                v-model="indicatorCard.territorio"
-                :options="territoryOptions2"
+                :modelValue="props.config.territorio"
+                :options="territoryOptions"
+                @update:modelValue="handleTerritoryChange"
                 label="Territorio"
                 :id="`territorio${indicador.codigoindicador}`"
                 placeholder="Seleccione un territorio"
@@ -165,7 +144,7 @@
               class="h-34 overflow-auto border border-gray-300 dark:border-gray-600 rounded-lg my-2"
             >
               <li
-                v-for="(elemento, index) in indicatorCard.elementos"
+                v-for="(elemento, index) in props.config.elementos"
                 :key="`${elemento.tipoterritorio.value}-${elemento.territorio.value}`"
                 class="grid grid-cols-12 sm:grid-cols-12 p-2 gap-1 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors border-b border-gray-200 dark:border-gray-600"
                 :class="{
@@ -177,11 +156,7 @@
                   <Checkbox
                     :name="`check-${elemento.tipoterritorio.value}-${elemento.territorio.value}-${props.indicador.idindicador}`"
                     :modelValue="elemento.checked"
-                    @update:modelValue="
-                      (val: boolean) => {
-                        elemento.checked = val
-                      }
-                    "
+                    @update:modelValue="() => handleElementToggle(index)"
                     label-class="text-[12px]"
                     :label="elemento.tipoterritorio.label + ' - ' + elemento.territorio.label"
                   />
@@ -196,6 +171,7 @@
                         { value: 'area', label: 'Área' },
                       ]"
                       v-model="elemento.chartseleccionado"
+                      @update:modelValue="(val) => handleChartTypeChange(index, val)"
                       placeholder="Tipo"
                       label=""
                       select-class="text-[12px]"
@@ -258,8 +234,8 @@
               </li>
             </ul>
             <div class="flex justify-end pr-2">
-              <p class="text-gray-300 font-light text-sm">
-                Total: {{ indicatorCard.elementos.length }}
+              <p class="text-gray-300 font-light text-[12px]">
+                Total: {{ props.config.elementos.length }}
               </p>
             </div>
           </div>
@@ -271,14 +247,14 @@
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12">
             <SelectInput
-              v-model="indicatorCard.tipoperiodo"
+              :modelValue="props.config.tipoperiodo"
               :options="
                 indicador.tiposperiodo.map((pt) => ({
                   value: pt.idtipoperiodo,
                   label: pt.nombretipoperiodo,
                 }))
               "
-              @change="handleOnPeriodTypeChange(indicatorCard.tipoperiodo)"
+              @update:modelValue="handlePeriodTypeChange"
               label="Tipo de período"
               label-position="left"
               :id="`Tipo de periodo${indicador.codigoindicador}`"
@@ -287,8 +263,9 @@
           </div>
           <div class="col-span-6 pl-2">
             <SelectInput
-              v-model="indicatorCard.desde"
+              :modelValue="props.config.desde"
               :options="periodOptions"
+              @update:modelValue="handleDesdeChange"
               :id="`idperiododesde${indicador.codigoindicador}`"
               label="Desde"
               placeholder="Seleccione"
@@ -296,14 +273,22 @@
           </div>
           <div class="col-span-6 pr-2">
             <SelectInput
-              v-model="indicatorCard.hasta"
+              :modelValue="props.config.hasta"
               :options="periodOptions"
+              @update:modelValue="handleHastaChange"
               :id="`idperiodohasta${indicador.codigoindicador}`"
               label="Hasta"
               placeholder="Seleccione"
             />
           </div>
         </div>
+      </div>
+      <hr class="border-gray-100" />
+      <div class="flex justify-center items-center p-2">
+        <!-- Botón de aplicar a todos los indicadores -->
+        <Button size="md" @click="applyConfigToAll" :loading="false" variant="primary" class="p-3">
+          Aplicar esta configuración a todos los indicadores
+        </Button>
       </div>
     </div>
   </div>
@@ -328,29 +313,29 @@ import SelectInput from '@/components/forms/FormElements/SelectInput.vue'
 import Checkbox from '@/components/common/custom/Checkbox.vue'
 import ModalIndicatorDetail from '@/components/common/custom/ModalIndicatorDetail.vue'
 import { useNotificationStore } from '@/stores/notification'
+import { useIndicatorConfigStore } from '@/stores/indicatorConfig'
 import TrashIcon from '@/icons/TrashIcon.vue'
+import Button from '@/components/ui/Button.vue'
+import indicator from '@/services/indicator'
+
 // Props
 interface Props {
   indicador: BOIndicadorDto
+  config: BOCardIndicadorDto // Ahora es requerido, no opcional
 }
 const notificationStore = useNotificationStore()
+const indicatorConfigStore = useIndicatorConfigStore()
 
 const props = defineProps<Props>()
-const indicatorCard = ref<BOCardIndicadorDto>({
-  idindicador: props.indicador.idindicador,
-  tipoterritorio: null,
-  territorio: null,
-  tipoperiodo: null,
-  elementos: [],
-  desde: '',
-  hasta: '',
-})
 // Emits
 const emit = defineEmits<{
   editar: [indicator: BOIndicadorDto]
   'ver-detalle': [indicator: BOIndicadorDto]
   deseleccionar: [indicator: BOIndicadorDto]
   'update:config': [indicatorCard: BOCardIndicadorDto]
+  'copy-config': [indicatorId: number, config: Partial<BOCardIndicadorDto>]
+  'paste-config': [indicatorId: number]
+  'apply-to-all': [config: Partial<BOCardIndicadorDto>]
 }>()
 
 // Tema actual (puede venir de un store, prop o composable)
@@ -360,7 +345,7 @@ const { isDark } = useTheme()
 // Tipo de gráfico seleccionado para este indicador
 const showDetails = ref(false)
 const periodOptions = ref<OptionType[]>([])
-const territoryOptions2 = ref<OptionType[]>([])
+const territoryOptions = ref<OptionType[]>([])
 const territoryTypeOptions = ref<OptionType[]>(
   props.indicador.tiposterritorio.map((tt) => ({
     value: tt.idtipoterritorio,
@@ -368,17 +353,124 @@ const territoryTypeOptions = ref<OptionType[]>(
   })),
 )
 
-// Watcher para emitir cambios en la configuración
-watch(
-  [indicatorCard],
-  () => {
-    emit('update:config', indicatorCard.value)
-  },
-  { deep: true },
-)
-onMounted(() => {
-  emit('update:config', indicatorCard.value)
+// Handlers para cambios directos en los inputs
+const handleTerritoryTypeChange = (value: any) => {
+  const updatedConfig = { ...props.config, tipoterritorio: value }
+  emit('update:config', updatedConfig)
+
+  if (value) {
+    loadTerritories(value)
+  }
+}
+
+const handleTerritoryChange = (value: any) => {
+  const updatedConfig = { ...props.config, territorio: value }
+  emit('update:config', updatedConfig)
+}
+
+const handlePeriodTypeChange = (value: any) => {
+  const updatedConfig = { ...props.config, tipoperiodo: value }
+  emit('update:config', updatedConfig)
+  handleOnPeriodTypeChange(value)
+}
+
+const handleDesdeChange = (value: any) => {
+  const updatedConfig = { ...props.config, desde: value }
+  emit('update:config', updatedConfig)
+}
+
+const handleHastaChange = (value: any) => {
+  const updatedConfig = { ...props.config, hasta: value }
+  emit('update:config', updatedConfig)
+}
+
+const handleElementToggle = (index: number) => {
+  const elementos = [...props.config.elementos]
+  elementos[index] = { ...elementos[index], checked: !elementos[index].checked }
+  const updatedConfig = { ...props.config, elementos }
+  emit('update:config', updatedConfig)
+}
+
+const handleChartTypeChange = (index: number, chartType: string) => {
+  const elementos = [...props.config.elementos]
+  elementos[index] = { ...elementos[index], chartseleccionado: chartType }
+  const updatedConfig = { ...props.config, elementos }
+  emit('update:config', updatedConfig)
+}
+
+// Computed properties for copy/paste functionality
+const hasConfiguration = computed(() => {
+  return (
+    props.config.elementos.length > 0 &&
+    props.config.elementos.some((el) => el.checked) &&
+    props.config.tipoperiodo &&
+    props.config.desde &&
+    props.config.hasta
+  )
 })
+
+// Paste configuration method
+const pasteConfiguration = () => {
+  if (!indicatorConfigStore.hasConfigToApply) {
+    notificationStore.error('No hay configuración copiada disponible')
+    return
+  }
+
+  try {
+    const config = indicatorConfigStore.copiedConfig!
+
+    // Create updated config and emit to parent
+    const updatedConfig = {
+      ...props.config,
+      elementos: [...config.elementos],
+      tipoperiodo: config.tipoperiodo ?? null,
+      desde: config.desde ?? '',
+      hasta: config.hasta ?? '',
+    }
+
+    emit('update:config', updatedConfig)
+
+    // Load period options if period type is set
+    if (config.tipoperiodo) {
+      handleOnPeriodTypeChange(config.tipoperiodo)
+    }
+  } catch (error) {
+    notificationStore.error('Error al pegar la configuración')
+  }
+}
+
+// Apply configuration to all indicators method
+const applyConfigToAll = () => {
+  if (!hasConfiguration.value) {
+    notificationStore.error('No hay configuración disponible para aplicar')
+    return
+  }
+
+  try {
+    const configToApply = {
+      elementos: [...props.config.elementos],
+      tipoperiodo: props.config.tipoperiodo,
+      desde: props.config.desde,
+      hasta: props.config.hasta,
+    }
+
+    // Store in Pinia store for sharing
+    indicatorConfigStore.copyIndicatorConfig(configToApply)
+
+    // Emit to parent to apply to all indicators
+    emit('apply-to-all', configToApply)
+
+    notificationStore.success('Configuración aplicada a todos los indicadores')
+  } catch (error) {
+    notificationStore.error('Error al aplicar la configuración a todos los indicadores')
+  }
+}
+
+// Check for copied configuration on mount
+onMounted(() => {
+  emit('update:config', props.config)
+})
+defineExpose({ pasteConfiguration })
 // Clases dinámicas según el tema
 const themeClasses = computed(() => ({
   // Fondo del card
@@ -469,26 +561,29 @@ const themeClasses = computed(() => ({
   },
 }))
 
-const handleTerritoryTypeChange = async (territoryTypeId: number) => {
+const loadTerritories = async (territoryTypeId: number) => {
   // Load territories for the selected type
-
   const territories: BOTerritorio[] = await getTerritoryByIdTipoAndIdIndicador(
     territoryTypeId,
     props.indicador.idindicador,
   )
-  territoryOptions2.value = territories.map((t: BOTerritorio) => ({
+  territoryOptions.value = territories.map((t: BOTerritorio) => ({
     value: t.idterritorio,
     label: t.nombreterritorio,
   }))
+
+  // Reset territorio when tipoterritorio changes
+  const updatedConfig = { ...props.config, territorio: null }
+  emit('update:config', updatedConfig)
 }
 
 const handleAdd = () => {
   // Find the selected territory type and territory
   const selectedTerritoryType = territoryTypeOptions.value.find(
-    (option) => option.value === indicatorCard.value.tipoterritorio,
+    (option) => option.value === props.config.tipoterritorio,
   )
-  const selectedTerritory = territoryOptions2.value.find(
-    (option) => option.value === indicatorCard.value.territorio,
+  const selectedTerritory = territoryOptions.value.find(
+    (option) => option.value === props.config.territorio,
   )
 
   // Check if both selections are made
@@ -498,7 +593,7 @@ const handleAdd = () => {
   }
 
   // Check if the element already exists
-  const exists = indicatorCard.value.elementos.some(
+  const exists = props.config.elementos.some(
     (elemento) =>
       elemento.tipoterritorio.value === selectedTerritoryType.value &&
       elemento.territorio.value === selectedTerritory.value,
@@ -510,21 +605,26 @@ const handleAdd = () => {
   }
 
   // Add the new element
-  indicatorCard.value.elementos.push({
-    tipoterritorio: selectedTerritoryType,
-    territorio: selectedTerritory,
-    chartseleccionado: 'bar',
-    fontSize: 'sm',
-    checked: true,
-  })
-
-  // Reset selections
-  indicatorCard.value.tipoterritorio = null
-  indicatorCard.value.territorio = null
+  const updatedConfig = {
+    ...props.config,
+    elementos: [
+      ...props.config.elementos,
+      {
+        tipoterritorio: selectedTerritoryType,
+        territorio: selectedTerritory,
+        chartseleccionado: 'bar',
+        fontSize: 'sm',
+        checked: true,
+      },
+    ],
+    tipoterritorio: null,
+    territorio: null,
+  }
+  emit('update:config', updatedConfig)
 }
 
 const moveElementUp = (index: number) => {
-  const elementos = indicatorCard.value.elementos
+  const elementos = [...props.config.elementos]
   if (index > 0) {
     const element = elementos.splice(index, 1)[0]
     elementos.splice(index - 1, 0, element)
@@ -533,10 +633,13 @@ const moveElementUp = (index: number) => {
     const element = elementos.splice(index, 1)[0]
     elementos.push(element)
   }
+
+  const updatedConfig = { ...props.config, elementos }
+  emit('update:config', updatedConfig)
 }
 
 const moveElementDown = (index: number) => {
-  const elementos = indicatorCard.value.elementos
+  const elementos = [...props.config.elementos]
   if (index < elementos.length - 1) {
     const element = elementos.splice(index, 1)[0]
     elementos.splice(index + 1, 0, element)
@@ -545,10 +648,16 @@ const moveElementDown = (index: number) => {
     const element = elementos.splice(index, 1)[0]
     elementos.unshift(element)
   }
+
+  const updatedConfig = { ...props.config, elementos }
+  emit('update:config', updatedConfig)
 }
 
 const removeElement = (index: number) => {
-  indicatorCard.value.elementos.splice(index, 1)
+  const elementos = [...props.config.elementos]
+  elementos.splice(index, 1)
+  const updatedConfig = { ...props.config, elementos }
+  emit('update:config', updatedConfig)
 }
 
 const handleOnPeriodTypeChange = async (periodType: number | null) => {
@@ -568,6 +677,7 @@ const handleOnPeriodTypeChange = async (periodType: number | null) => {
 .line-clamp-3 {
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

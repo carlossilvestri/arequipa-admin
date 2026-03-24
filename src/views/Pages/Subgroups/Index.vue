@@ -49,7 +49,7 @@ import { routes } from '@/utilities/constants'
 
 const { loadSubgroups, loading, handleDelete, loadingDelete } = useSubGroup()
 const unitSubgroupStore = useSubGroupStore()
-const currentPageTitle = ref('Subgrupos')
+const currentPageTitle = ref('Subsectores')
 const router = useRouter()
 const showConfirm = ref(false)
 const rowToDelete = ref<BOSubGrupo | null>(null)
@@ -93,7 +93,7 @@ const mockInfoTable = ref({
     { key: 'nombresubgrupo', label: 'Nombre', thClass: 'px-5 py-3 text-left w-2/11 sm:px-6' },
     {
       key: 'nombregrupo',
-      label: 'Grupo',
+      label: 'Sector',
       thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
     },
     {

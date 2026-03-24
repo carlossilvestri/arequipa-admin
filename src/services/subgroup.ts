@@ -12,7 +12,7 @@ import { useSubGroupStore } from '@/stores/subgroup'
 
 const notifications = useNotificationStore()
 const subgroupStore = useSubGroupStore()
-const name = 'Subgrupo'
+const name = 'Subsector'
 
 const handleShowError = (error: any) => {
   console.error(error)

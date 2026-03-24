@@ -75,8 +75,8 @@
                               :model-value="value"
                               @update:model-value="onInput"
                               :options="computedValues.groupOptions"
-                              label="Grupo*"
-                              placeholder="Seleccione un grupo"
+                              label="Sector*"
+                              placeholder="Seleccione un sector"
                               id="IDGRUPO"
                             />
                           </template>
@@ -90,8 +90,8 @@
                               :model-value="value"
                               @update:model-value="onInput"
                               :options="computedValues.subgroupsFilter"
-                              label="Subgrupo"
-                              placeholder="Seleccione un subgrupo"
+                              label="Subsector"
+                              placeholder="Seleccione un subsector"
                               id="IDSUBGRUPO"
                             />
                           </template>

@@ -15,8 +15,8 @@ const router = createRouter({
     },
     {
       path: '/admin',
-      name: 'Ecommerce',
-      component: () => import('../views/Ecommerce.vue'),
+      name: 'Dashboard',
+      component: () => import('../views/Dashboard.vue'),
       meta: {
         title: 'Dashboard',
         requiresAuth: true,
@@ -202,10 +202,10 @@ const router = createRouter({
     },
     {
       path: '/admin/subgroups',
-      name: 'Subgrupos',
+      name: 'Subsectores',
       component: () => import('../views/Pages/Subgroups/Index.vue'),
       meta: {
-        title: 'Subgrupos',
+        title: 'Subsectores',
         requiresAuth: true,
       },
     },
@@ -214,7 +214,7 @@ const router = createRouter({
       name: 'SubgroupNew',
       component: () => import('../views/Pages/Subgroups/:id/Index.vue'),
       meta: {
-        title: 'Nuevo Subgrupo',
+        title: 'Nuevo Subsector',
         requiresAuth: true,
       },
     },
@@ -223,16 +223,16 @@ const router = createRouter({
       name: 'SubgroupEdit',
       component: () => import('../views/Pages/Subgroups/:id/Index.vue'),
       meta: {
-        title: 'Editar Subgrupo',
+        title: 'Editar Subsector',
         requiresAuth: true,
       },
     },
     {
       path: '/admin/groups',
-      name: 'Grupos',
+      name: 'Sectores',
       component: () => import('../views/Pages/Groups/Index.vue'),
       meta: {
-        title: 'Grupos',
+        title: 'Sectores',
         requiresAuth: true,
       },
     },
@@ -241,7 +241,7 @@ const router = createRouter({
       name: 'GroupNew',
       component: () => import('../views/Pages/Groups/:id/Index.vue'),
       meta: {
-        title: 'Nuevo Grupo',
+        title: 'Nuevo Sector',
         requiresAuth: true,
       },
     },
@@ -250,7 +250,7 @@ const router = createRouter({
       name: 'GroupEdit',
       component: () => import('../views/Pages/Groups/:id/Index.vue'),
       meta: {
-        title: 'Editar Grupo',
+        title: 'Editar Sector',
         requiresAuth: true,
       },
     },

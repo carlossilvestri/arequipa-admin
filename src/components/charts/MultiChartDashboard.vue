@@ -1,7 +1,73 @@
 <template>
   <div class="bg-gray-50 p-0 md:p-6">
     <!-- Gráfico principal (para otros tipos) -->
-    <div class="bg-white rounded-xl shadow-sm pb-4 pr-2 md:p-4 mb-6 flex flex-col">
+    <div
+      class="flex justify-center md:justify-between items-start mt-4 bg-white shadow-sm rounded-t-lg border-t border-l border-r"
+    >
+      <h2 class="text-lg font-semibold text-gray-800 pl-5 pt-2 hidden md:block"></h2>
+      <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0">
+        <!-- Leyenda -->
+        <div class="flex-1">
+          <div class="m-2 sm:m-3 p-2 sm:p-3 flex flex-col border border-gray-100 rounded-2xl">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 pb-3"
+            >
+              <h3 class="text-sm font-medium text-gray-700 sm:pr-5">Leyenda</h3>
+              <Button
+                :variant="showLegend ? 'outline' : 'primary'"
+                class="shrink-0 w-full sm:w-auto"
+                @click="toggleLegend"
+                className="px-4! py-1!"
+              >
+                {{ showLegend ? 'Ocultar' : 'Mostrar' }}
+              </Button>
+            </div>
+          </div>
+        </div>
+        <!-- Valores -->
+        <div class="flex-1 sm:flex-none">
+          <div class="m-2 sm:m-3 p-2 sm:p-3 flex flex-col border border-gray-100 rounded-2xl">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 pb-3"
+            >
+              <h3 class="text-sm font-medium text-gray-700">Valores</h3>
+              <Button
+                :variant="showDataLabels ? 'outline' : 'primary'"
+                class="shrink-0 w-full sm:w-auto"
+                @click="toggleDataLabels"
+                className="px-4! py-1!"
+              >
+                {{ showDataLabels ? 'Ocultar' : 'Mostrar' }}
+              </Button>
+            </div>
+            <div class="flex items-center space-x-2">
+              <label class="text-sm text-gray-600">Tamaño:</label>
+              <input v-model="dataLabelsSize" type="range" min="8" max="20" class="w-20" />
+              <span class="text-sm text-gray-600 w-8">{{ dataLabelsSize }}px</span>
+            </div>
+          </div>
+        </div>
+        <!-- Tooltip -->
+        <div class="flex-1">
+          <div class="m-2 sm:m-3 p-2 sm:p-3 flex flex-col border border-gray-100 rounded-2xl">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 pb-3"
+            >
+              <h3 class="text-sm font-medium text-gray-700 sm:pr-5">Tooltip</h3>
+              <Button
+                :variant="showTooltip ? 'outline' : 'primary'"
+                class="shrink-0 w-full sm:w-auto"
+                @click="toggleTooltip"
+                className="px-4! py-1!"
+              >
+                {{ showTooltip ? 'Ocultar' : 'Mostrar' }}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white rounded-b-xl shadow-sm pb-4 pr-2 md:p-4 mb-6 flex flex-col">
       <div class="flex-1 w-full" style="min-height: 400px">
         <VueApexCharts
           :key="chartKey"
@@ -12,28 +78,6 @@
           width="100%"
           ref="mainChart"
         />
-      </div>
-      <div class="flex justify-between items-center mt-4">
-        <span></span>
-        <div class="flex items-center space-x-4">
-          <button
-            @click="toggleLegend"
-            class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-          >
-            {{ showLegend ? 'Ocultar Leyenda' : 'Mostrar Leyenda' }}
-          </button>
-          <button
-            @click="toggleDataLabels"
-            class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-          >
-            {{ showDataLabels ? 'Ocultar Valores' : 'Mostrar Valores' }}
-          </button>
-          <div class="flex items-center space-x-2">
-            <label class="text-sm text-gray-600">Tamaño:</label>
-            <input v-model="dataLabelsSize" type="range" min="8" max="20" class="w-20" />
-            <span class="text-sm text-gray-600 w-8">{{ dataLabelsSize }}px</span>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -88,6 +132,7 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import VueApexCharts from 'vue3-apexcharts'
 import { useTheme } from '@/composables/useTheme'
+import Button from '@/components/ui/Button.vue'
 
 // Props para recibir datos del componente padre
 const props = defineProps({
@@ -112,7 +157,8 @@ const lastUpdate = ref(new Date().toLocaleString())
 const chartKey = ref(0)
 const showLegend = ref(true)
 const showDataLabels = ref(true)
-const dataLabelsSize = ref(10)
+const showTooltip = ref(true)
+const dataLabelsSize = ref(9)
 const { isDark } = useTheme()
 const mainChart = ref(null)
 
@@ -181,6 +227,12 @@ const chartOptions = computed(() => ({
     zoom: {
       enabled: currentChartType.value !== 'radar',
     },
+    padding: {
+      left: 20,
+      right: 20,
+      top: 20,
+      bottom: 20,
+    },
     toolbar: {
       show: true,
       tools: {
@@ -202,6 +254,63 @@ const chartOptions = computed(() => ({
       },
     },
   },
+  plotOptions: {
+    line: {
+      dataLabels: {
+        position: 'top',
+      },
+    },
+    area: {
+      dataLabels: {
+        position: 'top',
+      },
+    },
+    bar: {
+      dataLabels: {
+        position: 'center',
+        orientation: 'horizontal',
+      },
+      horizontal: false,
+      columnWidth: '70%',
+      endingShape: 'rounded',
+    },
+  },
+  responsive: [
+    {
+      breakpoint: 768,
+      options: {
+        dataLabels: {
+          enabled: showDataLabels.value && xaxisCategories.value.length <= 8,
+          style: {
+            fontSize: `${Math.max(dataLabelsSize.value - 2, 6)}px`,
+          },
+          offsetY: -8,
+        },
+        plotOptions: {
+          bar: {
+            columnWidth: '80%',
+          },
+        },
+      },
+    },
+    {
+      breakpoint: 480,
+      options: {
+        dataLabels: {
+          enabled: showDataLabels.value && xaxisCategories.value.length <= 6,
+          style: {
+            fontSize: `${Math.max(dataLabelsSize.value - 3, 5)}px`,
+          },
+          offsetY: -6,
+        },
+        plotOptions: {
+          bar: {
+            columnWidth: '90%',
+          },
+        },
+      },
+    },
+  ],
   colors: series.value.map((_, index) => seriesColor(index)),
   dataLabels: {
     enabled: showDataLabels.value,
@@ -209,6 +318,28 @@ const chartOptions = computed(() => ({
       fontSize: `${dataLabelsSize.value}px`,
       colors: series.value.map((_, index) => seriesColor(index)),
     },
+    dropShadow: {
+      enabled: true,
+      top: 1,
+      left: 1,
+      blur: 1,
+      opacity: 0.5,
+    },
+    background: {
+      enabled: true,
+      foreColor: '#fff',
+      padding: 4,
+      borderRadius: 2,
+      borderWidth: 1,
+      borderColor: series.value.map((_, index) => seriesColor(index)),
+      opacity: 0.9,
+    },
+    offsetX: 0,
+    offsetY: -10,
+    position: 'top',
+    textAnchor: 'middle',
+    distributed: false,
+    hideOverflowingLabels: true,
     formatter: function (value, opts) {
       const seriesIndex = opts.seriesIndex
       if (props.chartData && props.chartData.series && props.chartData.series[seriesIndex]) {
@@ -414,6 +545,7 @@ const chartOptions = computed(() => ({
       tooltipContent += '</div>'
       return tooltipContent
     },
+    enabled: showTooltip.value,
   },
   markers: {
     size: currentChartType.value === 'scatter' ? 6 : 4,
@@ -507,6 +639,10 @@ const exportToPNG = () => {
 
 const toggleLegend = () => {
   showLegend.value = !showLegend.value
+}
+
+const toggleTooltip = () => {
+  showTooltip.value = !showTooltip.value
 }
 
 const toggleDataLabels = () => {

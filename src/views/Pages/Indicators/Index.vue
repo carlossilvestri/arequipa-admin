@@ -49,8 +49,8 @@
                 :model-value="filters.groupId"
                 @update:model-value="(v) => (filters.groupId = String(v))"
                 :options="computedValues.groupOptions"
-                label="Grupo"
-                placeholder="Seleccione un grupo"
+                label="Sector"
+                placeholder="Seleccione un sector"
               />
             </div>
             <div>
@@ -58,8 +58,8 @@
                 :model-value="filters.subgroupId"
                 @update:model-value="(v) => (filters.subgroupId = String(v))"
                 :options="computedValues.subgroupsFilter"
-                label="Subgrupo"
-                placeholder="Seleccione un subgrupo"
+                label="Subsector"
+                placeholder="Seleccione un subsector"
               />
             </div>
             <div class="flex items-end justify-end">
@@ -155,12 +155,12 @@ const mockInfoTable = ref({
     { key: 'nombreindicador', label: 'Nombre', thClass: 'px-5 py-3 text-left w-2/11 sm:px-6' },
     {
       key: 'nombregrupo',
-      label: 'Grupo',
+      label: 'Sector',
       thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
     },
     {
       key: 'nombresubgrupo',
-      label: 'Subgrupo',
+      label: 'Subsector',
       thClass: 'px-5 py-3 text-left w-2/11 sm:px-6',
     },
     {

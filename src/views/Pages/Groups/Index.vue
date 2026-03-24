@@ -49,7 +49,7 @@ import { routes } from '@/utilities/constants'
 
 const { loadGroups, loading, handleDelete, loadingDelete } = useGroup()
 const unitMeasureStore = useGroupStore()
-const currentPageTitle = ref('Grupos')
+const currentPageTitle = ref('Sectores')
 const router = useRouter()
 const showConfirm = ref(false)
 const rowToDelete = ref<BOGrupo | null>(null)

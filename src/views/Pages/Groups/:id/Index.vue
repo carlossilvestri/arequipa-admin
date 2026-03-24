@@ -63,7 +63,7 @@ import {
 import { createGroup, getGroupById, updateGroup } from '@/services/group'
 import { routes } from '@/utilities/constants'
 
-const topic: string = 'Grupo'
+const topic: string = 'Sector'
 const currentPageTitle = ref(`Editar ${topic}`)
 const status = ref('')
 const loading = ref(false)

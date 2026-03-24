@@ -12,7 +12,7 @@ import { useGroupStore } from '@/stores/group'
 
 const notifications = useNotificationStore()
 const groupStore = useGroupStore()
-const name = 'Grupo'
+const name = 'Sector'
 
 const handleShowError = (error: any) => {
   console.error(error)

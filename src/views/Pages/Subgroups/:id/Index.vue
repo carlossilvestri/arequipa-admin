@@ -39,8 +39,8 @@
                     :model-value="value"
                     @update:model-value="onInput"
                     :options="computedValues.groups"
-                    label="Grupo*"
-                    placeholder="Seleccione un grupo"
+                    label="Sector*"
+                    placeholder="Seleccione un sector"
                     id="IDGRUPO"
                   />
                 </template>
@@ -80,7 +80,7 @@ import { createSubGroup, getSubGroupById, updateSubGroup } from '@/services/subg
 import { getGroups } from '@/services/group'
 import { routes } from '@/utilities/constants'
 
-const topic: string = 'Subgrupo'
+const topic: string = 'Subsector'
 const currentPageTitle = ref(`Editar ${topic}`)
 const status = ref('')
 const loading = ref(false)
