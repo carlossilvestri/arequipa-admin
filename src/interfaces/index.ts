@@ -306,6 +306,8 @@ export interface BOCardIndicadorDto {
   elementos: BOIndicadorElemento[]
   desde: string
   hasta: string
+  tiposeleccion: 'multiple' | 'range'
+  periodomultiple: string // Here you save periodo ids separated by comma.
 }
 
 export interface FilterBOIndicador {
@@ -352,6 +354,7 @@ export interface IndicatorRequest {
   idtipoperiodo: number
   idperiododesde: number
   idperiodohasta: number
+  periodomultiple?: string // ids separated by comma
 }
 
 export interface Serie {

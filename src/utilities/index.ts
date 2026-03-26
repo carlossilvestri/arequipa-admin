@@ -31,7 +31,7 @@ export const truncateText = ({
   symbol?: string
 }): string => {
   if (text.length <= maxLength) return text
-  return text.slice(0, maxLength) + symbol
+  return text.slice(0, maxLength).trim() + symbol
 }
 
 export const truncateTextWithEllipsis = (text: string, maxLength: number): string => {

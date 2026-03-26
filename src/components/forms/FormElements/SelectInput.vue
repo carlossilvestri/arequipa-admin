@@ -6,7 +6,7 @@
     >
       <label
         v-if="label"
-        class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+        class="mb-0.5 block text-[13px] font-medium text-gray-700 dark:text-gray-400"
         :for="id"
         :class="labelPosition === 'left' ? 'mb-2 sm:mb-0 flex-shrink-0 w-32' : ''"
       >
@@ -17,7 +17,7 @@
           v-model="internalValue"
           :disabled="disabled"
           :id="id"
-          class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+          class="dark:bg-dark-900 h-9 text-[13px] w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2 pr-11 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:placeholder:text-white/30 dark:focus:border-brand-800"
           :class="[{ 'text-gray-800 dark:text-white/90': internalValue }, selectClass]"
         >
           <option v-if="placeholder" :value="''" disabled>{{ placeholder }}</option>
@@ -25,7 +25,7 @@
             v-for="(opt, idx) in options"
             :key="idx + '-' + String(opt?.[optionValue])"
             :value="opt?.[optionValue]"
-            class="text-gray-700 dark:bg-gray-900 dark:text-gray-400"
+            class="text-gray-700 dark:bg-gray-900 dark:text-gray-400 text-[13px]"
           >
             {{ opt?.[optionLabel] }}
           </option>

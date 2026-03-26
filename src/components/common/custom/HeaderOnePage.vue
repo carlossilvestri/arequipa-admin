@@ -198,7 +198,7 @@
               </div>
               <h3 class="text-xl font-semibold text-blue-900 mb-3">Busca indicadores</h3>
               <p class="text-gray-600 leading-relaxed">
-                Haz clic en "Buscar indicadores" para encontrarlos por sector, sector o nombre.
+                Haz clic en "Buscar indicadores" para encontrarlos por sector, subsector o nombre.
               </p>
             </div>
           </div>

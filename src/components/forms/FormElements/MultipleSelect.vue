@@ -1,8 +1,14 @@
 <template>
   <div class="relative" ref="multiSelectRef">
+    <label
+      v-if="props.label"
+      class="mb-0.5 block text-[13px] font-medium text-gray-700 dark:text-gray-400"
+      :for="props.id"
+      >{{ props.label }}</label
+    >
     <div
       @click="toggleDropdown"
-      class="dark:bg-dark-900 flex items-center w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 h-auto"
+      class="dark:bg-dark-900 flex items-center w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 h-auto"
       :class="{ 'text-gray-800 dark:text-white/90': isOpen }"
     >
       <span v-if="selectedItems.length === 0" class="text-gray-400"> {{ props.placeholder }} </span>
@@ -62,49 +68,44 @@
       leave-from-class="transform scale-100 opacity-100"
       leave-to-class="transform scale-95 opacity-0"
     >
-      <div
-        v-if="isOpen"
-        class="absolute z-50 w-full mt-1 bg-white rounded-lg shadow-sm dark:bg-gray-900 border border-gray-200 dark:border-gray-700"
-      >
-        <ul
-          class="overflow-y-auto divide-y divide-gray-200 custom-scrollbar max-h-60 dark:divide-gray-800"
-          role="listbox"
-          aria-multiselectable="true"
+      <teleport to="body">
+        <div
+          v-if="isOpen"
+          class="fixed z-[9999] bg-white rounded-lg shadow-sm dark:bg-gray-900 border border-gray-200 dark:border-gray-700"
+          :style="dropdownStyle"
         >
-          <li
-            v-for="item in props.options"
-            :key="item.value"
-            @click="toggleItem(item)"
-            class="relative flex items-center w-full px-3 py-2 border-transparent cursor-pointer first:rounded-t-lg last:rounded-b-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
-            :class="{ 'bg-gray-50 dark:bg-white/3': isSelected(item) }"
-            role="option"
-            :aria-selected="isSelected(item)"
+          <ul
+            class="overflow-y-auto divide-y divide-gray-200 custom-scrollbar max-h-60 dark:divide-gray-800"
+            role="listbox"
+            aria-multiselectable="true"
           >
-            <span class="grow">{{ item.label }}</span>
-            <svg
-              v-if="isSelected(item)"
-              class="w-5 h-5 text-gray-400 dark:text-gray-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+            <li
+              v-for="item in props.options"
+              :key="item.value"
+              class="relative flex items-center w-full px-3 py-2 border-transparent cursor-pointer first:rounded-t-lg last:rounded-b-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+              :class="{ 'bg-gray-50 dark:bg-white/3': isSelected(item) }"
+              role="option"
+              :aria-selected="isSelected(item)"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M5 13l4 4L19 7"
-              ></path>
-            </svg>
-          </li>
-        </ul>
-      </div>
+              <div class="flex items-center flex-1" @click.stop="toggleItem(item)">
+                <input
+                  type="checkbox"
+                  :checked="isSelected(item)"
+                  @click.stop="toggleItem(item)"
+                  class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <span class="ml-3 grow">{{ item.label }}</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </teleport>
     </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 
 const props = defineProps({
   options: {
@@ -119,6 +120,9 @@ const props = defineProps({
     type: String,
     default: 'Seleccionar...',
   },
+  label: {
+    type: String,
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -126,6 +130,30 @@ const emit = defineEmits(['update:modelValue'])
 const isOpen = ref(false)
 const selectedItems = ref(props.modelValue)
 const multiSelectRef = ref(null)
+
+// Calcular la posición del dropdown
+const dropdownStyle = computed(() => {
+  if (!isOpen.value || !multiSelectRef.value) return {}
+
+  const rect = multiSelectRef.value.getBoundingClientRect()
+  const dropdownHeight = 240 // Altura aproximada del dropdown (max-h-60)
+  const viewportHeight = window.innerHeight
+  const spaceBelow = viewportHeight - rect.bottom
+  const spaceAbove = rect.top
+
+  // Determinar si el dropdown debe ir arriba o abajo
+  const showAbove = spaceBelow < dropdownHeight && spaceAbove > dropdownHeight
+
+  const top = showAbove ? rect.top - dropdownHeight : rect.bottom
+
+  return {
+    position: 'fixed',
+    top: `${top}px`,
+    left: `${rect.left}px`,
+    width: `${rect.width}px`,
+    maxHeight: `${Math.min(dropdownHeight, showAbove ? spaceAbove - 10 : spaceBelow - 10)}px`,
+  }
+})
 
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value
@@ -166,4 +194,13 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
+
+// Watch for changes to modelValue prop
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    selectedItems.value = newValue || []
+  },
+  { immediate: true },
+)
 </script>

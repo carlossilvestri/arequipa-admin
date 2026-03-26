@@ -1,6 +1,6 @@
 <template>
   <div
-    class="rounded-xl shadow-lg overflow-hidden border transition-all duration-300 transform hover:-translate-y-1"
+    class="rounded-xl shadow-lg overflow-hidden border transition-all duration-300 transform hover:-translate-y-1 relative"
     :class="[
       themeClasses.card,
       {
@@ -96,7 +96,11 @@
             <div class="col-span-5">
               <SelectInput
                 :modelValue="props.config.territorio"
-                :options="territoryOptions"
+                :options="
+                  props.config.tipoterritorio
+                    ? territoryOptions[props.config.tipoterritorio] || []
+                    : []
+                "
                 @update:modelValue="handleTerritoryChange"
                 label="Territorio"
                 :id="`territorio${indicador.codigoindicador}`"
@@ -172,7 +176,7 @@
                       ]"
                       v-model="elemento.chartseleccionado"
                       @update:modelValue="(val) => handleChartTypeChange(index, val)"
-                      placeholder="Tipo"
+                      placeholder="Seleccione"
                       label=""
                       select-class="text-[12px]"
                     />
@@ -242,7 +246,7 @@
         </div>
       </div>
       <hr class="border-gray-100" />
-      <div class="px-6 pt-3 pb-6">
+      <div class="px-6 py-3">
         <!-- Elegir periodo -->
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-12">
@@ -261,7 +265,51 @@
               placeholder="Seleccione"
             />
           </div>
-          <div class="col-span-6 pl-2">
+        </div>
+      </div>
+      <hr class="border-gray-100" />
+      <div class="px-6 pt-3 pb-3">
+        <!-- Opciones de selección -->
+        <div class="flex">
+          <label class="block text-[13px] font-medium mr-4 text-gray-700">Tipo de selección</label>
+          <div class="flex justify-center space-x-4">
+            <label
+              class="flex items-center cursor-pointer"
+              :for="`range-${indicador.codigoindicador}`"
+            >
+              <input
+                :id="`range-${indicador.codigoindicador}`"
+                type="radio"
+                :name="`selection-type-${indicador.codigoindicador}`"
+                value="range"
+                v-model="props.config.tiposeleccion"
+                class="mr-2"
+              />
+              <span class="text-[12px]">Por rango</span>
+            </label>
+            <label
+              class="flex items-center cursor-pointer"
+              :for="`multiple-${indicador.codigoindicador}`"
+            >
+              <input
+                :id="`multiple-${indicador.codigoindicador}`"
+                type="radio"
+                :name="`selection-type-${indicador.codigoindicador}`"
+                value="multiple"
+                v-model="props.config.tiposeleccion"
+                class="mr-2"
+              />
+              <span class="text-[12px]">Múltiple</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <hr class="border-gray-100" />
+
+      <div class="px-6 py-3">
+        <div class="grid grid-cols-12 gap-4">
+          <!-- Range selectors -->
+          <div v-if="props.config.tiposeleccion === 'range'" class="col-span-6">
             <SelectInput
               :modelValue="props.config.desde"
               :options="periodOptions"
@@ -271,7 +319,7 @@
               placeholder="Seleccione"
             />
           </div>
-          <div class="col-span-6 pr-2">
+          <div v-if="props.config.tiposeleccion === 'range'" class="col-span-6">
             <SelectInput
               :modelValue="props.config.hasta"
               :options="periodOptions"
@@ -281,12 +329,31 @@
               placeholder="Seleccione"
             />
           </div>
+
+          <!-- Multiple selector px-6 pt-3 pb-3 -->
+          <div v-if="props.config.tiposeleccion === 'multiple'" class="col-span-12">
+            <MultipleSelect
+              :key="`periods-${props.config.tipoperiodo}`"
+              :options="periodOptions"
+              label="Períodos"
+              :id="`periodomultiple${indicador.codigoindicador}`"
+              placeholder="Seleccione múltiples períodos"
+              :modelValue="selectedPeriodsMultiple"
+              @update:modelValue="handlePeriodMultipleChange"
+            />
+          </div>
         </div>
       </div>
       <hr class="border-gray-100" />
-      <div class="flex justify-center items-center p-2">
+      <div class="flex justify-center items-center py-2 px-6">
         <!-- Botón de aplicar a todos los indicadores -->
-        <Button size="md" @click="applyConfigToAll" :loading="false" variant="primary" class="p-3">
+        <Button
+          variant="secondary"
+          size="md"
+          @click="applyConfigToAll"
+          :loading="false"
+          class="p-3 w-full"
+        >
           Aplicar esta configuración a todos los indicadores
         </Button>
       </div>
@@ -312,6 +379,7 @@ import { truncateTextWithEllipsis } from '@/utilities'
 import SelectInput from '@/components/forms/FormElements/SelectInput.vue'
 import Checkbox from '@/components/common/custom/Checkbox.vue'
 import ModalIndicatorDetail from '@/components/common/custom/ModalIndicatorDetail.vue'
+import MultipleSelect from '@/components/forms/FormElements/MultipleSelect.vue'
 import { useNotificationStore } from '@/stores/notification'
 import { useIndicatorConfigStore } from '@/stores/indicatorConfig'
 import TrashIcon from '@/icons/TrashIcon.vue'
@@ -322,6 +390,7 @@ import indicator from '@/services/indicator'
 interface Props {
   indicador: BOIndicadorDto
   config: BOCardIndicadorDto // Ahora es requerido, no opcional
+  periodsCache?: Map<string, any[]> // Cache de períodos compartido
 }
 const notificationStore = useNotificationStore()
 const indicatorConfigStore = useIndicatorConfigStore()
@@ -345,7 +414,7 @@ const { isDark } = useTheme()
 // Tipo de gráfico seleccionado para este indicador
 const showDetails = ref(false)
 const periodOptions = ref<OptionType[]>([])
-const territoryOptions = ref<OptionType[]>([])
+const territoryOptions = ref<Record<number, OptionType[]>>({})
 const territoryTypeOptions = ref<OptionType[]>(
   props.indicador.tiposterritorio.map((tt) => ({
     value: tt.idtipoterritorio,
@@ -369,7 +438,11 @@ const handleTerritoryChange = (value: any) => {
 }
 
 const handlePeriodTypeChange = (value: any) => {
-  const updatedConfig = { ...props.config, tipoperiodo: value }
+  const updatedConfig = {
+    ...props.config,
+    tipoperiodo: value,
+    periodomultiple: '', // Reset multi-selector when period type changes
+  }
   emit('update:config', updatedConfig)
   handleOnPeriodTypeChange(value)
 }
@@ -381,6 +454,12 @@ const handleDesdeChange = (value: any) => {
 
 const handleHastaChange = (value: any) => {
   const updatedConfig = { ...props.config, hasta: value }
+  emit('update:config', updatedConfig)
+}
+
+const handlePeriodMultipleChange = (value: OptionType[]) => {
+  const periodIds = value.map((option) => option.value).join(',')
+  const updatedConfig = { ...props.config, periodomultiple: periodIds }
   emit('update:config', updatedConfig)
 }
 
@@ -400,13 +479,15 @@ const handleChartTypeChange = (index: number, chartType: string) => {
 
 // Computed properties for copy/paste functionality
 const hasConfiguration = computed(() => {
-  return (
-    props.config.elementos.length > 0 &&
-    props.config.elementos.some((el) => el.checked) &&
-    props.config.tipoperiodo &&
-    props.config.desde &&
-    props.config.hasta
-  )
+  const hasElements =
+    props.config.elementos.length > 0 && props.config.elementos.some((el) => el.checked)
+  const hasPeriodType = props.config.tipoperiodo
+
+  if (props.config.tiposeleccion === 'multiple') {
+    return hasElements && hasPeriodType && props.config.periodomultiple
+  } else {
+    return hasElements && hasPeriodType && props.config.desde && props.config.hasta
+  }
 })
 
 // Paste configuration method
@@ -452,6 +533,8 @@ const applyConfigToAll = () => {
       tipoperiodo: props.config.tipoperiodo,
       desde: props.config.desde,
       hasta: props.config.hasta,
+      tiposeleccion: props.config.tiposeleccion,
+      periodomultiple: props.config.periodomultiple,
     }
 
     // Store in Pinia store for sharing
@@ -460,11 +543,29 @@ const applyConfigToAll = () => {
     // Emit to parent to apply to all indicators
     emit('apply-to-all', configToApply)
 
-    notificationStore.success('Configuración aplicada a todos los indicadores')
+    //notificationStore.success('Configuración aplicada a todos los indicadores')
   } catch (error) {
     notificationStore.error('Error al aplicar la configuración a todos los indicadores')
   }
 }
+
+// Watch for period type changes to load periods from cache
+watch(
+  () => props.config.tipoperiodo,
+  async (newPeriodType) => {
+    if (newPeriodType && props.periodsCache) {
+      const cacheKey = `${props.indicador.idindicador}-${newPeriodType}`
+      if (props.periodsCache.has(cacheKey)) {
+        const cachedPeriods = props.periodsCache.get(cacheKey)!
+        periodOptions.value = cachedPeriods.map((period: any) => ({
+          value: period.idperiodo,
+          label: period.etiquetalarga,
+        }))
+      }
+    }
+  },
+  { immediate: true },
+)
 
 // Check for copied configuration on mount
 onMounted(() => {
@@ -567,7 +668,7 @@ const loadTerritories = async (territoryTypeId: number) => {
     territoryTypeId,
     props.indicador.idindicador,
   )
-  territoryOptions.value = territories.map((t: BOTerritorio) => ({
+  territoryOptions.value[territoryTypeId] = territories.map((t: BOTerritorio) => ({
     value: t.idterritorio,
     label: t.nombreterritorio,
   }))
@@ -582,8 +683,11 @@ const handleAdd = () => {
   const selectedTerritoryType = territoryTypeOptions.value.find(
     (option) => option.value === props.config.tipoterritorio,
   )
-  const selectedTerritory = territoryOptions.value.find(
-    (option) => option.value === props.config.territorio,
+  const territoriesForType = props.config.tipoterritorio
+    ? territoryOptions.value[props.config.tipoterritorio] || []
+    : []
+  const selectedTerritory = territoriesForType.find(
+    (option: OptionType) => option.value === props.config.territorio,
   )
 
   // Check if both selections are made
@@ -662,13 +766,41 @@ const removeElement = (index: number) => {
 
 const handleOnPeriodTypeChange = async (periodType: number | null) => {
   if (!periodType) return
+
+  // Check if periods are already cached
+  const cacheKey = `${props.indicador.idindicador}-${periodType}`
+  if (props.periodsCache && props.periodsCache.has(cacheKey)) {
+    const cachedPeriods = props.periodsCache.get(cacheKey)!
+    periodOptions.value = cachedPeriods.map((period) => ({
+      value: period.idperiodo,
+      label: period.etiquetalarga,
+    }))
+    return
+  }
+
+  // Load periods if not cached
   const periods = await getPeriodByIdTipoAndIdIndicador(periodType, props.indicador.idindicador)
 
   periodOptions.value = periods.map((period) => ({
     value: period.idperiodo,
     label: period.etiquetalarga,
   }))
+
+  // Cache the periods for future use
+  if (props.periodsCache) {
+    props.periodsCache.set(cacheKey, periods)
+  }
 }
+
+// Computed properties
+const selectedPeriodsMultiple = computed(() => {
+  if (!props.config.periodomultiple) return []
+  const periodIds = props.config.periodomultiple.split(',').filter((id) => id.trim())
+  return periodIds.map((id) => {
+    const period = periodOptions.value.find((p) => p.value.toString() === id.trim())
+    return period || { value: parseInt(id.trim()), label: id.trim() }
+  })
+})
 
 // Métodos (no se requieren utilidades del modal aquí)
 </script>

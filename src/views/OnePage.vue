@@ -38,7 +38,7 @@
                   data-fg-brcf14="1.18:9.14074:/src/app/components/IndicatorExplorer.tsx:68:17:2284:147:e:p:t"
                   data-fgid-brcf14=":r2t:"
                 >
-                  Haz clic en "Buscar indicadores" para encontrarlos por sector, sector o nombre.
+                  Haz clic en "Buscar indicadores" para encontrarlos por sector, subsector o nombre.
                 </p>
               </div>
               <button
@@ -76,7 +76,7 @@
               <div class="pt-3 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 items-start">
                 <IndicatorCard
                   v-for="indicator in displayIndicators"
-                  :key="indicator.idindicador"
+                  :key="`${indicator.idindicador}-${configUpdateKey}`"
                   :indicador="indicator"
                   :config="
                     indicatorsConfig.get(indicator.idindicador) || {
@@ -87,8 +87,11 @@
                       elementos: [],
                       desde: '',
                       hasta: '',
+                      tiposeleccion: 'range',
+                      periodomultiple: '',
                     }
                   "
+                  :periods-cache="periodsCache"
                   @deseleccionar="handleDeseleccionar"
                   @update:config="handleConfigChange"
                   @apply-to-all="handleApplyToAll"
@@ -103,14 +106,25 @@
               @click="handleClickGenerateGraphic"
               :loading="loadingGenerateGraphics"
             >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.8"
+                stroke="currentColor"
+                class="w-6 h-6 mr-2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 3v18h18M6 15l4-4 4 4 6-6"
+                />
+              </svg>
               Generar gráfico
             </Button>
           </div>
           <div v-if="chartData">
             <div id="step-3" class="bg-white rounded-xl p-8 shadow-md mb-8">
-              <div class="flex mt-2 mb-4">
-                <p class="text-xl font-semibold text-blue-900 mb-2">Resultados del análisis</p>
-              </div>
               <div class="grid">
                 <MultiChartDashboard
                   :chart-data="chartData"
@@ -253,16 +267,16 @@
     <Modal v-if="isSearchModalOpen" :full-screen-backdrop="true" @close="isSearchModalOpen = false">
       <template #body>
         <div
-          class="no-scrollbar relative w-full max-w-[900px] mx-4 max-h-[90vh] flex flex-col rounded-3xl bg-white dark:bg-gray-900 lg:p-4"
+          class="no-scrollbar relative w-full max-w-[1050px] mx-4 flex flex-col rounded-3xl bg-white dark:bg-gray-900 lg:p-4"
         >
           <!-- Header fijo con close btn y título -->
           <div
-            class="flex-shrink-0 sticky top-0 z-50 bg-white dark:bg-gray-900 rounded-t-3xl p-4 pb-2"
+            class="flex-shrink-0 sticky top-0 z-50 bg-white dark:bg-gray-900 rounded-t-3xl pt-3 md:pt-0 px-2 md:px-0 pb-1"
           >
             <!-- close btn -->
             <button
               @click="isSearchModalOpen = false"
-              class="transition-color absolute right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:bg-gray-700 dark:bg-white/[0.05] dark:text-gray-400 dark:hover:bg-white/[0.07] dark:hover:text-gray-300 lg:right-5 lg:top-5 lg:h-11 lg:w-11"
+              class="transition-color absolute right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:bg-gray-700 dark:bg-white/[0.05] dark:text-gray-400 dark:hover:bg-white/[0.07] dark:hover:text-gray-300 lg:right-5 lg:top-0 lg:h-11 lg:w-11"
             >
               <svg
                 class="fill-current h-5 w-5 lg:h-6 lg:w-6"
@@ -282,17 +296,17 @@
             </button>
 
             <div class="px-2 pr-12 lg:pr-14">
-              <h4 class="mb-2 text-xl font-semibold text-gray-800 dark:text-white/90 lg:text-2xl">
+              <h4 class="mb-2 text-lg font-semibold text-gray-800 dark:text-white/90 lg:text-2xl">
                 Buscar y seleccionar indicadores
                 <span class="block text-sm text-gray-500 dark:text-gray-400 lg:inline">
-                  (Seleccionados: {{ form.selectedItems.length }})</span
+                  -- (Seleccionados: {{ form.selectedItems.length }})</span
                 >
               </h4>
             </div>
           </div>
 
           <!-- Contenido scrollable -->
-          <div class="flex-1 overflow-y-auto px-2 pb-2">
+          <div class="flex-1 overflow-y-auto px-2 pb-0">
             <!-- Loading -->
             <div v-if="loadingIndicators" class="mt-6 flex items-center justify-center px-2 py-14">
               <div class="flex items-center gap-3 text-gray-600 dark:text-gray-300">
@@ -321,21 +335,21 @@
             </div>
 
             <!-- Layout árbol izquierda + resultados derecha -->
-            <div v-else class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-12">
+            <div v-else class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12">
               <!-- Panel izquierdo: Árbol de grupos/subgrupos -->
               <aside class="lg:col-span-4 xl:col-span-3">
-                <div class="flex items-center justify-between mb-3 mx-2 md:mx-0 md:mb-2">
+                <div class="flex items-center justify-between mb-3 mx-2 md:mx-0 md:mb-0 md:mt-0">
                   <h5 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Sectores</h5>
-                  <Button type="button" variant="outline" size="sm" @click="clearGroupFilters">
-                    Limpiar
-                  </Button>
+                  <div class="cursor-pointer" @click="clearGroupFilters" title="Restaurar">
+                    <BroomIcon />
+                  </div>
                 </div>
                 <div
-                  class="rounded-xl border border-gray-200 dark:border-gray-800 overflow-y-auto max-h-[300px] lg:max-h-[440px] relative"
+                  class="rounded-xl border border-gray-200 dark:border-gray-800 overflow-y-auto max-h-[300px] lg:max-h-[calc(100vh-20rem)] relative md:mt-2"
                 >
                   <ul class="divide-y divide-gray-200 dark:divide-gray-800 bg-gray-50">
                     <li v-for="g in treeData" :key="g.id" class="py-2">
-                      <div class="flex items-center gap-2 pl-2">
+                      <div class="flex items-center gap-2 px-2">
                         <button
                           class="h-6 w-6 flex items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-gray-800"
                           @click="toggleGroupExpand(g.id)"
@@ -405,18 +419,25 @@
               <section class="lg:col-span-8 xl:col-span-9 flex flex-col">
                 <div class="mb-2">
                   <div class="mb-3">
-                    <div class="flex flex-col sm:flex-row gap-2">
-                      <input
-                        v-model="filters.name"
-                        type="text"
-                        placeholder="Buscar por nombre"
-                        class="dark:bg-dark-900 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                      />
+                    <div class="flex flex-col sm:flex-row sm:justify-between gap-2">
+                      <div class="w-full md:w-[82%]">
+                        <label
+                          class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                        >
+                          Nombre
+                        </label>
+                        <input
+                          v-model="filters.name"
+                          type="text"
+                          placeholder="Buscar por nombre"
+                          class="dark:bg-dark-900 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                        />
+                      </div>
                       <Button
                         type="button"
                         size="sm"
                         variant="outline"
-                        class="shrink-0"
+                        class="shrink-0 md:mt-6"
                         @click="clearFilters"
                       >
                         Limpiar filtros
@@ -430,12 +451,12 @@
                       class="overflow-hidden border border-gray-200 rounded-xl dark:border-gray-800"
                     >
                       <ul
-                        class="divide-y divide-gray-200 dark:divide-gray-800 overflow-y-auto relative h-[300px] lg:h-[420px]"
+                        class="divide-y divide-gray-200 dark:divide-gray-800 overflow-y-auto relative h-[calc(100vh-23rem)]"
                       >
                         <li
                           v-for="item in paginatedIndicators"
                           :key="item.idindicador"
-                          class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4"
+                          class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-2 px-4"
                         >
                           <div class="min-w-0 flex-1">
                             <div class="flex items-start gap-2">
@@ -447,11 +468,15 @@
                                 <p
                                   class="text-sm font-medium text-gray-800 dark:text-white/90 break-words"
                                 >
-                                  {{ item.nombreindicador }}
+                                  {{ truncateTextWithEllipsis(item.nombreindicador, 78) }}
                                 </p>
                                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                  Sector: {{ item.nombregrupo }} • Subsector:
-                                  {{ item.nombresubgrupo }}
+                                  {{
+                                    truncateTextWithEllipsis(
+                                      `Sector: ${item.nombregrupo} • Subsector: ${item.nombresubgrupo}`,
+                                      88,
+                                    )
+                                  }}
                                 </p>
                               </div>
                             </div>
@@ -460,7 +485,7 @@
                             :variant="isSelected(String(item.idindicador)) ? 'primary' : 'outline'"
                             class="shrink-0 w-full sm:w-auto"
                             @click="toggleSelection(item)"
-                            className="px-4! py-1!"
+                            size="sm"
                           >
                             {{
                               isSelected(String(item.idindicador)) ? 'Seleccionado' : 'Seleccionar'
@@ -474,12 +499,12 @@
 
                 <!-- Pie de página fijo con paginación y botones -->
                 <div
-                  class="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 space-y-3"
+                  class="flex-shrink-0 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 md:px-0 pt-2 pb-2 md:pb-0 space-y-3"
                 >
                   <!-- Controles de paginación -->
                   <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div
-                      class="flex items-center gap-2 text-[13px] text-gray-600 dark:text-gray-400"
+                      class="flex items-center justify-center gap-2 text-[11px] text-gray-600 dark:text-gray-400"
                     >
                       <span>Mostrar</span>
                       <select
@@ -493,14 +518,11 @@
                       </select>
                       <span> por página. Total de registros: {{ filteredIndicators.length }}</span>
                     </div>
-                    <div class="flex items-center gap-1">
-                      <Button
-                        variant="outline"
-                        type="button"
-                        size="sm"
+                    <div class="flex items-center justify-center gap-1">
+                      <div
                         @click="page = 1"
-                        :disabled="page === 1"
-                        className="px-2! py-1!"
+                        :class="{ 'cursor-not-allowed opacity-50': page === 1 }"
+                        class="px-2 py-1 cursor-pointer"
                         title="Primera página"
                       >
                         <svg
@@ -516,14 +538,11 @@
                         >
                           <path d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
                         </svg>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        type="button"
-                        size="sm"
+                      </div>
+                      <div
                         @click="prevPage"
-                        :disabled="page === 1"
-                        className="px-2! py-1!"
+                        class="px-2 py-1 cursor-pointer"
+                        :class="{ 'cursor-not-allowed opacity-50': page === 1 }"
                         title="Página anterior"
                       >
                         <svg
@@ -539,17 +558,14 @@
                         >
                           <path d="m15 18-6-6 6-6" />
                         </svg>
-                      </Button>
-                      <span class="text-sm text-gray-600 dark:text-gray-400 px-2"
+                      </div>
+                      <span class="text-[11px] text-gray-600 dark:text-gray-400 px-2"
                         >Página {{ page }} de {{ totalPages }}</span
                       >
-                      <Button
-                        variant="outline"
-                        type="button"
-                        size="sm"
+                      <div
                         @click="nextPage"
-                        :disabled="page === totalPages"
-                        className="px-2! py-1!"
+                        :class="{ 'cursor-not-allowed opacity-50': page === totalPages }"
+                        class="px-2 py-1 cursor-pointer"
                         title="Página siguiente"
                       >
                         <svg
@@ -565,14 +581,11 @@
                         >
                           <path d="m9 18 6-6-6-6" />
                         </svg>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        type="button"
-                        size="sm"
+                      </div>
+                      <div
                         @click="page = totalPages"
-                        :disabled="page === totalPages"
-                        className="px-2! py-1!"
+                        :class="{ 'cursor-not-allowed opacity-50': page === totalPages }"
+                        class="px-2 py-1 cursor-pointer"
                         title="Última página"
                       >
                         <svg
@@ -588,7 +601,7 @@
                         >
                           <path d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                         </svg>
-                      </Button>
+                      </div>
                     </div>
                   </div>
 
@@ -641,13 +654,16 @@ import type {
   Serie,
 } from '@/interfaces'
 import { generateGraphic, getIndicators } from '@/services/indicator'
+import { getPeriodByIdTipoAndIdIndicador } from '@/services/period'
 import IndicatorCard from '@/components/common/custom/IndicatorCard.vue'
 import InfoCircleIcon from '@/icons/InfoCircleIcon.vue'
+import BroomIcon from '@/icons/BroomIcon.vue'
 import ModalIndicatorDetail from '@/components/common/custom/ModalIndicatorDetail.vue'
 import { useNotificationStore } from '@/stores/notification'
 import { useIndicatorConfigStore } from '@/stores/indicatorConfig'
 import NotificationContainer from '@/components/common/custom/NotificationContainer.vue'
 import FooterOnePage from '@/components/common/custom/FooterOnePage.vue'
+import { truncateTextWithEllipsis } from '@/utilities'
 
 const notificationStore = useNotificationStore()
 const indicatorConfigStore = useIndicatorConfigStore()
@@ -666,6 +682,8 @@ const form = ref<{ selectedItems: { value: string; label: string }[] }>({
 
 // Estado para almacenar configuración y checkbox por indicador
 const indicatorsConfig = ref<Map<number, BOCardIndicadorDto>>(new Map())
+const configUpdateKey = ref(0) // Key para forzar re-renderización
+const periodsCache = ref<Map<string, any[]>>(new Map()) // Cache de períodos por indicador y tipo
 
 // Selección temporal dentro del modal; solo se aplica al confirmar
 const modalSelectedItems = ref<{ value: string; label: string }[]>([])
@@ -711,11 +729,11 @@ const handleClickGenerateGraphic = async () => {
           notificationStore.error('Debe seleccionar un tipo de periodo')
           error = true
         }
-        if (!indicator.desde) {
+        if (!indicator.desde && indicator.tiposeleccion === 'range') {
           notificationStore.error('Debe completar desde')
           error = true
         }
-        if (!indicator.hasta) {
+        if (!indicator.hasta && indicator.tiposeleccion === 'range') {
           notificationStore.error('Debe completar hasta')
           error = true
         }
@@ -732,6 +750,10 @@ const handleClickGenerateGraphic = async () => {
           idtipoperiodo: indicator.tipoperiodo!,
           idperiododesde: +indicator.desde,
           idperiodohasta: +indicator.hasta,
+          periodomultiple:
+            indicator.tiposeleccion === 'multiple' && indicator.periodomultiple
+              ? indicator.periodomultiple
+              : undefined,
         })
       }
     }
@@ -822,9 +844,14 @@ const handleConfigChange = (indicatorCard: BOCardIndicadorDto) => {
   indicatorsConfig.value.set(id, indicatorCardCopy)
 }
 
-const handleApplyToAll = (config: Partial<BOCardIndicadorDto>) => {
+const handleApplyToAll = async (config: Partial<BOCardIndicadorDto>) => {
   // Apply the configuration to all displayed indicators
-  displayIndicators.value.forEach((indicator) => {
+  const updatedConfigs = new Map<number, BOCardIndicadorDto>()
+
+  // Pre-load periods for all indicators if period type is specified
+  const periodLoadPromises: Promise<void>[] = []
+
+  for (const indicator of displayIndicators.value) {
     const existingConfig = indicatorsConfig.value.get(indicator.idindicador) || {
       idindicador: indicator.idindicador,
       tipoterritorio: null,
@@ -833,6 +860,8 @@ const handleApplyToAll = (config: Partial<BOCardIndicadorDto>) => {
       elementos: [],
       desde: '',
       hasta: '',
+      tiposeleccion: 'range',
+      periodomultiple: '',
     }
 
     // Update the configuration
@@ -842,28 +871,47 @@ const handleApplyToAll = (config: Partial<BOCardIndicadorDto>) => {
       tipoperiodo: config.tipoperiodo || null,
       desde: config.desde || '',
       hasta: config.hasta || '',
+      tiposeleccion: config.tiposeleccion || 'range',
+      periodomultiple: config.periodomultiple || '',
     }
 
-    indicatorsConfig.value.set(indicator.idindicador, updatedConfig)
-    // Call function pasteConfiguration of child component IndicatorCard
-  })
-  notificationStore.success('Configuración aplicada a todos los indicadores')
-}
+    updatedConfigs.set(indicator.idindicador, updatedConfig)
 
-const handleCopyConfig = (indicatorId: number, config: Partial<BOCardIndicadorDto>) => {
-  // Store the copied configuration globally
-  const copiedConfig = {
-    elementos: config.elementos || [],
-    tipoperiodo: config.tipoperiodo,
-    desde: config.desde,
-    hasta: config.hasta,
+    // Load period options if period type is set and cache them
+    if (config.tipoperiodo) {
+      const cacheKey = `${indicator.idindicador}-${config.tipoperiodo}`
+      if (!periodsCache.value.has(cacheKey)) {
+        const loadPromise = getPeriodByIdTipoAndIdIndicador(
+          config.tipoperiodo,
+          indicator.idindicador,
+        )
+          .then((periods) => {
+            // Cache the periods for this indicator and period type
+            periodsCache.value.set(cacheKey, periods)
+          })
+          .catch((error) => {
+            console.error('Error loading periods for indicator:', indicator.idindicador, error)
+          })
+        periodLoadPromises.push(loadPromise)
+      }
+    }
   }
-  indicatorConfigStore.copyIndicatorConfig(copiedConfig)
-  notificationStore.success(`Configuración copiada del indicador ${indicatorId}`)
-}
 
-const handlePasteConfig = (indicatorId: number) => {
-  notificationStore.success(`Configuración pegada en el indicador ${indicatorId}`)
+  // Wait for all periods to load before applying configs
+  if (periodLoadPromises.length > 0) {
+    await Promise.all(periodLoadPromises)
+  }
+
+  // Apply all updates at once to ensure reactivity
+  for (const [id, config] of updatedConfigs) {
+    indicatorsConfig.value.set(id, config)
+  }
+
+  // Force re-render by incrementing the key
+  configUpdateKey.value++
+
+  await nextTick()
+  notificationStore.success('Configuración aplicada a todos los indicadores')
 }
 
 // Filtros modal

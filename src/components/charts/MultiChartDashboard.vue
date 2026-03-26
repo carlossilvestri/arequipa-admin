@@ -1,92 +1,70 @@
 <template>
-  <div class="bg-gray-50 p-0 md:p-6">
+  <div class="bg-gray-50 p-0">
     <!-- Gráfico principal (para otros tipos) -->
     <div
-      class="flex justify-center md:justify-between items-start mt-4 bg-white shadow-sm rounded-t-lg border-t border-l border-r"
+      class="flex justify-center md:justify-between items-start bg-gray shadow-sm rounded-t-lg border-t border-l border-r py-5 pr-4"
     >
-      <h2 class="text-lg font-semibold text-gray-800 pl-5 pt-2 hidden md:block"></h2>
-      <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0">
+      <h2 class="text-lg font-semibold text-blue-900 pl-5 pt-2 hidden md:block">
+        Vista del gráfico
+      </h2>
+      <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 items-center">
         <!-- Leyenda -->
-        <div class="flex-1">
-          <div class="m-2 sm:m-3 p-2 sm:p-3 flex flex-col border border-gray-100 rounded-2xl">
+        <div class="flex-1 border-r border-gray-200">
+          <div class="p-2 sm:p-3 flex flex-col">
             <div
-              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 pb-3"
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0"
             >
-              <h3 class="text-sm font-medium text-gray-700 sm:pr-5">Leyenda</h3>
               <Button
                 :variant="showLegend ? 'outline' : 'primary'"
                 class="shrink-0 w-full sm:w-auto"
                 @click="toggleLegend"
                 className="px-4! py-1!"
               >
-                {{ showLegend ? 'Ocultar' : 'Mostrar' }}
+                {{ showLegend ? 'Ocultar' : 'Mostrar' }} leyenda
               </Button>
             </div>
           </div>
         </div>
         <!-- Valores -->
-        <div class="flex-1 sm:flex-none">
-          <div class="m-2 sm:m-3 p-2 sm:p-3 flex flex-col border border-gray-100 rounded-2xl">
+        <div class="flex-1 sm:flex-none border-r border-gray-200">
+          <div class="p-2 sm:p-3 flex space-x-3 justify-center">
             <div
-              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 pb-3"
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0"
             >
-              <h3 class="text-sm font-medium text-gray-700">Valores</h3>
               <Button
                 :variant="showDataLabels ? 'outline' : 'primary'"
                 class="shrink-0 w-full sm:w-auto"
                 @click="toggleDataLabels"
                 className="px-4! py-1!"
               >
-                {{ showDataLabels ? 'Ocultar' : 'Mostrar' }}
+                {{ showDataLabels ? 'Ocultar' : 'Mostrar' }} valores
               </Button>
             </div>
             <div class="flex items-center space-x-2">
-              <label class="text-sm text-gray-600">Tamaño:</label>
               <input v-model="dataLabelsSize" type="range" min="8" max="20" class="w-20" />
               <span class="text-sm text-gray-600 w-8">{{ dataLabelsSize }}px</span>
             </div>
           </div>
         </div>
         <!-- Tooltip -->
-        <div class="flex-1">
-          <div class="m-2 sm:m-3 p-2 sm:p-3 flex flex-col border border-gray-100 rounded-2xl">
+        <div class="flex-1 border-r border-gray-200">
+          <div class="p-2 sm:p-3 flex flex-col">
             <div
-              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 pb-3"
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0"
             >
-              <h3 class="text-sm font-medium text-gray-700 sm:pr-5">Tooltip</h3>
               <Button
                 :variant="showTooltip ? 'outline' : 'primary'"
                 class="shrink-0 w-full sm:w-auto"
                 @click="toggleTooltip"
                 className="px-4! py-1!"
               >
-                {{ showTooltip ? 'Ocultar' : 'Mostrar' }}
+                {{ showTooltip ? 'Ocultar' : 'Mostrar' }} tooltip
               </Button>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="bg-white rounded-b-xl shadow-sm pb-4 pr-2 md:p-4 mb-6 flex flex-col">
-      <div class="flex-1 w-full" style="min-height: 400px">
-        <VueApexCharts
-          :key="chartKey"
-          :options="chartOptions"
-          :series="series"
-          :type="currentChartType === 'pie' ? 'pie' : 'line'"
-          height="100%"
-          width="100%"
-          ref="mainChart"
-        />
-      </div>
-    </div>
-
-    <!-- Botones de exportación -->
-    <div class="bg-white rounded-xl shadow-sm p-4">
-      <div class="flex flex-wrap gap-3 justify-left">
-        <div class="flex flex-col space-y-2">
-          <span class="text-sm font-medium text-gray-700">Exportar Datos:</span>
-          <div class="flex items-center space-x-3">
+        <div class="flex-1">
+          <div class="flex items-center space-x-3 ml-3">
             <button
               @click="exportToCSV"
               :disabled="
@@ -123,6 +101,19 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="bg-white rounded-b-xl shadow-sm pr-2 md:p-4 flex flex-col">
+      <div class="flex-1 w-full" style="min-height: 400px">
+        <VueApexCharts
+          :key="chartKey"
+          :options="chartOptions"
+          :series="series"
+          :type="currentChartType === 'pie' ? 'pie' : 'line'"
+          height="100%"
+          width="100%"
+          ref="mainChart"
+        />
       </div>
     </div>
   </div>
