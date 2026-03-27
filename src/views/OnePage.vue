@@ -306,7 +306,7 @@
           </div>
 
           <!-- Contenido scrollable -->
-          <div class="flex-1 overflow-y-auto px-2 pb-0">
+          <div class="flex-1 overflow-y-auto px-2 pb-0 mt-[300px] sm:mt-[170px] lg:mt-0">
             <!-- Loading -->
             <div v-if="loadingIndicators" class="mt-6 flex items-center justify-center px-2 py-14">
               <div class="flex items-center gap-3 text-gray-600 dark:text-gray-300">
@@ -345,7 +345,7 @@
                   </div>
                 </div>
                 <div
-                  class="rounded-xl border border-gray-200 dark:border-gray-800 overflow-y-auto max-h-[300px] lg:max-h-[calc(100vh-20rem)] relative md:mt-2"
+                  class="rounded-xl border border-gray-200 dark:border-gray-800 overflow-y-auto max-h-[400px] sm:max-h-[500px] lg:max-h-[calc(100vh-20rem)] relative md:mt-2"
                 >
                   <ul class="divide-y divide-gray-200 dark:divide-gray-800 bg-gray-50">
                     <li v-for="g in treeData" :key="g.id" class="py-2">
@@ -649,6 +649,7 @@ import HeaderOnePage from '@/components/common/custom/HeaderOnePage.vue'
 import type {
   BOCardIndicadorDto,
   BOIndicadorDto,
+  BOIndicadorElemento,
   GenerateIndicatorRequest,
   IndicatorRequest,
   Serie,
@@ -720,6 +721,25 @@ const handleClickGenerateGraphic = async () => {
       notificationStore.error(`Debe seleccionar al menos un territorio`)
       error = true
     }
+
+    // Validar que todos los indicadores tengan el mismo tiposeleccion
+    const activeIndicators = Array.from(indicatorsConfig.value.values()).filter((indicator) =>
+      indicator.elementos.some((element) => element.checked),
+    )
+
+    if (activeIndicators.length > 1) {
+      const selectionTypes = activeIndicators.map((indicator) => indicator.tiposeleccion)
+      const uniqueSelectionTypes = [...new Set(selectionTypes)]
+
+      if (uniqueSelectionTypes.length > 1) {
+        notificationStore.error(
+          'Todos los indicadores deben tener el mismo tipo de selección (Por rango o Múltiple)',
+        )
+        loadingGenerateGraphics.value = false
+        return
+      }
+    }
+
     for (const [, indicator] of indicatorsConfig.value) {
       // Validaciones:
       const checkedElements = indicator.elementos.filter((element) => element.checked)
@@ -780,7 +800,7 @@ const handleClickGenerateGraphic = async () => {
     responseTransformed.objeto.series = responseTransformed.objeto.series.map((serie: Serie) => {
       return {
         ...serie,
-        nombreindicador: `${serie.nombreindicador} - ${serie.nombretipoterritorio} - ${serie.nombreterritorio}`,
+        nombreindicador: `${serie.nombreindicador} [${serie.nombretipoterritorio} - ${serie.nombreterritorio}]`,
       }
     })
 
@@ -796,7 +816,7 @@ const handleClickGenerateGraphic = async () => {
         const indicatorsWithNoValues = copyResponseObject.series.filter(
           (serie: Serie) => serie.valores.length === 0,
         )
-        notificationStore.error(
+        notificationStore.warning(
           `Los siguientes indicadores no tienen datos para el tipo de período y territorio seleccionado: ${indicatorsWithNoValues.map((serie: Serie) => serie.nombreindicador).join(', ')}`,
         )
       } else {
@@ -805,11 +825,6 @@ const handleClickGenerateGraphic = async () => {
       // Esperar a que el DOM se actualice y luego hacer scroll al div con id step-3
       nextTick(() => {
         document.getElementById('step-3')?.scrollIntoView({ behavior: 'smooth' })
-        /*
-        setTimeout(() => {
-          document.querySelector('.apexcharts-legend')?.classList.add('block!')
-        }, 500)
-        */
       })
     }
   } finally {
@@ -851,6 +866,9 @@ const handleApplyToAll = async (config: Partial<BOCardIndicadorDto>) => {
   // Pre-load periods for all indicators if period type is specified
   const periodLoadPromises: Promise<void>[] = []
 
+  // Track indicators that couldn't receive certain elements
+  const incompatibilityWarnings: Record<string, string[]> = {}
+
   for (const indicator of displayIndicators.value) {
     const existingConfig = indicatorsConfig.value.get(indicator.idindicador) || {
       idindicador: indicator.idindicador,
@@ -864,21 +882,71 @@ const handleApplyToAll = async (config: Partial<BOCardIndicadorDto>) => {
       periodomultiple: '',
     }
 
-    // Update the configuration
+    // Check if elements and period type are compatible with this indicator
+    const compatibleElements: BOIndicadorElemento[] = []
+    const incompatibleElements: string[] = []
+    let periodTypeCompatible = true
+
+    // Check territory elements compatibility
+    if (config.elementos && config.elementos.length > 0) {
+      // Get available territory types for this indicator
+      const availableTerritoryTypes = indicator.tiposterritorio.map((tt) => tt.idtipoterritorio)
+
+      for (const element of config.elementos) {
+        const elementTerritoryTypeId = Number(element.tipoterritorio.value)
+
+        // Check if the territory type exists in this indicator
+        if (availableTerritoryTypes.includes(elementTerritoryTypeId)) {
+          compatibleElements.push(element)
+        } else {
+          incompatibleElements.push(
+            `[${element.territorio.label} - ${element.tipoterritorio.label}]`,
+          )
+        }
+      }
+
+      // If there are incompatible elements, add to warnings
+      if (incompatibleElements.length > 0) {
+        if (!incompatibilityWarnings[indicator.nombreindicador]) {
+          incompatibilityWarnings[indicator.nombreindicador] = []
+        }
+        incompatibilityWarnings[indicator.nombreindicador].push(
+          `No se pudo agregar el territorio ${incompatibleElements.join(', ')}`,
+        )
+      }
+    }
+
+    // Check period type compatibility
+    if (config.tipoperiodo) {
+      const availablePeriodTypes = indicator.tiposperiodo.map((tp) => tp.idtipoperiodo)
+      const configPeriodTypeId = Number(config.tipoperiodo)
+
+      if (!availablePeriodTypes.includes(configPeriodTypeId)) {
+        periodTypeCompatible = false
+        if (!incompatibilityWarnings[indicator.nombreindicador]) {
+          incompatibilityWarnings[indicator.nombreindicador] = []
+        }
+        incompatibilityWarnings[indicator.nombreindicador].push(
+          `No se pudo agregar el tipo de período`,
+        )
+      }
+    }
+
+    // Update the configuration with compatible elements and period type only
     const updatedConfig = {
       ...existingConfig,
-      elementos: config.elementos || [],
-      tipoperiodo: config.tipoperiodo || null,
-      desde: config.desde || '',
-      hasta: config.hasta || '',
-      tiposeleccion: config.tiposeleccion || 'range',
-      periodomultiple: config.periodomultiple || '',
+      elementos: compatibleElements,
+      tipoperiodo: periodTypeCompatible ? config.tipoperiodo || null : null,
+      desde: periodTypeCompatible ? config.desde || '' : '',
+      hasta: periodTypeCompatible ? config.hasta || '' : '',
+      tiposeleccion: periodTypeCompatible ? config.tiposeleccion || 'range' : 'range',
+      periodomultiple: periodTypeCompatible ? config.periodomultiple || '' : '',
     }
 
     updatedConfigs.set(indicator.idindicador, updatedConfig)
 
-    // Load period options if period type is set and cache them
-    if (config.tipoperiodo) {
+    // Load period options if period type is set, compatible, and cache them
+    if (config.tipoperiodo && periodTypeCompatible) {
       const cacheKey = `${indicator.idindicador}-${config.tipoperiodo}`
       if (!periodsCache.value.has(cacheKey)) {
         const loadPromise = getPeriodByIdTipoAndIdIndicador(
@@ -911,7 +979,23 @@ const handleApplyToAll = async (config: Partial<BOCardIndicadorDto>) => {
   configUpdateKey.value++
 
   await nextTick()
+
+  // Show success message
   notificationStore.success('Configuración aplicada a todos los indicadores')
+
+  // Show incompatibility warnings if any
+  const warningCount = Object.keys(incompatibilityWarnings).length
+  if (warningCount > 0) {
+    // Use setTimeout to show the warning after the success message
+    setTimeout(() => {
+      Object.entries(incompatibilityWarnings).forEach(([indicatorName, warnings], index) => {
+        setTimeout(() => {
+          const message = `En el proceso de aplicar configuración, algunos valores en el indicador de destino: "${indicatorName}" .<br> - ${warnings.join('<br> - ')}`
+          notificationStore.warning(message, 'Advertencia', 9000)
+        }, index * 1000) // Stagger warnings by 1000ms
+      })
+    }, 100)
+  }
 }
 
 // Filtros modal

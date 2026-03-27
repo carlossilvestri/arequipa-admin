@@ -19,7 +19,7 @@ export const useNotificationStore = defineStore('notification', {
   actions: {
     notify(payload: Omit<Notification, 'id'>) {
       const id = idCounter++
-      const duration = payload.duration ?? 4000
+      const duration = payload.duration ?? 5000
       const item: Notification = { id, ...payload }
       this.notifications.push(item)
       if (duration > 0) {
@@ -38,6 +38,9 @@ export const useNotificationStore = defineStore('notification', {
     },
     remove(id: number) {
       this.notifications = this.notifications.filter((n) => n.id !== id)
+    },
+    warning(message: string, title = 'Advertencia', duration?: number) {
+      return this.notify({ message, title, variant: 'warning', duration })
     },
   },
 })

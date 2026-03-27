@@ -1,13 +1,19 @@
 <template>
-  <div class="fixed top-25 right-6 z-2 space-y-3">
-    <transition-group name="fade" tag="div">
-      <div v-for="n in notifications" :key="n.id">
+  <div class="fixed top-25 right-6 z-100">
+    <transition-group name="fade" tag="div" class="flex flex-col items-end">
+      <div
+        v-for="n in notifications"
+        :key="n.id"
+        :class="{ 'mt-3': notifications.indexOf(n) > 0 }"
+        class="w-fit"
+      >
         <Alert
-          :class="{ 'mt-2': notifications.indexOf(n) > 0 }"
           :variant="n.variant"
           :title="n.title!"
           :message="n.message"
           :showLink="false"
+          :showClose="true"
+          @close="store.remove(n.id)"
         />
       </div>
     </transition-group>

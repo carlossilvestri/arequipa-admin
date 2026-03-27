@@ -80,7 +80,9 @@
     <!-- Contenido principal -->
     <div>
       <div class="px-6 pt-3 pb-2">
-        <p class="text-sm">Agregue territorios y seleccione cuáles desea mostrar en la gráfica</p>
+        <p class="text-[0.70rem]">
+          Agregue territorios y seleccione cuáles desea mostrar en la gráfica
+        </p>
         <div class="mt-3">
           <div class="md:grid grid-cols-12 gap-2 flex">
             <div class="col-span-5">
@@ -267,11 +269,9 @@
           </div>
         </div>
       </div>
-      <hr class="border-gray-100" />
-      <div class="px-6 pt-3 pb-3">
+      <div class="px-6">
         <!-- Opciones de selección -->
-        <div class="flex">
-          <label class="block text-[13px] font-medium mr-4 text-gray-700">Tipo de selección</label>
+        <div class="flex justify-center pt-1">
           <div class="flex justify-center space-x-4">
             <label
               class="flex items-center cursor-pointer"
@@ -304,7 +304,6 @@
           </div>
         </div>
       </div>
-      <hr class="border-gray-100" />
 
       <div class="px-6 py-3">
         <div class="grid grid-cols-12 gap-4">
@@ -352,7 +351,7 @@
           size="md"
           @click="applyConfigToAll"
           :loading="false"
-          class="p-3 w-full"
+          class="p-3 w-full text-[13px]!"
         >
           Aplicar esta configuración a todos los indicadores
         </Button>

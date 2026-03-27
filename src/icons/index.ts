@@ -46,6 +46,7 @@ import UserGroupIcon from './UserGroupIcon.vue'
 import BellIcon from './BellIcon.vue'
 import BarChartIcon from './BarChartIcon.vue'
 import EditIcon from './EditIcon.vue'
+import XIcon from './XIcon.vue'
 
 export {
   BellIcon,
@@ -96,4 +97,5 @@ export {
   SendIcon,
   DraftIcon,
   EditIcon,
+  XIcon,
 }
