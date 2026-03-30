@@ -33,6 +33,11 @@ export const useNotificationStore = defineStore('notification', {
     error(message: string, title = 'Error', duration?: number) {
       return this.notify({ message, title, variant: 'error', duration })
     },
+    delayedError(message: string, title = 'Error', duration?: number, delay = 1000) {
+      setTimeout(() => {
+        this.notify({ message, title, variant: 'error', duration })
+      }, delay)
+    },
     info(message: string, title = 'Información', duration?: number) {
       return this.notify({ message, title, variant: 'info', duration })
     },

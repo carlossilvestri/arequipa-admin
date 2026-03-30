@@ -740,39 +740,52 @@ const handleClickGenerateGraphic = async () => {
       }
     }
 
-    for (const [, indicator] of indicatorsConfig.value) {
+    let i = 0
+    for (const [, indicatorCard] of indicatorsConfig.value) {
+      i++
       // Validaciones:
-      const checkedElements = indicator.elementos.filter((element) => element.checked)
+      const checkedElements = indicatorCard.elementos.filter((element) => element.checked)
+
+      // Obtener el nombre del indicador desde la lista original
+      const indicator = indicators.value.find(
+        (ind) => ind.idindicador === indicatorCard.idindicador,
+      )
+      const indicatorName = indicator?.nombreindicador
 
       for (const element of checkedElements) {
-        if (!indicator.tipoperiodo) {
-          notificationStore.error('Debe seleccionar un tipo de periodo')
+        let notificatioError = `<p class="font-bold">${indicatorName}</p>`
+        if (!indicatorCard.tipoperiodo) {
+          notificatioError += '<p class="pl-3"> - Debe seleccionar un tipo de periodo</p>'
+          //notificationStore.error(notificatioError)
           error = true
         }
-        if (!indicator.desde && indicator.tiposeleccion === 'range') {
-          notificationStore.error('Debe completar desde')
+        if (!indicatorCard.desde && indicatorCard.tiposeleccion === 'range') {
+          notificatioError += '<p class="pl-3"> - Debe completar desde</p>'
+          //notificationStore.error(`<p class="font-bold">${indicatorName}</p> <p>Debe completar desde</p>`)
           error = true
         }
-        if (!indicator.hasta && indicator.tiposeleccion === 'range') {
-          notificationStore.error('Debe completar hasta')
+        if (!indicatorCard.hasta && indicatorCard.tiposeleccion === 'range') {
+          notificatioError += '<p class="pl-3"> - Debe completar hasta</p>'
+          //notificationStore.error(`<p class="font-bold">${indicatorName}</p> Debe completar hasta`)
           error = true
         }
         if (error) {
           loadingGenerateGraphics.value = false
-          return
+          notificationStore.delayedError(notificatioError, 'Error', 6000, i * 1500)
+          continue
         }
 
         transformedIndicators.push({
-          idindicador: indicator.idindicador,
+          idindicador: indicatorCard.idindicador,
           tipografica: element.chartseleccionado,
           idtipoterritorio: +element.tipoterritorio.value,
           idterritorio: +element.territorio.value,
-          idtipoperiodo: indicator.tipoperiodo!,
-          idperiododesde: +indicator.desde,
-          idperiodohasta: +indicator.hasta,
+          idtipoperiodo: indicatorCard.tipoperiodo!,
+          idperiododesde: +indicatorCard.desde,
+          idperiodohasta: +indicatorCard.hasta,
           periodomultiple:
-            indicator.tiposeleccion === 'multiple' && indicator.periodomultiple
-              ? indicator.periodomultiple
+            indicatorCard.tiposeleccion === 'multiple' && indicatorCard.periodomultiple
+              ? indicatorCard.periodomultiple
               : undefined,
         })
       }
@@ -900,7 +913,7 @@ const handleApplyToAll = async (config: Partial<BOCardIndicadorDto>) => {
           compatibleElements.push(element)
         } else {
           incompatibleElements.push(
-            `[${element.territorio.label} - ${element.tipoterritorio.label}]`,
+            `[${element.tipoterritorio.label} - ${element.territorio.label}]`,
           )
         }
       }
@@ -990,7 +1003,7 @@ const handleApplyToAll = async (config: Partial<BOCardIndicadorDto>) => {
     setTimeout(() => {
       Object.entries(incompatibilityWarnings).forEach(([indicatorName, warnings], index) => {
         setTimeout(() => {
-          const message = `En el proceso de aplicar configuración, algunos valores en el indicador de destino: "${indicatorName}" .<br> - ${warnings.join('<br> - ')}`
+          const message = `En el proceso de aplicar configuración, algunos valores no están disponibles en los indicadores de destino: <br> "${indicatorName}" <br> <p class="pl-3">- ${warnings.join('<br> - ')}</p>`
           notificationStore.warning(message, 'Advertencia', 9000)
         }, index * 1000) // Stagger warnings by 1000ms
       })
